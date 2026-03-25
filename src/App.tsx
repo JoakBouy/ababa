@@ -10,7 +10,6 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Terminals from './pages/Terminals';
 import TerminalDetail from './pages/TerminalDetail';
-import Billing from './pages/Billing';
 import Settings from './pages/Settings';
 
 export default function App() {
@@ -22,7 +21,6 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="terminals" element={<Terminals />} />
           <Route path="terminals/:id" element={<TerminalDetail />} />
-          <Route path="billing" element={<Billing />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

@@ -75,3 +75,25 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Leaflet Customizations */
+.leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
+}
+.leaflet-popup-tip {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+.custom-leaflet-icon {
+  background: transparent;
+  border: none;
+}
+.leaflet-popup-close-button {
+  display: none !important;
+}
