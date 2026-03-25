@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -8,7 +8,9 @@ import {
   Menu,
   Search,
   Bell,
-  UserCircle
+  UserCircle,
+  AlertTriangle,
+  Info
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -19,11 +21,36 @@ export function cn(...inputs: ClassValue[]) {
 
 export default function Layout() {
   const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const notifRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Terminals', path: '/terminals', icon: Satellite },
     { name: 'Settings', path: '/settings', icon: Settings },
+  ];
+
+  const mockAlerts = [
+    { id: 1, title: 'Obstruction Detected', desc: 'Terminal EA-JUB-009 (Juba A2) is reporting physical obstruction.', time: '10m ago', type: 'error' },
+    { id: 2, title: 'Terminal Offline', desc: 'Terminal EA-ZNZ-021 lost connection.', time: '1h ago', type: 'error' },
+    { id: 3, title: 'Firmware Update', desc: 'EA-KMP-014 successfully updated to v2.4.1', time: '2h ago', type: 'info' },
   ];
 
   return (
@@ -94,12 +121,94 @@ export default function Layout() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border-2 border-surface-container-lowest"></span>
-            </button>
-            <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label font-bold text-sm cursor-pointer">
-              AR
+            {/* Notifications Dropdown */}
+            <div className="relative" ref={notifRef}>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors relative"
+              >
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border-2 border-surface-container-lowest"></span>
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                  <div className="p-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low/50">
+                    <h3 className="font-headline font-bold text-on-surface">Alerts & Notifications</h3>
+                    <span className="text-xs font-bold bg-error/10 text-error px-2 py-0.5 rounded-full">2 New</span>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {mockAlerts.map(alert => (
+                      <div key={alert.id} className="p-4 border-b border-outline-variant/10 hover:bg-surface-container/50 transition-colors cursor-pointer flex gap-3">
+                        <div className={cn("mt-0.5 shrink-0", alert.type === 'error' ? 'text-error' : 'text-primary')}>
+                          {alert.type === 'error' ? <AlertTriangle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-on-surface">{alert.title}</h4>
+                          <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">{alert.desc}</p>
+                          <span className="text-[10px] font-bold text-on-surface-variant/70 uppercase tracking-wider mt-2 block">{alert.time}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-3 text-center border-t border-outline-variant/30 bg-surface-container-low/50">
+                    <button className="text-xs font-bold text-primary hover:underline uppercase tracking-wider">View All History</button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Profile Dropdown */}
+            <div className="relative" ref={profileRef}>
+              <div 
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label font-bold text-sm cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+              >
+                AR
+              </div>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                  <div className="p-4 border-b border-outline-variant/30">
+                    <p className="text-sm font-bold text-on-surface">Alex Rodriguez</p>
+                    <p className="text-xs text-on-surface-variant truncate">admin@enjojofoundation.org</p>
+                  </div>
+                  <div className="p-2">
+                    <button 
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        navigate('/settings');
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-md transition-colors"
+                    >
+                      <UserCircle className="w-4 h-4" />
+                      My Profile
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        navigate('/settings');
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-md transition-colors"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Account Settings
+                    </button>
+                  </div>
+                  <div className="p-2 border-t border-outline-variant/30">
+                    <button 
+                      onClick={() => {
+                        alert('Logged out successfully.');
+                        setShowProfileMenu(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error hover:bg-error/10 rounded-md transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
