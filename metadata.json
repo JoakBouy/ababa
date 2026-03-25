@@ -1,0 +1,5 @@
+{
+  "name": "Enjojo Foundation Command Centre",
+  "description": "A Starlink API dashboard for managing and monitoring terminal fleets.",
+  "requestFramePermissions": []
+}
