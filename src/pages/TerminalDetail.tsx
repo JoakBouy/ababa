@@ -18,6 +18,9 @@ import {
   Lock,
   Loader2
 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
 // Need to import cn
 import { clsx, type ClassValue } from 'clsx';
@@ -26,6 +29,33 @@ import { twMerge } from 'tailwind-merge';
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+// Fix for default marker icon in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const createCustomIcon = (status: string) => {
+  const isOnline = status === 'online';
+  const colorClass = isOnline ? 'bg-[#005477]' : 'bg-error';
+  const shadowColor = isOnline ? 'rgba(0,84,119,0.8)' : 'rgba(186,26,26,0.8)';
+  
+  return L.divIcon({
+    className: 'custom-leaflet-icon',
+    html: `
+      <div class="relative flex items-center justify-center w-6 h-6">
+        <div class="absolute w-full h-full rounded-full animate-ping opacity-40 ${colorClass}"></div>
+        <div class="relative w-3 h-3 rounded-full border-2 border-white ${colorClass}" style="box-shadow: 0 0 10px ${shadowColor}"></div>
+      </div>
+    `,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
+  });
+};
 
 export default function TerminalDetail() {
   const { id } = useParams();
@@ -45,6 +75,14 @@ export default function TerminalDetail() {
   // Config States
   const [dishConfig, setDishConfig] = useState({ snowMeltMode: 'auto', powerSaving: false });
   const [wifiConfig, setWifiConfig] = useState({ ssid: 'STARLINK_BDR_082', password: '••••••••', hideSsid: false, bypassMode: false });
+
+  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+  const tileUrl = mapboxToken 
+    ? `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
+    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+  const attribution = mapboxToken
+    ? 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
+    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
   // Simulate initial data fetch
   useEffect(() => {
@@ -276,9 +314,40 @@ export default function TerminalDetail() {
 
         </div>
 
-        {/* Right Column - WiFi Config */}
+        {/* Right Column - Location & WiFi Config */}
         <div className="space-y-6">
           
+          {/* Location Map */}
+          <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 shadow-sm p-6 overflow-hidden flex flex-col">
+            <h2 className="text-xl font-headline font-bold text-on-surface flex items-center gap-2 mb-6">
+              <MapPin className="w-5 h-5 text-primary" />
+              Location
+            </h2>
+            <div className="h-[250px] relative bg-[#e5e7eb] rounded-xl overflow-hidden z-0">
+              <MapContainer 
+                center={[location.lat, location.lng]} 
+                zoom={12} 
+                scrollWheelZoom={false} 
+                zoomControl={true}
+                className="absolute inset-0 w-full h-full"
+              >
+                <TileLayer
+                  attribution={attribution}
+                  url={tileUrl}
+                />
+                <Marker position={[location.lat, location.lng]} icon={createCustomIcon('online')}>
+                  <Popup>
+                    <div className="p-1 font-body text-sm font-bold">{id || 'SS-UG_BDR_082'}</div>
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+            <div className="mt-4 flex justify-between items-center text-sm">
+              <span className="text-on-surface-variant">Coordinates</span>
+              <span className="font-mono font-medium">{location.lat.toFixed(4)}, {location.lng.toFixed(4)}</span>
+            </div>
+          </div>
+
           {/* WiFi Configuration */}
           <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 shadow-sm p-6">
             <div className="flex justify-between items-center mb-6">

@@ -10,7 +10,9 @@ import {
   Bell,
   UserCircle,
   AlertTriangle,
-  Info
+  Info,
+  BarChart3,
+  HeartHandshake
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -45,6 +47,8 @@ export default function Layout() {
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Terminals', path: '/terminals', icon: Satellite },
+    { name: 'Analytics & Impact', path: '/analytics', icon: BarChart3 },
+    { name: 'Community Impact', path: '/impact', icon: HeartHandshake },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
