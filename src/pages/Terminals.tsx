@@ -13,16 +13,13 @@ import {
   Plus,
   Server
 } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../utils/cn';
+import { useToast } from '../contexts/ToastContext';
 
 export default function Terminals() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
@@ -98,9 +95,9 @@ export default function Terminals() {
               </tr>
             </thead>
             <tbody>
-              {terminals.map((term, i) => (
-                <tr 
-                  key={i} 
+              {terminals.map((term) => (
+                <tr
+                  key={term.id}
                   onClick={() => navigate(`/terminals/${term.id}`)}
                   className="border-b border-outline-variant/10 hover:bg-surface-container/50 transition-colors cursor-pointer group"
                 >
@@ -216,9 +213,9 @@ export default function Terminals() {
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={() => {
-                  alert('Terminal added successfully.');
+                  toast('Terminal added successfully.', 'success');
                   setIsAddModalOpen(false);
                 }}
                 className="px-5 py-2.5 rounded-full bg-primary text-on-primary font-label font-medium hover:bg-primary/90 transition-colors shadow-sm"

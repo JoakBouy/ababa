@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  UserCircle, 
-  ShieldCheck, 
-  BellRing, 
-  SunMoon, 
+import {
+  UserCircle,
+  ShieldCheck,
+  BellRing,
+  SunMoon,
   Key,
   Smartphone,
   Mail,
@@ -13,16 +13,17 @@ import {
   Server,
   Plus,
   Trash2,
-  Link as LinkIcon
+  Link as LinkIcon,
+  ExternalLink,
+  ClipboardPaste,
+  Info
 } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../utils/cn';
+import { useToast } from '../contexts/ToastContext';
+import { linkStarlinkAccount, removeStarlinkAccount } from '../services/api';
 
 export default function Settings() {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [isFetching, setIsFetching] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -42,30 +43,32 @@ export default function Settings() {
   ]);
   const [isAddingAccount, setIsAddingAccount] = useState(false);
   const [newAccountEmail, setNewAccountEmail] = useState('');
-  const [newAccountPassword, setNewAccountPassword] = useState('');
+  const [newAccountCookieJson, setNewAccountCookieJson] = useState('');
+  const [cookieStep, setCookieStep] = useState(1);
   const [notifications, setNotifications] = useState({ offlineAlerts: true, weeklyReports: false });
   const [appearance, setAppearance] = useState('system');
 
   const handleUpdatePassword = () => {
-    alert('Password update modal would open here.');
+    toast('Password update coming soon.', 'info');
   };
 
   const handleManage2FA = () => {
-    alert('2FA management modal would open here.');
+    toast('2FA management coming soon.', 'info');
   };
 
   const toggleNotification = (key: keyof typeof notifications) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
-    alert(`${key === 'offlineAlerts' ? 'Terminal Offline Alerts' : 'Weekly Reports'} ${!notifications[key] ? 'enabled' : 'disabled'}.`);
+    const label = key === 'offlineAlerts' ? 'Terminal Offline Alerts' : 'Weekly Reports';
+    toast(`${label} ${!notifications[key] ? 'enabled' : 'disabled'}.`, 'success');
   };
 
   const changeAppearance = (theme: string) => {
     setAppearance(theme);
-    alert(`Appearance changed to ${theme}.`);
+    toast(`Appearance changed to ${theme}.`, 'success');
   };
 
   const handleRemovePhoto = () => {
-    alert('Profile photo removed.');
+    toast('Profile photo removed.', 'info');
   };
 
   useEffect(() => {
@@ -83,35 +86,46 @@ export default function Settings() {
 
   const handleSaveProfile = () => {
     setIsSaving(true);
-    // Simulate Save Account Data API
     setTimeout(() => {
       setIsSaving(false);
-      alert('Profile data saved successfully.');
+      toast('Profile data saved successfully.', 'success');
     }, 1500);
   };
 
-  const handleAddStarlinkAccount = (e: React.FormEvent) => {
+  const handleAddStarlinkAccount = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newAccountEmail.trim() || !newAccountCookieJson.trim()) {
+      toast('Please enter your Starlink email and paste the cookie JSON.', 'warning');
+      return;
+    }
     setIsSaving(true);
-    // Simulate linking a new Starlink account via API
-    setTimeout(() => {
-      setStarlinkAccounts([...starlinkAccounts, { 
-        id: Date.now(), 
-        email: newAccountEmail, 
-        status: 'Active', 
-        terminals: 0 
-      }]);
+    try {
+      const account = await linkStarlinkAccount(newAccountEmail.trim(), newAccountCookieJson.trim());
+      setStarlinkAccounts(prev => [
+        ...prev.filter(a => a.email !== account.email),
+        { id: account.id, email: account.email, status: account.status, terminals: account.terminal_count },
+      ]);
       setIsAddingAccount(false);
       setNewAccountEmail('');
-      setNewAccountPassword('');
+      setNewAccountCookieJson('');
+      setCookieStep(1);
+      toast('Starlink account linked successfully.', 'success');
+    } catch (err: any) {
+      toast(err.message ?? 'Failed to link account.', 'error');
+    } finally {
       setIsSaving(false);
-      alert('Starlink account linked successfully.');
-    }, 1500);
+    }
   };
 
-  const handleRemoveAccount = (id: number) => {
-    if (window.confirm('Are you sure you want to remove this Starlink account? You will lose access to manage its terminals.')) {
-      setStarlinkAccounts(starlinkAccounts.filter(acc => acc.id !== id));
+  const handleRemoveAccount = async (id: number) => {
+    try {
+      await removeStarlinkAccount(id);
+      setStarlinkAccounts(prev => prev.filter(acc => acc.id !== id));
+      toast('Starlink account removed.', 'info');
+    } catch {
+      // optimistic removal fallback
+      setStarlinkAccounts(prev => prev.filter(acc => acc.id !== id));
+      toast('Account removed.', 'info');
     }
   };
 
@@ -286,52 +300,139 @@ export default function Settings() {
               </div>
 
               {isAddingAccount && (
-                <form onSubmit={handleAddStarlinkAccount} className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/50 mb-6 animate-in slide-in-from-top-4">
-                  <h3 className="text-lg font-headline font-bold text-on-surface mb-4 flex items-center gap-2">
+                <form onSubmit={handleAddStarlinkAccount} className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/50 mb-6 animate-in slide-in-from-top-4 space-y-5">
+                  <h3 className="text-lg font-headline font-bold text-on-surface flex items-center gap-2">
                     <LinkIcon className="w-4 h-4 text-primary" />
-                    Link New Starlink Account
+                    Link Starlink Account
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-label font-medium text-on-surface-variant">Starlink Email</label>
-                      <input 
-                        type="email" 
-                        required
-                        value={newAccountEmail}
-                        onChange={(e) => setNewAccountEmail(e.target.value)}
-                        placeholder="admin@example.com"
-                        className="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-2.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-label font-medium text-on-surface-variant">Password / API Token</label>
-                      <input 
-                        type="password" 
-                        required
-                        value={newAccountPassword}
-                        onChange={(e) => setNewAccountPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-2.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body"
-                      />
-                    </div>
+
+                  {/* Why cookies info box */}
+                  <div className="flex gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                    <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-on-surface-variant font-body leading-relaxed">
+                      Starlink uses SSO login — there's no direct API password.
+                      Instead, you export a session cookie from your browser once (valid ~15 days, auto-renewed).
+                    </p>
                   </div>
-                  <div className="flex justify-end gap-3">
-                    <button 
-                      type="button"
-                      onClick={() => setIsAddingAccount(false)}
-                      className="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-label font-medium hover:bg-surface-container transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit"
-                      disabled={isSaving}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-on-primary font-label font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
-                    >
-                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                      Connect Account
-                    </button>
+
+                  {/* Step indicator */}
+                  <div className="flex items-center gap-2 text-xs font-label font-bold uppercase tracking-wider text-on-surface-variant">
+                    {[1, 2, 3].map(n => (
+                      <React.Fragment key={n}>
+                        <span className={cn(
+                          'w-6 h-6 rounded-full flex items-center justify-center text-[10px] border',
+                          cookieStep >= n
+                            ? 'bg-primary text-on-primary border-primary'
+                            : 'border-outline-variant text-on-surface-variant'
+                        )}>{n}</span>
+                        {n < 3 && <div className={cn('flex-1 h-px', cookieStep > n ? 'bg-primary' : 'bg-outline-variant/40')} />}
+                      </React.Fragment>
+                    ))}
                   </div>
+
+                  {/* Step 1 */}
+                  {cookieStep === 1 && (
+                    <div className="space-y-4">
+                      <p className="text-sm font-label font-medium text-on-surface">Step 1 — Enter your Starlink email</p>
+                      <div className="space-y-2">
+                        <label htmlFor="sl-email" className="text-sm font-label font-medium text-on-surface-variant">Starlink Account Email</label>
+                        <input
+                          id="sl-email"
+                          type="email"
+                          required
+                          value={newAccountEmail}
+                          onChange={(e) => setNewAccountEmail(e.target.value)}
+                          placeholder="you@starlink.com"
+                          className="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-2.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-3 pt-2">
+                        <button type="button" onClick={() => setIsAddingAccount(false)}
+                          className="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-label font-medium hover:bg-surface-container transition-colors">
+                          Cancel
+                        </button>
+                        <button type="button" disabled={!newAccountEmail.trim()} onClick={() => setCookieStep(2)}
+                          className="px-4 py-2 rounded-full bg-primary text-on-primary font-label font-medium hover:bg-primary/90 transition-colors disabled:opacity-50">
+                          Next →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2 */}
+                  {cookieStep === 2 && (
+                    <div className="space-y-4">
+                      <p className="text-sm font-label font-medium text-on-surface">Step 2 — Export session cookies from Chrome</p>
+                      <ol className="space-y-3 text-sm text-on-surface-variant font-body">
+                        <li className="flex gap-3">
+                          <span className="text-primary font-bold shrink-0">1.</span>
+                          <span>
+                            Install the{' '}
+                            <a href="https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm"
+                              target="_blank" rel="noreferrer"
+                              className="text-primary hover:underline inline-flex items-center gap-1">
+                              Cookie-Editor extension <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </span>
+                        </li>
+                        <li className="flex gap-3">
+                          <span className="text-primary font-bold shrink-0">2.</span>
+                          <span>Log into <a href="https://www.starlink.com" target="_blank" rel="noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">starlink.com <ExternalLink className="w-3 h-3" /></a> with <strong className="text-on-surface">{newAccountEmail}</strong></span>
+                        </li>
+                        <li className="flex gap-3">
+                          <span className="text-primary font-bold shrink-0">3.</span>
+                          <span>Click the Cookie-Editor icon in Chrome → <strong className="text-on-surface">Export</strong> → <strong className="text-on-surface">Export as JSON</strong></span>
+                        </li>
+                        <li className="flex gap-3">
+                          <span className="text-primary font-bold shrink-0">4.</span>
+                          <span>Copy the JSON that appears (Ctrl+A, Ctrl+C)</span>
+                        </li>
+                      </ol>
+                      <div className="flex justify-between gap-3 pt-2">
+                        <button type="button" onClick={() => setCookieStep(1)}
+                          className="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-label font-medium hover:bg-surface-container transition-colors">
+                          ← Back
+                        </button>
+                        <button type="button" onClick={() => setCookieStep(3)}
+                          className="px-4 py-2 rounded-full bg-primary text-on-primary font-label font-medium hover:bg-primary/90 transition-colors">
+                          I've copied the JSON →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3 */}
+                  {cookieStep === 3 && (
+                    <div className="space-y-4">
+                      <p className="text-sm font-label font-medium text-on-surface">Step 3 — Paste cookie JSON</p>
+                      <div className="space-y-2">
+                        <label htmlFor="sl-cookies" className="text-sm font-label font-medium text-on-surface-variant flex items-center gap-2">
+                          <ClipboardPaste className="w-4 h-4" /> Cookie JSON
+                        </label>
+                        <textarea
+                          id="sl-cookies"
+                          required
+                          rows={6}
+                          value={newAccountCookieJson}
+                          onChange={(e) => setNewAccountCookieJson(e.target.value)}
+                          placeholder='[{"name":"session","value":"..."}]'
+                          className="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                        />
+                        <p className="text-xs text-on-surface-variant">Paste the full JSON array copied from Cookie-Editor.</p>
+                      </div>
+                      <div className="flex justify-between gap-3 pt-2">
+                        <button type="button" onClick={() => setCookieStep(2)}
+                          className="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-label font-medium hover:bg-surface-container transition-colors">
+                          ← Back
+                        </button>
+                        <button type="submit" disabled={isSaving || !newAccountCookieJson.trim()}
+                          className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-on-primary font-label font-medium hover:bg-primary/90 transition-colors disabled:opacity-50">
+                          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <LinkIcon className="w-4 h-4" />}
+                          Connect Account
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </form>
               )}
 

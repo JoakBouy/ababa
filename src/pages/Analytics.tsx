@@ -42,8 +42,11 @@ export default function Analytics() {
     ];
   }, []);
 
-  // Custom tooltips
-  const CostTooltip = ({ active, payload }: any) => {
+  interface CostEntry { name: string; fullName: string; cost: number; plan: string }
+  interface UtilEntry { id: string; usage: number; uptime: number; devices: number; status: string }
+  interface TooltipProps<T> { active?: boolean; payload?: Array<{ payload: T }> }
+
+  const CostTooltip = ({ active, payload }: TooltipProps<CostEntry>) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -57,7 +60,7 @@ export default function Analytics() {
     return null;
   };
 
-  const UtilizationTooltip = ({ active, payload }: any) => {
+  const UtilizationTooltip = ({ active, payload }: TooltipProps<UtilEntry>) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

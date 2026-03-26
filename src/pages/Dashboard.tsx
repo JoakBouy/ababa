@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Satellite, 
-  Activity, 
-  AlertTriangle, 
-  Wifi, 
+import {
+  Activity,
+  AlertTriangle,
+  Wifi,
   ArrowRight,
   MapPin,
   TrendingUp,
@@ -16,41 +15,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { Map as LeafletMap } from 'leaflet';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { Map as LeafletMap } from 'leaflet';
+import { cn } from '../utils/cn';
+import { initLeafletIcons, createStatusIcon } from '../utils/leafletSetup';
 import { accounts, terminals } from '../data/mockData';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-// Fix for default marker icon in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-const createCustomIcon = (status: string) => {
-  const isOnline = status === 'online';
-  const colorClass = isOnline ? 'bg-[#005477]' : 'bg-error';
-  const shadowColor = isOnline ? 'rgba(0,84,119,0.8)' : 'rgba(186,26,26,0.8)';
-  
-  return L.divIcon({
-    className: 'custom-leaflet-icon',
-    html: `
-      <div class="relative flex items-center justify-center w-6 h-6">
-        <div class="absolute w-full h-full rounded-full animate-ping opacity-40 ${colorClass}"></div>
-        <div class="relative w-3 h-3 rounded-full border-2 border-white ${colorClass}" style="box-shadow: 0 0 10px ${shadowColor}"></div>
-      </div>
-    `,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12],
-  });
-};
+initLeafletIcons();
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -272,7 +242,7 @@ export default function Dashboard() {
                     weight: 1
                   }} 
                 />
-                <Marker position={term.coords} icon={createCustomIcon(term.status.toLowerCase())}>
+                <Marker position={term.coords} icon={createStatusIcon(term.status.toLowerCase())}>
                   <Popup>
                     <div className="p-1 font-body">
                       <div className="font-bold text-sm mb-1">{term.id}</div>
@@ -322,9 +292,9 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {filteredTerminals.slice(0, 10).map((term, i) => (
-                <tr 
-                  key={i} 
+              {filteredTerminals.slice(0, 10).map((term) => (
+                <tr
+                  key={term.id}
                   onClick={() => handleLocateTerminal(term.coords)}
                   className="border-b border-outline-variant/10 hover:bg-surface-container/50 transition-colors cursor-pointer"
                 >

@@ -20,46 +20,16 @@ import {
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { cn } from '../utils/cn';
+import { initLeafletIcons, createStatusIcon } from '../utils/leafletSetup';
+import { useToast } from '../contexts/ToastContext';
 
-// Need to import cn
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-// Fix for default marker icon in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-const createCustomIcon = (status: string) => {
-  const isOnline = status === 'online';
-  const colorClass = isOnline ? 'bg-[#005477]' : 'bg-error';
-  const shadowColor = isOnline ? 'rgba(0,84,119,0.8)' : 'rgba(186,26,26,0.8)';
-  
-  return L.divIcon({
-    className: 'custom-leaflet-icon',
-    html: `
-      <div class="relative flex items-center justify-center w-6 h-6">
-        <div class="absolute w-full h-full rounded-full animate-ping opacity-40 ${colorClass}"></div>
-        <div class="relative w-3 h-3 rounded-full border-2 border-white ${colorClass}" style="box-shadow: 0 0 10px ${shadowColor}"></div>
-      </div>
-    `,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12],
-  });
-};
+initLeafletIcons();
 
 export default function TerminalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Simulated API States
   const [isRebooting, setIsRebooting] = useState(false);
@@ -96,7 +66,7 @@ export default function TerminalDetail() {
     setIsRebooting(true);
     setTimeout(() => {
       setIsRebooting(false);
-      alert('Dish rebooted successfully.');
+      toast('Dish rebooted successfully.', 'success');
     }, 3000);
   };
 
@@ -104,7 +74,7 @@ export default function TerminalDetail() {
     setIsSavingDish(true);
     setTimeout(() => {
       setIsSavingDish(false);
-      alert('Dish configuration saved.');
+      toast('Dish configuration saved.', 'success');
     }, 1500);
   };
 
@@ -112,7 +82,7 @@ export default function TerminalDetail() {
     setIsSavingWifi(true);
     setTimeout(() => {
       setIsSavingWifi(false);
-      alert('WiFi configuration saved.');
+      toast('WiFi configuration saved.', 'success');
     }, 2000);
   };
 
@@ -335,7 +305,7 @@ export default function TerminalDetail() {
                   attribution={attribution}
                   url={tileUrl}
                 />
-                <Marker position={[location.lat, location.lng]} icon={createCustomIcon('online')}>
+                <Marker position={[location.lat, location.lng]} icon={createStatusIcon('online')}>
                   <Popup>
                     <div className="p-1 font-body text-sm font-bold">{id || 'SS-UG_BDR_082'}</div>
                   </Popup>

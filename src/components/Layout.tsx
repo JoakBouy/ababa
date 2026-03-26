@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Satellite, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Satellite,
+  Settings,
   LogOut,
   Menu,
   Search,
@@ -14,15 +14,14 @@ import {
   BarChart3,
   HeartHandshake
 } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../utils/cn';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 export default function Layout() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -119,12 +118,12 @@ export default function Layout() {
           </button>
           
           <div className="pt-4 border-t border-outline-variant/30 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shrink-0">
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex&backgroundColor=f0f0f0" alt="User" className="w-full h-full object-cover" />
+            <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 font-bold text-sm">
+              {user?.name?.substring(0, 2).toUpperCase() ?? 'OP'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-label font-bold text-on-surface truncate">Alex Rodriguez</p>
-              <p className="text-xs font-body text-on-surface-variant truncate">East Africa Region</p>
+              <p className="text-sm font-label font-bold text-on-surface truncate">{user?.name ?? 'Operator'}</p>
+              <p className="text-xs font-body text-on-surface-variant truncate">{user?.role ?? 'Fleet Manager'}</p>
             </div>
           </div>
         </div>
@@ -135,7 +134,8 @@ export default function Layout() {
         {/* Top App Bar */}
         <header className="h-16 bg-surface-container-lowest border-b border-outline-variant/30 flex items-center justify-between px-4 md:px-8 z-10">
           <div className="flex items-center gap-4">
-            <button 
+            <button
+              aria-label="Open navigation menu"
               className="md:hidden p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors"
               onClick={() => setShowMobileMenu(true)}
             >
@@ -154,7 +154,8 @@ export default function Layout() {
           <div className="flex items-center gap-4">
             {/* Notifications Dropdown */}
             <div className="relative" ref={notifRef}>
-              <button 
+              <button
+                aria-label="Toggle notifications"
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors relative"
               >
@@ -201,8 +202,8 @@ export default function Layout() {
               {showProfileMenu && (
                 <div className="absolute right-0 mt-2 w-56 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
                   <div className="p-4 border-b border-outline-variant/30">
-                    <p className="text-sm font-bold text-on-surface">Alex Rodriguez</p>
-                    <p className="text-xs text-on-surface-variant truncate">admin@enjojofoundation.org</p>
+                    <p className="text-sm font-bold text-on-surface">{user?.name ?? 'Operator'}</p>
+                    <p className="text-xs text-on-surface-variant truncate">{user?.email}</p>
                   </div>
                   <div className="p-2">
                     <button 
@@ -227,10 +228,12 @@ export default function Layout() {
                     </button>
                   </div>
                   <div className="p-2 border-t border-outline-variant/30">
-                    <button 
+                    <button
                       onClick={() => {
-                        alert('Logged out successfully.');
                         setShowProfileMenu(false);
+                        logout();
+                        toast('Signed out successfully.', 'info');
+                        navigate('/login');
                       }}
                       className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error hover:bg-error/10 rounded-md transition-colors"
                     >
