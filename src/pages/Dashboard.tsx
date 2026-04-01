@@ -1,88 +1,71 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
-  Activity,
-  AlertTriangle,
-  Wifi,
   ArrowRight,
-  MapPin,
-  TrendingUp,
   CheckCircle2,
-  Plus,
-  Minus,
+  Filter,
+  Loader2,
+  MapPin,
   Maximize,
-  Filter
+  Minus,
+  Plus,
+  Server,
+  TrendingUp,
+  Wifi,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import { Circle, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Map as LeafletMap } from 'leaflet';
 import { cn } from '../utils/cn';
-import { initLeafletIcons, createStatusIcon } from '../utils/leafletSetup';
-import { accounts, terminals } from '../data/mockData';
+import { createStatusIcon, initLeafletIcons } from '../utils/leafletSetup';
+import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
 
 initLeafletIcons();
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [map, setMap] = useState<LeafletMap | null>(null);
-  const [selectedAccountId, setSelectedAccountId] = useState<string>('all');
+  const [selectedAccountEmail, setSelectedAccountEmail] = useState('all');
+  const { accounts, terminals, fleetStats, isLoading, error } = useFleetSnapshot();
 
-  // Coordinates for Uganda and South Sudan
-  const mapCenter: [number, number] = [4.0, 31.5];
-  const zoomLevel = 5;
+  const filteredTerminals = selectedAccountEmail === 'all'
+    ? terminals
+    : terminals.filter((terminal) => terminal.account_email === selectedAccountEmail);
 
-  const handleZoomIn = () => {
-    map?.zoomIn();
-  };
+  const telemetryTerminals = filteredTerminals.filter((terminal) => terminal.download_mbps != null);
+  const wifiTerminals = filteredTerminals.filter((terminal) => terminal.connected_devices != null);
+  const currentThroughputMbps = telemetryTerminals.reduce((sum, terminal) => sum + (terminal.download_mbps ?? 0), 0).toFixed(1);
+  const onlineCount = filteredTerminals.filter((terminal) => terminal.status === 'ONLINE').length;
+  const connectedDevices = wifiTerminals.reduce((sum, terminal) => sum + (terminal.connected_devices ?? 0), 0);
+  const attentionCount = filteredTerminals.filter((terminal) => terminal.status !== 'ONLINE').length;
 
-  const handleZoomOut = () => {
-    map?.zoomOut();
-  };
+  const mapCenter: [number, number] = filteredTerminals[0]?.coords ?? [4.0, 31.5];
+  const zoomLevel = filteredTerminals.length > 0 ? 6 : 5;
 
-  const handleResetView = () => {
-    map?.setView(mapCenter, zoomLevel);
-  };
+  const handleZoomIn = () => map?.zoomIn();
+  const handleZoomOut = () => map?.zoomOut();
+  const handleResetView = () => map?.setView(mapCenter, zoomLevel);
 
   const handleLocateTerminal = (coords: [number, number]) => {
-    if (map) {
-      map.flyTo(coords, 9, { duration: 1.5 });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!map) {
+      return;
     }
+    map.flyTo(coords, 9, { duration: 1.5 });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-  const tileUrl = mapboxToken 
+  const tileUrl = mapboxToken
     ? `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
-    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
   const attribution = mapboxToken
     ? 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
     : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
-  const filteredTerminals = useMemo(() => {
-    if (selectedAccountId === 'all') return terminals;
-    return terminals.filter(t => t.accountId === selectedAccountId);
-  }, [selectedAccountId]);
-
-  const totalDataUsage = useMemo(() => {
-    const totalGB = filteredTerminals.reduce((sum, t) => sum + t.dataUsageGB, 0);
-    return (totalGB / 1000).toFixed(1); // Convert to TB
-  }, [filteredTerminals]);
-
-  const activeTerminalsCount = useMemo(() => {
-    return filteredTerminals.filter(t => t.status === 'ONLINE' || t.status === 'DEGRADED').length;
-  }, [filteredTerminals]);
-
-  const totalDevices = useMemo(() => {
-    return filteredTerminals.reduce((sum, t) => sum + t.connectedDevices, 0);
-  }, [filteredTerminals]);
-
-  const degradedCount = useMemo(() => {
-    return filteredTerminals.filter(t => t.status === 'DEGRADED').length;
-  }, [filteredTerminals]);
+  const hasLiveFleet = accounts.length > 0 || terminals.length > 0;
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Operational Overview</p>
@@ -91,113 +74,131 @@ export default function Dashboard() {
         <div className="flex gap-3 items-center">
           <div className="relative">
             <select
-              value={selectedAccountId}
-              onChange={(e) => setSelectedAccountId(e.target.value)}
+              value={selectedAccountEmail}
+              onChange={(e) => setSelectedAccountEmail(e.target.value)}
               className="appearance-none bg-surface-container-low border border-outline-variant/50 text-on-surface text-sm font-bold rounded-md pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="all">All Accounts ({accounts.length})</option>
-              {accounts.map(acc => (
-                <option key={acc.id} value={acc.id}>{acc.name}</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.email}>{account.email}</option>
               ))}
             </select>
             <Filter className="w-4 h-4 text-on-surface-variant absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
-          <button 
-            onClick={() => navigate('/terminals?add=true')}
+          <button
+            onClick={() => navigate('/settings')}
             className="flex items-center gap-2 px-6 py-3 rounded-md bg-on-surface text-surface font-label font-bold text-xs tracking-widest uppercase hover:bg-on-surface/90 transition-colors shadow-sm"
           >
-            Add Terminal
+            Link Account
           </button>
         </div>
       </div>
 
-      {/* Top Stats Grid */}
+      {error && (
+        <div className="rounded-xl border border-error/20 bg-error-container/20 p-4 text-sm text-error">
+          {error}
+        </div>
+      )}
+
+      {!isLoading && !hasLiveFleet && !error && (
+        <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Server className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-headline font-bold text-on-surface">No live Starlink data loaded</h2>
+            <p className="text-sm text-on-surface-variant mt-1">
+              In remote mode, the backend only shows real terminals after you link at least one Starlink account in Settings and save valid cookie JSON.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Stat Card 1 */}
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Total Active Kits</h3>
+        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Online Kits</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-headline font-bold text-on-surface">{activeTerminalsCount}</span>
-              <span className="text-sm font-bold text-on-surface-variant">/ {filteredTerminals.length}</span>
+              <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : onlineCount}</span>
+              <span className="text-sm font-bold text-on-surface-variant">/ {isLoading ? '...' : filteredTerminals.length}</span>
             </div>
             <span className="flex items-center gap-1 text-xs font-bold text-[#00875A]">
               <CheckCircle2 className="w-3 h-3" />
-              Fleet is healthy
+              {fleetStats ? `${fleetStats.online} fleet-wide online` : 'Fleet status'}
             </span>
           </div>
         </div>
 
-        {/* Stat Card 2 */}
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Total Connected Devices</h3>
+        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Connected Devices</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-headline font-bold text-on-surface">{totalDevices}</span>
+              <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : connectedDevices}</span>
               <span className="text-sm font-bold text-on-surface-variant">clients</span>
             </div>
             <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
               <Wifi className="w-3 h-3" />
-              Active connections
+              {wifiTerminals.length === 0 ? 'Awaiting live router data' : `${wifiTerminals.length}/${filteredTerminals.length} terminals reporting`}
             </span>
           </div>
         </div>
 
-        {/* Stat Card 3 */}
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Fleet Bandwidth (24H)</h3>
+        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Live Throughput</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-headline font-bold text-on-surface">{totalDataUsage}</span>
-              <span className="text-sm font-bold text-on-surface-variant">TB</span>
+              <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : telemetryTerminals.length === 0 ? '--' : currentThroughputMbps}</span>
+              <span className="text-sm font-bold text-on-surface-variant">Mbps</span>
             </div>
             <span className="flex items-center gap-1.5 text-xs font-bold text-[#00875A]">
               <TrendingUp className="w-3 h-3" />
-              Nominal usage
+              {telemetryTerminals.length === 0 ? 'Awaiting live dish telemetry' : `${telemetryTerminals.length}/${filteredTerminals.length} terminals reporting`}
             </span>
           </div>
         </div>
 
-        {/* Stat Card 4 */}
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between border-l-4 border-l-error">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider text-error mb-4">Degraded / Offline</h3>
+        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between border-l-4 border-l-error min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider text-error mb-4">Needs Attention</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-headline font-bold text-error">{degradedCount}</span>
+              <span className="text-4xl font-headline font-bold text-error">{isLoading ? '...' : attentionCount}</span>
               <span className="text-sm font-bold text-on-surface-variant">kits</span>
             </div>
             <span className="text-xs font-bold text-error uppercase tracking-wider">
-              {degradedCount > 0 ? 'ATTENTION REQUIRED' : 'ALL CLEAR'}
+              {attentionCount > 0 ? 'ATTENTION REQUIRED' : 'ALL CLEAR'}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Map Section */}
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col relative">
         <div className="absolute top-4 left-4 z-10 bg-surface-container-lowest/90 backdrop-blur-sm p-3 rounded-lg border border-outline-variant/30 shadow-sm">
           <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest mb-1">Current Focus</p>
-          <h3 className="text-sm font-headline font-bold text-on-surface mb-2">South Sudan & Uganda</h3>
+          <h3 className="text-sm font-headline font-bold text-on-surface mb-2">
+            {filteredTerminals[0]?.loc ?? 'Awaiting remote fleet data'}
+          </h3>
           <div className="flex gap-2">
-            <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">H3: Res 6</span>
-            <span className="text-[10px] font-bold bg-surface-container text-on-surface-variant px-2 py-0.5 rounded">LIVE TELEMETRY</span>
+            <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
+              {accounts.length} Accounts
+            </span>
+            <span className="text-[10px] font-bold bg-surface-container text-on-surface-variant px-2 py-0.5 rounded">API</span>
           </div>
         </div>
-        
+
         <div className="absolute top-4 right-4 z-10 flex flex-col gap-1">
-          <button 
+          <button
             onClick={handleZoomIn}
             className="w-8 h-8 bg-surface-container-lowest border border-outline-variant/30 rounded flex items-center justify-center hover:bg-surface-container transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4 text-on-surface" />
           </button>
-          <button 
+          <button
             onClick={handleZoomOut}
             className="w-8 h-8 bg-surface-container-lowest border border-outline-variant/30 rounded flex items-center justify-center hover:bg-surface-container transition-colors shadow-sm"
           >
             <Minus className="w-4 h-4 text-on-surface" />
           </button>
-          <button 
+          <button
             onClick={handleResetView}
             className="w-8 h-8 bg-surface-container-lowest border border-outline-variant/30 rounded flex items-center justify-center hover:bg-surface-container transition-colors shadow-sm mt-2"
           >
@@ -207,51 +208,53 @@ export default function Dashboard() {
 
         <div className="absolute bottom-4 left-4 z-10 flex items-center gap-4 bg-surface-container-lowest/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-outline-variant/30 shadow-sm">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-[#005477] opacity-40 rounded-sm"></div>
-            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Active H3 Cell</span>
+            <div className="w-3 h-3 bg-[#005477] opacity-40 rounded-sm" />
+            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Coverage</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-[#005477] rounded-full border-2 border-white"></div>
+            <div className="w-3 h-3 bg-[#005477] rounded-full border-2 border-white" />
             <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Terminal</span>
           </div>
         </div>
 
         <div className="h-[400px] relative bg-[#e5e7eb] z-0">
-          <MapContainer 
+          {isLoading && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-surface-container-lowest/70 backdrop-blur-sm">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          )}
+          <MapContainer
             ref={setMap}
-            center={mapCenter} 
-            zoom={zoomLevel} 
-            scrollWheelZoom={false} 
+            center={mapCenter}
+            zoom={zoomLevel}
+            scrollWheelZoom={false}
             zoomControl={false}
             className="absolute inset-0 w-full h-full"
           >
-            <TileLayer
-              attribution={attribution}
-              url={tileUrl}
-            />
-            {filteredTerminals.map((term, idx) => (
-              <React.Fragment key={idx}>
-                {/* Coverage Radius */}
-                <Circle 
-                  center={term.coords} 
-                  radius={15000} // 15km radius approx
-                  pathOptions={{ 
-                    color: term.status === 'ONLINE' ? '#005477' : (term.status === 'DEGRADED' ? '#f59e0b' : '#ba1a1a'), 
-                    fillColor: term.status === 'ONLINE' ? '#005477' : (term.status === 'DEGRADED' ? '#f59e0b' : '#ba1a1a'), 
+            <TileLayer attribution={attribution} url={tileUrl} />
+            {filteredTerminals.map((terminal) => (
+              <React.Fragment key={terminal.id}>
+                <Circle
+                  center={terminal.coords}
+                  radius={15000}
+                  pathOptions={{
+                    color: terminal.status === 'ONLINE' ? '#005477' : (terminal.status === 'DEGRADED' ? '#f59e0b' : '#ba1a1a'),
+                    fillColor: terminal.status === 'ONLINE' ? '#005477' : (terminal.status === 'DEGRADED' ? '#f59e0b' : '#ba1a1a'),
                     fillOpacity: 0.1,
-                    weight: 1
-                  }} 
+                    weight: 1,
+                  }}
                 />
-                <Marker position={term.coords} icon={createStatusIcon(term.status.toLowerCase())}>
+                <Marker position={terminal.coords} icon={createStatusIcon(terminal.status.toLowerCase())}>
                   <Popup>
                     <div className="p-1 font-body">
-                      <div className="font-bold text-sm mb-1">{term.id}</div>
-                      <div className="text-xs text-on-surface-variant mb-1">{term.loc}</div>
+                      <div className="font-bold text-sm mb-1">{terminal.id}</div>
+                      <div className="text-xs text-on-surface-variant mb-1">{terminal.loc}</div>
+                      <div className="text-[10px] text-on-surface-variant mb-1">{terminal.account_email}</div>
                       <div className="text-[10px] text-on-surface-variant mb-3 flex items-center gap-1">
-                        <Wifi className="w-3 h-3" /> {term.connectedDevices} devices connected
+                        <Wifi className="w-3 h-3" /> {terminal.connected_devices ?? '--'} devices connected
                       </div>
-                      <button 
-                        onClick={() => navigate(`/terminals/${term.id}`)}
+                      <button
+                        onClick={() => navigate(`/terminals/${terminal.id}`)}
                         className="text-xs bg-primary text-on-primary px-3 py-1.5 rounded-md font-medium w-full hover:bg-primary/90 transition-colors"
                       >
                         View Details
@@ -265,14 +268,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Terminals Table */}
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm">
         <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-headline font-bold text-on-surface">Recent Terminals</h2>
-            <p className="text-sm text-on-surface-variant font-body">Live status for fleet endpoints across East Africa</p>
+            <p className="text-sm text-on-surface-variant font-body">Live status for linked Starlink endpoints</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/terminals')}
             className="px-4 py-2 rounded-md bg-primary/10 text-primary font-label font-bold text-xs tracking-widest uppercase hover:bg-primary/20 transition-colors"
           >
@@ -284,41 +286,59 @@ export default function Dashboard() {
             <thead>
               <tr className="border-b border-outline-variant/30">
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Terminal ID</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Account</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Location</th>
-                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Data (24H)</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Download</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Latency</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredTerminals.slice(0, 10).map((term) => (
+              {!isLoading && filteredTerminals.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-sm text-on-surface-variant">
+                    No terminals available yet. Link a Starlink account in Settings to load remote data.
+                  </td>
+                </tr>
+              )}
+              {filteredTerminals.slice(0, 10).map((terminal) => (
                 <tr
-                  key={term.id}
-                  onClick={() => handleLocateTerminal(term.coords)}
+                  key={terminal.id}
+                  onClick={() => handleLocateTerminal(terminal.coords)}
                   className="border-b border-outline-variant/10 hover:bg-surface-container/50 transition-colors cursor-pointer"
                 >
-                  <td className="p-4 font-label font-bold text-on-surface">{term.id}</td>
-                  <td className="p-4 text-sm text-on-surface-variant font-body">{term.loc}</td>
-                  <td className="p-4 text-sm font-medium text-on-surface">{term.dataUsageGB} GB</td>
-                  <td className="p-4 text-sm font-medium text-on-surface">{term.latency ? `${term.latency} ms` : '--'}</td>
+                  <td className="p-4 font-label font-bold text-on-surface">{terminal.id}</td>
+                  <td className="p-4 text-sm text-on-surface-variant font-body">{terminal.account_email}</td>
+                  <td className="p-4 text-sm text-on-surface-variant font-body">{terminal.loc}</td>
+                  <td className="p-4 text-sm font-medium text-on-surface">{terminal.download_mbps != null ? `${terminal.download_mbps.toFixed(1)} Mbps` : '--'}</td>
+                  <td className="p-4 text-sm font-medium text-on-surface">{terminal.latency_ms ? `${terminal.latency_ms} ms` : '--'}</td>
                   <td className="p-4">
-                    <div className={cn(
-                      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                      term.status === 'ONLINE' ? "bg-[#00875A]/10 text-[#00875A]" : 
-                      (term.status === 'DEGRADED' ? "bg-amber-500/10 text-amber-600" : "bg-error/10 text-error")
-                    )}>
-                      <span className={cn(
-                        "w-1.5 h-1.5 rounded-full", 
-                        term.status === 'ONLINE' ? "bg-[#00875A]" : 
-                        (term.status === 'DEGRADED' ? "bg-amber-500" : "bg-error")
-                      )}></span>
-                      {term.status}
+                    <div
+                      className={cn(
+                        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider',
+                        terminal.status === 'ONLINE' ? 'bg-[#00875A]/10 text-[#00875A]' :
+                          terminal.status === 'DEGRADED' ? 'bg-amber-500/10 text-amber-600' :
+                            'bg-error/10 text-error',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'w-1.5 h-1.5 rounded-full',
+                          terminal.status === 'ONLINE' ? 'bg-[#00875A]' :
+                            terminal.status === 'DEGRADED' ? 'bg-amber-500' :
+                              'bg-error',
+                        )}
+                      />
+                      {terminal.status}
                     </div>
                   </td>
                   <td className="p-4 text-right">
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); navigate(`/terminals/${term.id}`); }}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/terminals/${terminal.id}`);
+                      }}
                       className="p-2 hover:bg-surface-container-high rounded-full transition-colors inline-flex"
                       title="View Details"
                     >

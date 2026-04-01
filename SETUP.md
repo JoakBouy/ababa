@@ -72,7 +72,7 @@ You need two terminals running simultaneously.
 **Terminal 1 — Python backend (port 8000):**
 ```bash
 npm run backend
-# equivalent to: uvicorn server.main:app --reload --port 8000
+# equivalent to: python -m uvicorn server.main:app --reload --port 8000
 ```
 
 **Terminal 2 — React frontend (port 3000):**
@@ -171,7 +171,7 @@ Static files are output to `dist/`. Serve them from any static host (Nginx, Cadd
 ### Run the backend
 
 ```bash
-uvicorn server.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
 ```
 
 For production, run behind a reverse proxy (Nginx/Caddy) with TLS. Example Nginx block:

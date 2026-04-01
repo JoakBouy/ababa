@@ -1,7 +1,6 @@
 /**
  * Frontend API service layer.
  * All calls go to the Python FastAPI backend at /api (proxied by Vite in dev).
- * Falls back to mock data if the backend is unreachable.
  */
 
 const BASE = '/api';
@@ -44,7 +43,8 @@ export interface Terminal {
   status: 'ONLINE' | 'OFFLINE' | 'DEGRADED';
   data_usage_gb: number;
   latency_ms: number | null;
-  connected_devices: number;
+  download_mbps: number | null;
+  connected_devices: number | null;
   uptime_percent: number;
 }
 
@@ -120,11 +120,22 @@ export interface FleetStats {
   offline: number;
   degraded: number;
   total_data_tb: number;
+  current_download_mbps: number;
   avg_uptime_percent: number;
 }
 
 export function getFleetStats() {
   return request<FleetStats>('/analytics/fleet-stats');
+}
+
+export interface FleetSnapshot {
+  accounts: StarlinkAccount[];
+  terminals: Terminal[];
+  fleet_stats: FleetStats;
+}
+
+export function getFleetSnapshot() {
+  return request<FleetSnapshot>('/analytics/fleet-snapshot');
 }
 
 // ─── Starlink Accounts ───────────────────────────────────────────────────────

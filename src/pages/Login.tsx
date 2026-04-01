@@ -68,7 +68,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-surface-container-highest border border-outline-variant/50 rounded-xl px-4 py-3.5 pl-11 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body"
-                placeholder="admin@enjojofoundation.org"
+                placeholder="operator@example.com"
               />
               <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5" />
             </div>

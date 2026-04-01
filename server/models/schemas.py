@@ -26,7 +26,8 @@ class Terminal(BaseModel):
     status: str  # ONLINE | OFFLINE | DEGRADED
     data_usage_gb: float
     latency_ms: Optional[float]
-    connected_devices: int
+    download_mbps: Optional[float] = None
+    connected_devices: Optional[int]
     uptime_percent: float
 
 
@@ -80,6 +81,7 @@ class FleetStats(BaseModel):
     offline: int
     degraded: int
     total_data_tb: float
+    current_download_mbps: float = 0.0
     avg_uptime_percent: float
 
 
@@ -90,6 +92,12 @@ class StarlinkAccount(BaseModel):
     email: str
     status: str
     terminal_count: int
+
+
+class FleetSnapshotResponse(BaseModel):
+    accounts: list[StarlinkAccount]
+    terminals: list[Terminal]
+    fleet_stats: FleetStats
 
 
 class LinkAccountRequest(BaseModel):

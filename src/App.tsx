@@ -6,6 +6,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { FleetSnapshotProvider } from './contexts/FleetSnapshotContext';
 import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -31,7 +32,9 @@ export default function App() {
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <Layout />
+                    <FleetSnapshotProvider>
+                      <Layout />
+                    </FleetSnapshotProvider>
                   </ProtectedRoute>
                 }
               >

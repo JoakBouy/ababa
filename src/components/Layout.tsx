@@ -9,6 +9,7 @@ import {
   Search,
   Bell,
   UserCircle,
+  RefreshCw,
   AlertTriangle,
   Info,
   BarChart3,
@@ -16,15 +17,28 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useAuth } from '../contexts/AuthContext';
+import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
 import { useToast } from '../contexts/ToastContext';
+import StarlinkSetupModal from './StarlinkSetupModal';
 
 export default function Layout() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const {
+    accounts,
+    terminals,
+    isLoading: isLoadingFleet,
+    isRefreshing: isRefreshingFleet,
+    lastUpdatedAt,
+    refreshFleetSnapshot,
+  } = useFleetSnapshot();
   const { toast } = useToast();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showStarlinkSetup, setShowStarlinkSetup] = useState(false);
+  const [liveAlerts, setLiveAlerts] = useState<Array<{ id: string; title: string; desc: string; type: 'error' | 'info' }>>([]);
+  const [isLoadingAlerts, setIsLoadingAlerts] = useState(false);
 
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -43,6 +57,49 @@ export default function Layout() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!isLoadingFleet) {
+      setShowStarlinkSetup(accounts.length === 0);
+    }
+  }, [accounts.length, isLoadingFleet]);
+
+  useEffect(() => {
+    if (!showNotifications) {
+      return;
+    }
+
+    setIsLoadingAlerts(isLoadingFleet);
+    const nextAlerts = terminals.flatMap((terminal) => {
+      if (terminal.status === 'DEGRADED') {
+        return [{
+          id: `${terminal.id}-degraded`,
+          title: 'Terminal degraded',
+          desc: `${terminal.id} is reporting degraded service at ${terminal.loc}.`,
+          type: 'error' as const,
+        }];
+      }
+      if (terminal.status === 'OFFLINE') {
+        return [{
+          id: `${terminal.id}-offline`,
+          title: 'Terminal offline',
+          desc: `${terminal.id} is offline at ${terminal.loc}.`,
+          type: 'error' as const,
+        }];
+      }
+      if (terminal.download_mbps == null) {
+        return [{
+          id: `${terminal.id}-telemetry`,
+          title: 'Telemetry unavailable',
+          desc: `${terminal.id} is online, but Starlink is not exposing live telemetry right now.`,
+          type: 'info' as const,
+        }];
+      }
+      return [];
+    });
+    setLiveAlerts(nextAlerts);
+    setIsLoadingAlerts(false);
+  }, [isLoadingFleet, showNotifications, terminals]);
+
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Terminals', path: '/terminals', icon: Satellite },
@@ -51,14 +108,29 @@ export default function Layout() {
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
-  const mockAlerts = [
-    { id: 1, title: 'Obstruction Detected', desc: 'Terminal EA-JUB-009 (Juba A2) is reporting physical obstruction.', time: '10m ago', type: 'error' },
-    { id: 2, title: 'Terminal Offline', desc: 'Terminal EA-ZNZ-021 lost connection.', time: '1h ago', type: 'error' },
-    { id: 3, title: 'Firmware Update', desc: 'EA-KMP-014 successfully updated to v2.4.1', time: '2h ago', type: 'info' },
-  ];
+  const userInitials = user?.name
+    ?.split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() ?? 'OP';
+
+  const lastUpdatedLabel = lastUpdatedAt
+    ? new Intl.DateTimeFormat([], {
+        hour: 'numeric',
+        minute: '2-digit',
+      }).format(lastUpdatedAt)
+    : null;
 
   return (
     <div className="flex h-screen overflow-hidden bg-surface">
+      <StarlinkSetupModal
+        open={showStarlinkSetup}
+        onClose={() => setShowStarlinkSetup(false)}
+        onLinked={() => setShowStarlinkSetup(false)}
+        defaultEmail={user?.email}
+      />
+
       {/* Mobile Menu Overlay */}
       {showMobileMenu && (
         <div 
@@ -110,11 +182,11 @@ export default function Layout() {
           <button 
             onClick={() => {
               setShowMobileMenu(false);
-              navigate('/terminals?add=true');
+              navigate('/settings');
             }}
             className="w-full bg-on-surface text-surface py-3 rounded-md font-label font-bold text-xs tracking-widest uppercase hover:bg-on-surface/90 transition-colors shadow-sm"
           >
-            Add Terminal
+            Link Account
           </button>
           
           <div className="pt-4 border-t border-outline-variant/30 flex items-center gap-3">
@@ -152,6 +224,20 @@ export default function Layout() {
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => void refreshFleetSnapshot('manual')}
+              disabled={isRefreshingFleet}
+              className="hidden md:flex items-center gap-2 px-3 py-2 rounded-md border border-outline-variant/50 text-sm font-label font-medium text-on-surface hover:bg-surface-container transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={cn('w-4 h-4', isRefreshingFleet && 'animate-spin')} />
+              {isRefreshingFleet ? 'Refreshing...' : 'Refresh Live'}
+            </button>
+            {lastUpdatedLabel && (
+              <span className="hidden lg:block text-xs text-on-surface-variant">
+                Holding last live data from {lastUpdatedLabel}
+              </span>
+            )}
             {/* Notifications Dropdown */}
             <div className="relative" ref={notifRef}>
               <button
@@ -160,17 +246,29 @@ export default function Layout() {
                 className="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors relative"
               >
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border-2 border-surface-container-lowest"></span>
+                {liveAlerts.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border-2 border-surface-container-lowest"></span>
+                )}
               </button>
               
               {showNotifications && (
                 <div className="absolute right-0 mt-2 w-80 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
                   <div className="p-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low/50">
                     <h3 className="font-headline font-bold text-on-surface">Alerts & Notifications</h3>
-                    <span className="text-xs font-bold bg-error/10 text-error px-2 py-0.5 rounded-full">2 New</span>
+                    <span className="text-xs font-bold bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">
+                      {liveAlerts.length} Live
+                    </span>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
-                    {mockAlerts.map(alert => (
+                    {isLoadingAlerts && (
+                      <div className="p-4 text-sm text-on-surface-variant">Loading live alerts...</div>
+                    )}
+                    {!isLoadingAlerts && liveAlerts.length === 0 && (
+                      <div className="p-4 text-sm text-on-surface-variant">
+                        No live alerts are active right now.
+                      </div>
+                    )}
+                    {!isLoadingAlerts && liveAlerts.map((alert) => (
                       <div key={alert.id} className="p-4 border-b border-outline-variant/10 hover:bg-surface-container/50 transition-colors cursor-pointer flex gap-3">
                         <div className={cn("mt-0.5 shrink-0", alert.type === 'error' ? 'text-error' : 'text-primary')}>
                           {alert.type === 'error' ? <AlertTriangle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
@@ -178,13 +276,9 @@ export default function Layout() {
                         <div>
                           <h4 className="text-sm font-bold text-on-surface">{alert.title}</h4>
                           <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">{alert.desc}</p>
-                          <span className="text-[10px] font-bold text-on-surface-variant/70 uppercase tracking-wider mt-2 block">{alert.time}</span>
                         </div>
                       </div>
                     ))}
-                  </div>
-                  <div className="p-3 text-center border-t border-outline-variant/30 bg-surface-container-low/50">
-                    <button className="text-xs font-bold text-primary hover:underline uppercase tracking-wider">View All History</button>
                   </div>
                 </div>
               )}
@@ -196,7 +290,7 @@ export default function Layout() {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label font-bold text-sm cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
               >
-                AR
+                {userInitials}
               </div>
 
               {showProfileMenu && (
@@ -249,6 +343,22 @@ export default function Layout() {
 
         {/* Scrollable Content Area */}
         <main className="flex-1 overflow-y-auto bg-surface p-4 md:p-8">
+          <div className="md:hidden mb-4 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => void refreshFleetSnapshot('manual')}
+              disabled={isRefreshingFleet}
+              className="flex items-center gap-2 px-3 py-2 rounded-md border border-outline-variant/50 text-sm font-label font-medium text-on-surface hover:bg-surface-container transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={cn('w-4 h-4', isRefreshingFleet && 'animate-spin')} />
+              {isRefreshingFleet ? 'Refreshing...' : 'Refresh Live'}
+            </button>
+            {lastUpdatedLabel && (
+              <span className="text-xs text-on-surface-variant">
+                Last live data {lastUpdatedLabel}
+              </span>
+            )}
+          </div>
           <Outlet />
         </main>
       </div>
