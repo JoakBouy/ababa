@@ -1,0 +1,419 @@
+openapi: 3.1.0
+info:
+  title: Enjojo Command Center API
+  version: 1.0.0
+  description: API-first contract for Enjojo operational visibility, telemetry reuse, and JSON/CSV exports.
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/health:
+    get:
+      tags: [system]
+      summary: Health check
+      responses:
+        "200":
+          description: API is available.
+  /api/auth/login:
+    post:
+      tags: [auth]
+      summary: Authenticate an operator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated operator session.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+  /api/accounts:
+    get:
+      tags: [accounts]
+      summary: List linked connectivity accounts
+      responses:
+        "200":
+          description: Linked accounts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StarlinkAccount"
+    post:
+      tags: [accounts]
+      summary: Link a Starlink account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkAccountRequest"
+      responses:
+        "201":
+          description: Linked account.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StarlinkAccount"
+  /api/accounts/{account_id}:
+    delete:
+      tags: [accounts]
+      summary: Remove a linked account
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Account removed.
+  /api/analytics/fleet-stats:
+    get:
+      tags: [analytics]
+      summary: Fleet summary statistics
+      responses:
+        "200":
+          description: Current fleet statistics.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FleetStats"
+  /api/analytics/fleet-snapshot:
+    get:
+      tags: [analytics]
+      summary: Accounts, terminals, and fleet statistics
+      responses:
+        "200":
+          description: Current platform snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FleetSnapshotResponse"
+  /api/terminals:
+    get:
+      tags: [terminals]
+      summary: List connected endpoints
+      responses:
+        "200":
+          description: Terminal list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Terminal"
+  /api/terminals/{terminal_id}:
+    get:
+      tags: [terminals]
+      summary: Get one endpoint
+      parameters:
+        - $ref: "#/components/parameters/TerminalId"
+      responses:
+        "200":
+          description: Terminal detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Terminal"
+  /api/terminals/{terminal_id}/telemetry:
+    get:
+      tags: [terminals]
+      summary: Get raw telemetry for one endpoint
+      parameters:
+        - $ref: "#/components/parameters/TerminalId"
+      responses:
+        "200":
+          description: Telemetry detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TerminalTelemetry"
+  /api/platform/sites:
+    get:
+      tags: [platform]
+      summary: List reusable deployment/site data
+      responses:
+        "200":
+          description: Deployment sites independent from dashboard UI.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeploymentSite"
+  /api/platform/exports:
+    get:
+      tags: [platform]
+      summary: Export manifest
+      responses:
+        "200":
+          description: Available JSON/CSV export endpoints and docs URLs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportManifest"
+  /api/platform/exports/fleet.json:
+    get:
+      tags: [exports]
+      summary: Export fleet snapshot as JSON
+      responses:
+        "200":
+          description: JSON fleet snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FleetSnapshotResponse"
+  /api/platform/exports/fleet.csv:
+    get:
+      tags: [exports]
+      summary: Export endpoint telemetry as CSV
+      responses:
+        "200":
+          description: CSV terminal export.
+          content:
+            text/csv:
+              schema:
+                type: string
+  /api/platform/exports/sites.json:
+    get:
+      tags: [exports]
+      summary: Export sites as JSON
+      responses:
+        "200":
+          description: JSON deployment sites.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeploymentSite"
+  /api/platform/exports/sites.csv:
+    get:
+      tags: [exports]
+      summary: Export sites as CSV
+      responses:
+        "200":
+          description: CSV site export.
+          content:
+            text/csv:
+              schema:
+                type: string
+components:
+  parameters:
+    TerminalId:
+      name: terminal_id
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      required: [email, name, role]
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+    Terminal:
+      type: object
+      required: [id, account_id, account_email, loc, coords, status, data_usage_gb, uptime_percent]
+      properties:
+        id:
+          type: string
+        account_id:
+          type: string
+        account_email:
+          type: string
+        account_type:
+          type: string
+          enum: [ranger, community, base_camp, operations]
+        site_id:
+          type: string
+          nullable: true
+        site_type:
+          type: string
+        loc:
+          type: string
+        coords:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            type: number
+        status:
+          type: string
+          enum: [ONLINE, OFFLINE, DEGRADED]
+        data_usage_gb:
+          type: number
+        latency_ms:
+          type: number
+          nullable: true
+        download_mbps:
+          type: number
+          nullable: true
+        connected_devices:
+          type: integer
+          nullable: true
+        uptime_percent:
+          type: number
+        data_sources:
+          type: array
+          items:
+            type: string
+        community_usage_sessions:
+          type: integer
+          nullable: true
+        ranger_voice_sessions:
+          type: integer
+          nullable: true
+        bluetti_soc_percent:
+          type: number
+          nullable: true
+    TerminalTelemetry:
+      type: object
+      properties:
+        latency_ms:
+          type: number
+        download_mbps:
+          type: number
+        signal_percent:
+          type: number
+        uptime:
+          type: string
+        sw_version:
+          type: string
+        errors:
+          type: integer
+        warnings:
+          type: integer
+        location_type:
+          type: string
+        location_value:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+    StarlinkAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        status:
+          type: string
+        terminal_count:
+          type: integer
+        account_type:
+          type: string
+        display_name:
+          type: string
+          nullable: true
+    DeploymentSite:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        account_email:
+          type: string
+        account_type:
+          type: string
+        site_type:
+          type: string
+        purpose:
+          type: string
+        loc:
+          type: string
+        coords:
+          type: array
+          items:
+            type: number
+        terminal_ids:
+          type: array
+          items:
+            type: string
+        data_sources:
+          type: array
+          items:
+            type: string
+        metrics:
+          type: object
+          additionalProperties: true
+    FleetStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        online:
+          type: integer
+        offline:
+          type: integer
+        degraded:
+          type: integer
+        total_data_tb:
+          type: number
+        current_download_mbps:
+          type: number
+        avg_uptime_percent:
+          type: number
+    FleetSnapshotResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/StarlinkAccount"
+        terminals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Terminal"
+        fleet_stats:
+          $ref: "#/components/schemas/FleetStats"
+    LinkAccountRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          nullable: true
+        cookie_json:
+          type: string
+          nullable: true
+    ExportManifest:
+      type: object
+      properties:
+        formats:
+          type: array
+          items:
+            type: string
+        endpoints:
+          type: object
+          additionalProperties:
+            type: string
+        openapi_json:
+          type: string
+        swagger_docs:
+          type: string
+        redoc_docs:
+          type: string

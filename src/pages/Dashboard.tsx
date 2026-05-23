@@ -4,12 +4,12 @@ import {
   CheckCircle2,
   Filter,
   Loader2,
-  MapPin,
   Maximize,
   Minus,
   Plus,
+  Radio,
   Server,
-  TrendingUp,
+  Users,
   Wifi,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ import { Map as LeafletMap } from 'leaflet';
 import { cn } from '../utils/cn';
 import { createStatusIcon, initLeafletIcons } from '../utils/leafletSetup';
 import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
+import { accountTypeLabel, siteTypeLabel } from '../utils/platform';
 
 initLeafletIcons();
 
@@ -26,18 +27,27 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [map, setMap] = useState<LeafletMap | null>(null);
   const [selectedAccountEmail, setSelectedAccountEmail] = useState('all');
-  const { accounts, terminals, fleetStats, isLoading, error } = useFleetSnapshot();
+  const [selectedAccountType, setSelectedAccountType] = useState('all');
+  const { accounts, terminals, sites, fleetStats, isLoading, error } = useFleetSnapshot();
 
-  const filteredTerminals = selectedAccountEmail === 'all'
-    ? terminals
-    : terminals.filter((terminal) => terminal.account_email === selectedAccountEmail);
+  const filteredTerminals = terminals.filter((terminal) => {
+    const matchesAccount = selectedAccountEmail === 'all' || terminal.account_email === selectedAccountEmail;
+    const matchesType = selectedAccountType === 'all' || terminal.account_type === selectedAccountType;
+    return matchesAccount && matchesType;
+  });
+  const filteredSites = sites.filter((site) => {
+    const matchesAccount = selectedAccountEmail === 'all' || site.account_email === selectedAccountEmail;
+    const matchesType = selectedAccountType === 'all' || site.account_type === selectedAccountType;
+    return matchesAccount && matchesType;
+  });
 
-  const telemetryTerminals = filteredTerminals.filter((terminal) => terminal.download_mbps != null);
   const wifiTerminals = filteredTerminals.filter((terminal) => terminal.connected_devices != null);
-  const currentThroughputMbps = telemetryTerminals.reduce((sum, terminal) => sum + (terminal.download_mbps ?? 0), 0).toFixed(1);
   const onlineCount = filteredTerminals.filter((terminal) => terminal.status === 'ONLINE').length;
   const connectedDevices = wifiTerminals.reduce((sum, terminal) => sum + (terminal.connected_devices ?? 0), 0);
   const attentionCount = filteredTerminals.filter((terminal) => terminal.status !== 'ONLINE').length;
+  const communitySessions = filteredTerminals.reduce((sum, terminal) => sum + (terminal.community_usage_sessions ?? 0), 0);
+  const rangerSessions = filteredTerminals.reduce((sum, terminal) => sum + (terminal.ranger_voice_sessions ?? 0), 0);
+  const accountTypes = Array.from(new Set(accounts.map((account) => account.account_type).filter(Boolean))) as string[];
 
   const mapCenter: [number, number] = filteredTerminals[0]?.coords ?? [4.0, 31.5];
   const zoomLevel = filteredTerminals.length > 0 ? 6 : 5;
@@ -69,9 +79,22 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Operational Overview</p>
-          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">East Africa Fleet</h1>
+          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Command Center</h1>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="relative">
+            <select
+              value={selectedAccountType}
+              onChange={(e) => setSelectedAccountType(e.target.value)}
+              className="appearance-none bg-surface-container-low border border-outline-variant/50 text-on-surface text-sm font-bold rounded-md pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="all">All Site Types</option>
+              {accountTypes.map((type) => (
+                <option key={type} value={type}>{accountTypeLabel(type)}</option>
+              ))}
+            </select>
+            <Filter className="w-4 h-4 text-on-surface-variant absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
           <div className="relative">
             <select
               value={selectedAccountEmail}
@@ -89,7 +112,7 @@ export default function Dashboard() {
             onClick={() => navigate('/settings')}
             className="flex items-center gap-2 px-6 py-3 rounded-md bg-on-surface text-surface font-label font-bold text-xs tracking-widest uppercase hover:bg-on-surface/90 transition-colors shadow-sm"
           >
-            Link Account
+            Link Data Source
           </button>
         </div>
       </div>
@@ -116,15 +139,15 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Online Kits</h3>
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Active Sites</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : onlineCount}</span>
-              <span className="text-sm font-bold text-on-surface-variant">/ {isLoading ? '...' : filteredTerminals.length}</span>
+              <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : filteredSites.length}</span>
+              <span className="text-sm font-bold text-on-surface-variant">sites</span>
             </div>
             <span className="flex items-center gap-1 text-xs font-bold text-[#00875A]">
               <CheckCircle2 className="w-3 h-3" />
-              {fleetStats ? `${fleetStats.online} fleet-wide online` : 'Fleet status'}
+              {fleetStats ? `${onlineCount}/${filteredTerminals.length} endpoints online` : 'Platform status'}
             </span>
           </div>
         </div>
@@ -144,31 +167,63 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Live Throughput</h3>
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Community Sessions</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : telemetryTerminals.length === 0 ? '--' : currentThroughputMbps}</span>
-              <span className="text-sm font-bold text-on-surface-variant">Mbps</span>
+              <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : communitySessions}</span>
+              <span className="text-sm font-bold text-on-surface-variant">visits</span>
             </div>
-            <span className="flex items-center gap-1.5 text-xs font-bold text-[#00875A]">
-              <TrendingUp className="w-3 h-3" />
-              {telemetryTerminals.length === 0 ? 'Awaiting live dish telemetry' : `${telemetryTerminals.length}/${filteredTerminals.length} terminals reporting`}
+            <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
+              <Users className="w-3 h-3" />
+              Landing page usage reasons
             </span>
           </div>
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between border-l-4 border-l-error min-h-[148px]">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider text-error mb-4">Needs Attention</h3>
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider text-error mb-4">Ranger Radio</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-headline font-bold text-error">{isLoading ? '...' : attentionCount}</span>
-              <span className="text-sm font-bold text-on-surface-variant">kits</span>
+              <span className="text-4xl font-headline font-bold text-error">{isLoading ? '...' : rangerSessions}</span>
+              <span className="text-sm font-bold text-on-surface-variant">sessions</span>
             </div>
-            <span className="text-xs font-bold text-error uppercase tracking-wider">
-              {attentionCount > 0 ? 'ATTENTION REQUIRED' : 'ALL CLEAR'}
+            <span className="flex items-center gap-1.5 text-xs font-bold text-error uppercase tracking-wider">
+              <Radio className="w-3 h-3" />
+              {attentionCount > 0 ? `${attentionCount} endpoint alerts` : 'All clear'}
             </span>
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {filteredSites.slice(0, 3).map((site) => (
+          <div key={site.id} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm p-5">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">{siteTypeLabel(site.site_type)}</p>
+                <h2 className="text-lg font-headline font-bold text-on-surface mt-1">{site.name}</h2>
+              </div>
+              <span className="text-[10px] font-bold bg-surface-container text-on-surface-variant px-2 py-1 rounded">
+                {accountTypeLabel(site.account_type)}
+              </span>
+            </div>
+            <p className="text-sm text-on-surface-variant min-h-[60px]">{site.purpose}</p>
+            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-outline-variant/20">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Devices</p>
+                <p className="text-lg font-bold text-on-surface">{site.metrics.connected_devices ?? 0}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Voice</p>
+                <p className="text-lg font-bold text-on-surface">{site.metrics.ranger_voice_sessions ?? 0}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Power</p>
+                <p className="text-lg font-bold text-on-surface">{site.metrics.avg_bluetti_soc_percent ?? 0}%</p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col relative">
@@ -181,7 +236,9 @@ export default function Dashboard() {
             <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
               {accounts.length} Accounts
             </span>
-            <span className="text-[10px] font-bold bg-surface-container text-on-surface-variant px-2 py-0.5 rounded">API</span>
+            <span className="text-[10px] font-bold bg-surface-container text-on-surface-variant px-2 py-0.5 rounded">
+              {filteredSites.length} Sites
+            </span>
           </div>
         </div>
 
@@ -272,7 +329,7 @@ export default function Dashboard() {
         <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-headline font-bold text-on-surface">Recent Terminals</h2>
-            <p className="text-sm text-on-surface-variant font-body">Live status for linked Starlink endpoints</p>
+            <p className="text-sm text-on-surface-variant font-body">Live status by account, purpose, and deployment site</p>
           </div>
           <button
             onClick={() => navigate('/terminals')}
@@ -287,6 +344,7 @@ export default function Dashboard() {
               <tr className="border-b border-outline-variant/30">
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Terminal ID</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Account</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Site Type</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Location</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Download</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Latency</th>
@@ -297,7 +355,7 @@ export default function Dashboard() {
             <tbody>
               {!isLoading && filteredTerminals.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-sm text-on-surface-variant">
+                  <td colSpan={8} className="p-8 text-center text-sm text-on-surface-variant">
                     No terminals available yet. Link a Starlink account in Settings to load remote data.
                   </td>
                 </tr>
@@ -310,6 +368,7 @@ export default function Dashboard() {
                 >
                   <td className="p-4 font-label font-bold text-on-surface">{terminal.id}</td>
                   <td className="p-4 text-sm text-on-surface-variant font-body">{terminal.account_email}</td>
+                  <td className="p-4 text-sm text-on-surface-variant font-body">{siteTypeLabel(terminal.site_type)}</td>
                   <td className="p-4 text-sm text-on-surface-variant font-body">{terminal.loc}</td>
                   <td className="p-4 text-sm font-medium text-on-surface">{terminal.download_mbps != null ? `${terminal.download_mbps.toFixed(1)} Mbps` : '--'}</td>
                   <td className="p-4 text-sm font-medium text-on-surface">{terminal.latency_ms ? `${terminal.latency_ms} ms` : '--'}</td>

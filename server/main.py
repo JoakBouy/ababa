@@ -6,11 +6,14 @@ Docs: http://localhost:8000/docs
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.routes import auth, terminals, analytics, accounts
+from server.routes import auth, terminals, analytics, accounts, platform
 
 app = FastAPI(
-    title="Enjojo Command Centre API",
-    description="Backend for managing Starlink terminal fleets across East Africa",
+    title="Enjojo Command Center API",
+    description=(
+        "API-first backend for Enjojo operational visibility across connectivity, "
+        "ranger communications, community gateways, base-camp usage, and exportable telemetry."
+    ),
     version="1.0.0",
 )
 
@@ -26,6 +29,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(terminals.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
 app.include_router(accounts.router, prefix="/api")
+app.include_router(platform.router, prefix="/api")
 
 
 @app.get("/api/health")

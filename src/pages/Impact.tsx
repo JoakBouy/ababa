@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { Activity, Loader2, MapPin, Server, Wifi } from 'lucide-react';
 import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
+import { accountTypeLabel, siteTypeLabel } from '../utils/platform';
 
 const STATUS_COLORS: Record<string, string> = {
   ONLINE: '#00875A',
@@ -24,7 +25,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function Impact() {
-  const { accounts, terminals, isLoading, error } = useFleetSnapshot();
+  const { accounts, terminals, sites, isLoading, error } = useFleetSnapshot();
 
   const mapCenter: [number, number] = terminals[0]?.coords ?? [4.0, 31.5];
   const zoomLevel = terminals.length > 0 ? 6 : 5;
@@ -62,10 +63,10 @@ export default function Impact() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
-        <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Live Field Coverage</p>
+        <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Field Coverage & Impact</p>
         <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Network Footprint</h1>
         <p className="text-sm text-on-surface-variant mt-2">
-          This page now shows only live Starlink fleet coverage and telemetry availability. The old conflict demo data has been removed.
+          Live connectivity coverage, community usage signals, ranger communications, and base-camp telemetry from API data.
         </p>
       </div>
 
@@ -100,6 +101,7 @@ export default function Impact() {
             <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider">Linked Accounts</h3>
           </div>
           <div className="text-3xl font-headline font-bold text-on-surface">{accounts.length}</div>
+          <p className="text-xs text-on-surface-variant mt-2">{sites.length} deployment sites</p>
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm">
@@ -159,7 +161,7 @@ export default function Impact() {
                   <div className="p-1 font-body">
                     <div className="font-bold text-sm mb-1">{terminal.id}</div>
                     <div className="text-xs text-on-surface-variant mb-1">{terminal.loc}</div>
-                    <div className="text-[10px] text-on-surface-variant">{terminal.account_email}</div>
+                    <div className="text-[10px] text-on-surface-variant">{siteTypeLabel(terminal.site_type)} · {terminal.account_email}</div>
                   </div>
                 </Popup>
               </CircleMarker>
@@ -189,6 +191,24 @@ export default function Impact() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm p-6">
+          <div className="mb-6">
+            <h2 className="text-lg font-headline font-bold text-on-surface">Deployment Purpose</h2>
+            <p className="text-sm text-on-surface-variant">Current site split by field operating model</p>
+          </div>
+          <div className="space-y-3">
+            {sites.map((site) => (
+              <div key={site.id} className="flex items-center justify-between gap-4 border-b border-outline-variant/10 pb-3 last:border-b-0">
+                <div>
+                  <p className="text-sm font-bold text-on-surface">{site.name}</p>
+                  <p className="text-xs text-on-surface-variant">{siteTypeLabel(site.site_type)} · {accountTypeLabel(site.account_type)}</p>
+                </div>
+                <span className="text-xs font-bold text-primary">{site.metrics.connected_devices ?? 0} devices</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm p-6">
           <div className="mb-6">
             <h2 className="text-lg font-headline font-bold text-on-surface">Nodes by Account</h2>

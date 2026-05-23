@@ -28,6 +28,14 @@ def _verify(password: str, hashed: str) -> bool:
 
 @router.post("/login", response_model=LoginResponse)
 async def login(body: LoginRequest):
+    if settings.dev_auth_bypass:
+        email = body.email.strip() or "operator@enjojo.local"
+        return LoginResponse(
+            email=email,
+            name=_name_from_email(email),
+            role="Platform Operator",
+        )
+
     hashed = _ACCOUNTS.get(body.email)
     if not hashed or not _verify(body.password, hashed):
         raise HTTPException(

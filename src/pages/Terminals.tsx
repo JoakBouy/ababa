@@ -8,38 +8,44 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
+import { accountTypeLabel, siteTypeLabel } from '../utils/platform';
 
 export default function Terminals() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAccountEmail, setSelectedAccountEmail] = useState('all');
+  const [selectedAccountType, setSelectedAccountType] = useState('all');
   const { accounts, terminals, isLoading, error } = useFleetSnapshot();
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredTerminals = terminals.filter((terminal) => {
     const matchesAccount = selectedAccountEmail === 'all' || terminal.account_email === selectedAccountEmail;
+    const matchesType = selectedAccountType === 'all' || terminal.account_type === selectedAccountType;
     const matchesQuery = normalizedQuery.length === 0 || [
       terminal.id,
       terminal.account_email,
+      accountTypeLabel(terminal.account_type),
+      siteTypeLabel(terminal.site_type),
       terminal.loc,
       terminal.status,
     ].some((value) => value.toLowerCase().includes(normalizedQuery));
-    return matchesAccount && matchesQuery;
+    return matchesAccount && matchesType && matchesQuery;
   });
+  const accountTypes = Array.from(new Set(accounts.map((account) => account.account_type).filter(Boolean))) as string[];
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 relative">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">My Terminals</h1>
-          <p className="text-on-surface-variant font-body mt-1">Live terminals returned by the Starlink backend</p>
+          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Connected Endpoints</h1>
+          <p className="text-on-surface-variant font-body mt-1">Live terminals grouped by ranger, community, and base-camp deployments</p>
         </div>
         <button
           onClick={() => navigate('/settings')}
           className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-on-primary font-label font-medium hover:bg-primary/90 transition-colors shadow-sm"
         >
           <Server className="w-4 h-4" />
-          Link Account
+          Link Data Source
         </button>
       </div>
 
@@ -66,6 +72,16 @@ export default function Terminals() {
             {filteredTerminals.length} shown
           </div>
           <select
+            value={selectedAccountType}
+            onChange={(e) => setSelectedAccountType(e.target.value)}
+            className="flex-1 sm:flex-none px-4 py-2.5 rounded-full border border-outline-variant text-on-surface font-label font-medium bg-surface-container-lowest hover:bg-surface-container transition-colors outline-none focus:border-primary"
+          >
+            <option value="all">All Site Types</option>
+            {accountTypes.map((type) => (
+              <option key={type} value={type}>{accountTypeLabel(type)}</option>
+            ))}
+          </select>
+          <select
             value={selectedAccountEmail}
             onChange={(e) => setSelectedAccountEmail(e.target.value)}
             className="flex-1 sm:flex-none px-4 py-2.5 rounded-full border border-outline-variant text-on-surface font-label font-medium bg-surface-container-lowest hover:bg-surface-container transition-colors outline-none focus:border-primary"
@@ -84,6 +100,7 @@ export default function Terminals() {
             <thead>
               <tr className="border-b border-outline-variant/30 bg-surface-container-low/50">
                 <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Terminal ID</th>
+                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Site Type</th>
                 <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Account</th>
                 <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Location</th>
                 <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Download</th>
@@ -94,7 +111,7 @@ export default function Terminals() {
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan={6} className="p-8">
+                  <td colSpan={7} className="p-8">
                     <div className="flex items-center justify-center gap-3 text-on-surface-variant">Loading terminals...</div>
                   </td>
                 </tr>
@@ -102,7 +119,7 @@ export default function Terminals() {
 
               {!isLoading && filteredTerminals.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-sm text-on-surface-variant">
+                  <td colSpan={7} className="p-8 text-center text-sm text-on-surface-variant">
                     No live terminals found. If you&apos;re in remote mode, link a Starlink account with valid cookie JSON in Settings.
                   </td>
                 </tr>
@@ -122,6 +139,7 @@ export default function Terminals() {
                       <span className="font-headline font-bold text-on-surface group-hover:text-primary transition-colors">{terminal.id}</span>
                     </div>
                   </td>
+                  <td className="p-4 font-body text-sm text-on-surface-variant">{siteTypeLabel(terminal.site_type)}</td>
                   <td className="p-4 font-body text-sm text-on-surface-variant">{terminal.account_email}</td>
                   <td className="p-4 font-body text-sm text-on-surface-variant">{terminal.loc}</td>
                   <td className="p-4 font-body text-sm text-on-surface-variant">{terminal.download_mbps != null ? `${terminal.download_mbps.toFixed(1)} Mbps` : '--'}</td>

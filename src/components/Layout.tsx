@@ -101,8 +101,8 @@ export default function Layout() {
   }, [isLoadingFleet, showNotifications, terminals]);
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Terminals', path: '/terminals', icon: Satellite },
+    { name: 'Command Center', path: '/', icon: LayoutDashboard },
+    { name: 'Connected Endpoints', path: '/terminals', icon: Satellite },
     { name: 'Analytics & Impact', path: '/analytics', icon: BarChart3 },
     { name: 'Community Impact', path: '/impact', icon: HeartHandshake },
     { name: 'Settings', path: '/settings', icon: Settings },
@@ -149,7 +149,7 @@ export default function Layout() {
             <div className="flex items-center gap-2 mb-1">
               <span className="font-headline font-bold text-xl tracking-tight text-primary">Enjojo</span>
             </div>
-            <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">Global Ops - East Africa</p>
+            <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">Operations Platform</p>
           </div>
           <button 
             className="md:hidden p-2 text-on-surface-variant hover:bg-surface-container rounded-full"
@@ -186,7 +186,7 @@ export default function Layout() {
             }}
             className="w-full bg-on-surface text-surface py-3 rounded-md font-label font-bold text-xs tracking-widest uppercase hover:bg-on-surface/90 transition-colors shadow-sm"
           >
-            Link Account
+            Link Data Source
           </button>
           
           <div className="pt-4 border-t border-outline-variant/30 flex items-center gap-3">
@@ -217,7 +217,7 @@ export default function Layout() {
               <Search className="w-4 h-4 text-on-surface-variant" />
               <input 
                 type="text" 
-                placeholder="Search Terminals or Locations..." 
+                placeholder="Search endpoints, sites, or locations..." 
                 className="bg-transparent border-none outline-none text-sm font-body w-full text-on-surface placeholder:text-on-surface-variant"
               />
             </div>

@@ -15,8 +15,9 @@ import {
   YAxis,
   ZAxis,
 } from 'recharts';
-import { Activity, Loader2, Server, TrendingUp, Users, Wifi } from 'lucide-react';
+import { Activity, Download, Loader2, Server, TrendingUp, Wifi } from 'lucide-react';
 import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
+import { accountTypeLabel } from '../utils/platform';
 
 const STATUS_COLORS: Record<string, string> = {
   ONLINE: '#00875A',
@@ -25,7 +26,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function Analytics() {
-  const { accounts, terminals, fleetStats, isLoading, error } = useFleetSnapshot();
+  const { accounts, terminals, sites, fleetStats, isLoading, error } = useFleetSnapshot();
 
   const terminalsByAccount = accounts.map((account) => {
     const accountTerminals = terminals.filter((terminal) => terminal.account_email === account.email);
@@ -53,12 +54,38 @@ export default function Analytics() {
 
   const totalDevices = terminals.reduce((sum, terminal) => sum + (terminal.connected_devices ?? 0), 0);
   const totalThroughput = terminals.reduce((sum, terminal) => sum + (terminal.download_mbps ?? 0), 0);
+  const siteAccountTypes = Array.from(new Set(sites.map((site) => site.account_type))) as string[];
+  const sitesByType = siteAccountTypes.map((type) => ({
+    type: accountTypeLabel(type),
+    sites: sites.filter((site) => site.account_type === type).length,
+    devices: sites
+      .filter((site) => site.account_type === type)
+      .reduce((sum, site) => sum + Number(site.metrics.connected_devices ?? 0), 0),
+  }));
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <div>
         <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Live Fleet Analytics</p>
-        <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Analytics Dashboard</h1>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Analytics Dashboard</h1>
+          <div className="flex gap-2">
+            <a
+              href="/api/platform/exports/fleet.csv"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-outline-variant/50 text-sm font-label font-medium text-on-surface hover:bg-surface-container transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Fleet CSV
+            </a>
+            <a
+              href="/api/platform/exports/sites.csv"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-outline-variant/50 text-sm font-label font-medium text-on-surface hover:bg-surface-container transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Sites CSV
+            </a>
+          </div>
+        </div>
       </div>
 
       {error && (
@@ -92,6 +119,7 @@ export default function Analytics() {
             <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider">Linked Accounts</h3>
           </div>
           <div className="text-3xl font-headline font-bold text-on-surface">{accounts.length}</div>
+          <p className="text-xs text-on-surface-variant mt-2">{sites.length} deployment sites</p>
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm">
@@ -130,15 +158,15 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm p-6">
           <div className="mb-6">
-            <h2 className="text-lg font-headline font-bold text-on-surface">Terminals by Account</h2>
-            <p className="text-sm text-on-surface-variant">Live terminal counts grouped by linked Starlink account</p>
+            <h2 className="text-lg font-headline font-bold text-on-surface">Sites by Account Type</h2>
+            <p className="text-sm text-on-surface-variant">Ranger, community, base-camp, and operations deployments</p>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={terminalsByAccount} margin={{ top: 10, right: 10, left: -20, bottom: 30 }}>
+              <BarChart data={sitesByType} margin={{ top: 10, right: 10, left: -20, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                 <XAxis
-                  dataKey="email"
+                  dataKey="type"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12, fill: '#6b7280' }}
@@ -148,7 +176,7 @@ export default function Analytics() {
                 />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} allowDecimals={false} />
                 <RechartsTooltip />
-                <Bar dataKey="terminals" fill="#005477" radius={[4, 4, 0, 0]} maxBarSize={56} />
+                <Bar dataKey="sites" fill="#005477" radius={[4, 4, 0, 0]} maxBarSize={56} />
               </BarChart>
             </ResponsiveContainer>
           </div>

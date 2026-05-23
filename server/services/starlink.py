@@ -18,7 +18,7 @@ from typing import Any, Optional
 import httpx
 
 from server.models.schemas import (
-    Terminal, TerminalTelemetry, WifiConfig, DishConfig, FleetStats, StarlinkAccount, FleetSnapshotResponse,
+    DeploymentSite, Terminal, TerminalTelemetry, WifiConfig, DishConfig, FleetStats, StarlinkAccount, FleetSnapshotResponse,
 )
 from server.config import settings
 
@@ -28,35 +28,62 @@ logger = logging.getLogger(__name__)
 
 _MOCK_TERMINALS: list[Terminal] = [
     Terminal(id="EA-JUB-001", account_id="acc-1", account_email="admin@enjojofoundation.org",
+             account_type="ranger", site_id="site-rangers-juba", site_type="ranger_gateway",
              loc="Juba Central, SS", coords=(4.85, 31.6), status="ONLINE",
-             data_usage_gb=42.4, latency_ms=28, connected_devices=18, uptime_percent=99.1),
+             data_usage_gb=42.4, latency_ms=28, connected_devices=18, uptime_percent=99.1,
+             data_sources=["starlink", "ruijie_ap", "zalo_dns", "ranger_radio_gateway"],
+             ranger_voice_sessions=164, bluetti_soc_percent=86),
     Terminal(id="EA-KMP-014", account_id="acc-2", account_email="kenya.ops@enjojofoundation.org",
+             account_type="community", site_id="site-community-kampala", site_type="community_gateway",
              loc="Kampala North, UG", coords=(0.34, 32.58), status="ONLINE",
-             data_usage_gb=8.1, latency_ms=31, connected_devices=6, uptime_percent=98.4),
+             data_usage_gb=8.1, latency_ms=31, connected_devices=6, uptime_percent=98.4,
+             data_sources=["starlink", "unifi_ap", "community_landing_page"],
+             community_usage_sessions=83, bluetti_soc_percent=71),
     Terminal(id="EA-JUB-009", account_id="acc-1", account_email="admin@enjojofoundation.org",
+             account_type="ranger", site_id="site-rangers-juba", site_type="ranger_gateway",
              loc="Juba A2 Outpost, SS", coords=(4.9, 31.65), status="DEGRADED",
-             data_usage_gb=0.0, latency_ms=None, connected_devices=2, uptime_percent=45.0),
+             data_usage_gb=0.0, latency_ms=None, connected_devices=2, uptime_percent=45.0,
+             data_sources=["starlink", "zalo_dns", "ranger_radio_gateway"],
+             ranger_voice_sessions=27, bluetti_soc_percent=44),
     Terminal(id="EA-KMP-022", account_id="acc-3", account_email="rwanda.ops@enjojofoundation.org",
+             account_type="base_camp", site_id="site-base-entebbe", site_type="base_camp",
              loc="Entebbe Logistics, UG", coords=(0.06, 32.44), status="ONLINE",
-             data_usage_gb=112.9, latency_ms=35, connected_devices=31, uptime_percent=97.8),
+             data_usage_gb=112.9, latency_ms=35, connected_devices=31, uptime_percent=97.8,
+             data_sources=["starlink", "unifi_ap", "bluetti_exporter"],
+             bluetti_soc_percent=92),
     Terminal(id="EA-NBO-004", account_id="acc-1", account_email="admin@enjojofoundation.org",
+             account_type="ranger", site_id="site-rangers-nairobi", site_type="ranger_gateway",
              loc="Nairobi, KE", coords=(-1.29, 36.82), status="DEGRADED",
-             data_usage_gb=12.4, latency_ms=120, connected_devices=4, uptime_percent=72.3),
+             data_usage_gb=12.4, latency_ms=120, connected_devices=4, uptime_percent=72.3,
+             data_sources=["starlink", "zalo_dns", "ranger_radio_gateway"],
+             ranger_voice_sessions=42, bluetti_soc_percent=58),
     Terminal(id="EA-MSA-099", account_id="acc-2", account_email="kenya.ops@enjojofoundation.org",
+             account_type="community", site_id="site-community-mombasa", site_type="community_gateway",
              loc="Mombasa, KE", coords=(-4.05, 39.67), status="ONLINE",
-             data_usage_gb=56.2, latency_ms=38, connected_devices=22, uptime_percent=96.5),
+             data_usage_gb=56.2, latency_ms=38, connected_devices=22, uptime_percent=96.5,
+             data_sources=["starlink", "ruijie_ap", "community_landing_page"],
+             community_usage_sessions=231, bluetti_soc_percent=79),
     Terminal(id="EA-ZNZ-021", account_id="acc-1", account_email="admin@enjojofoundation.org",
+             account_type="community", site_id="site-community-zanzibar", site_type="community_gateway",
              loc="Zanzibar, TZ", coords=(-6.17, 39.2), status="OFFLINE",
-             data_usage_gb=0.0, latency_ms=None, connected_devices=0, uptime_percent=0.0),
+             data_usage_gb=0.0, latency_ms=None, connected_devices=0, uptime_percent=0.0,
+             data_sources=["starlink", "community_landing_page"],
+             community_usage_sessions=0, bluetti_soc_percent=12),
     Terminal(id="EA-GUL-003", account_id="acc-3", account_email="rwanda.ops@enjojofoundation.org",
+             account_type="base_camp", site_id="site-base-gulu", site_type="base_camp",
              loc="Gulu, UG", coords=(2.77, 32.29), status="ONLINE",
-             data_usage_gb=77.6, latency_ms=25, connected_devices=28, uptime_percent=99.5),
+             data_usage_gb=77.6, latency_ms=25, connected_devices=28, uptime_percent=99.5,
+             data_sources=["starlink", "unifi_ap", "bluetti_exporter"],
+             bluetti_soc_percent=88),
 ]
 
 _MOCK_ACCOUNTS: list[StarlinkAccount] = [
-    StarlinkAccount(id=1, email="admin@enjojofoundation.org", status="Active", terminal_count=4),
-    StarlinkAccount(id=2, email="kenya.ops@enjojofoundation.org", status="Active", terminal_count=2),
-    StarlinkAccount(id=3, email="rwanda.ops@enjojofoundation.org", status="Active", terminal_count=2),
+    StarlinkAccount(id=1, email="admin@enjojofoundation.org", status="Active", terminal_count=4,
+                    account_type="ranger", display_name="Ranger Communications"),
+    StarlinkAccount(id=2, email="kenya.ops@enjojofoundation.org", status="Active", terminal_count=2,
+                    account_type="community", display_name="Community Gateways"),
+    StarlinkAccount(id=3, email="rwanda.ops@enjojofoundation.org", status="Active", terminal_count=2,
+                    account_type="base_camp", display_name="Base Camp Operations"),
 ]
 
 _MOCK_WIFI: dict[str, WifiConfig] = {}
@@ -74,6 +101,65 @@ def _default_wifi(terminal_id: str) -> WifiConfig:
 
 def _default_dish(terminal_id: str) -> DishConfig:
     return DishConfig(snow_melt_mode="auto", power_saving=False)
+
+
+def _account_type_for_email(email: str) -> str:
+    account = next((item for item in _MOCK_ACCOUNTS if item.email == email), None)
+    return account.account_type if account else "operations"
+
+
+def _site_purpose(site_type: str) -> str:
+    purposes = {
+        "ranger_gateway": "Ranger communications, Zalo DNS routing, walkie-talkie gateway, and field telemetry.",
+        "community_gateway": "Community internet gateway with landing-page usage reasons and access-point analytics.",
+        "base_camp": "Office and base-camp connectivity for employees, power telemetry, and operational data collection.",
+    }
+    return purposes.get(site_type, "Operational connectivity and telemetry collection.")
+
+
+def _terminal_metric_sum(terminals: list[Terminal], field: str) -> int:
+    return int(sum(int(getattr(terminal, field) or 0) for terminal in terminals))
+
+
+def _build_deployment_sites(terminals: list[Terminal]) -> list[DeploymentSite]:
+    grouped: dict[str, list[Terminal]] = {}
+    for terminal in terminals:
+        grouped.setdefault(terminal.site_id or terminal.id, []).append(terminal)
+
+    sites: list[DeploymentSite] = []
+    for site_id, site_terminals in grouped.items():
+        first = site_terminals[0]
+        connected_devices = sum(int(terminal.connected_devices or 0) for terminal in site_terminals)
+        data_sources = sorted({
+            source
+            for terminal in site_terminals
+            for source in terminal.data_sources
+        })
+        sites.append(DeploymentSite(
+            id=site_id,
+            name=first.loc.split(",")[0],
+            account_email=first.account_email,
+            account_type=first.account_type,
+            site_type=first.site_type,
+            purpose=_site_purpose(first.site_type),
+            loc=first.loc,
+            coords=first.coords,
+            terminal_ids=[terminal.id for terminal in site_terminals],
+            data_sources=data_sources,
+            metrics={
+                "terminal_count": len(site_terminals),
+                "online_terminals": sum(1 for terminal in site_terminals if terminal.status == "ONLINE"),
+                "connected_devices": connected_devices,
+                "community_usage_sessions": _terminal_metric_sum(site_terminals, "community_usage_sessions"),
+                "ranger_voice_sessions": _terminal_metric_sum(site_terminals, "ranger_voice_sessions"),
+                "avg_bluetti_soc_percent": round(
+                    sum(float(terminal.bluetti_soc_percent or 0) for terminal in site_terminals)
+                    / max(sum(1 for terminal in site_terminals if terminal.bluetti_soc_percent is not None), 1),
+                    1,
+                ),
+            },
+        ))
+    return sites
 
 
 # ─── Mock Service ─────────────────────────────────────────────────────────────
@@ -148,6 +234,10 @@ class MockStarlinkService:
     async def get_accounts(self) -> list[StarlinkAccount]:
         return list(_MOCK_ACCOUNTS)
 
+    async def get_deployment_sites(self) -> list[DeploymentSite]:
+        terminals = await self.get_terminals()
+        return _build_deployment_sites(terminals)
+
     async def get_fleet_snapshot(self) -> FleetSnapshotResponse:
         terminals = await self.get_terminals()
         accounts = await self.get_accounts()
@@ -160,7 +250,14 @@ class MockStarlinkService:
 
     async def link_account(self, email: str, password: str = "", cookie_json: str | None = None) -> StarlinkAccount:
         new_id = max((a.id for a in _MOCK_ACCOUNTS), default=0) + 1
-        account = StarlinkAccount(id=new_id, email=email, status="Active", terminal_count=0)
+        account = StarlinkAccount(
+            id=new_id,
+            email=email,
+            status="Active",
+            terminal_count=0,
+            account_type="operations",
+            display_name="Operations Account",
+        )
         _MOCK_ACCOUNTS.append(account)
         return account
 
@@ -318,8 +415,8 @@ class RemoteStarlinkService(MockStarlinkService):
         self._clients: dict[str, any] = {}          # email → GrpcWebClient
         self._sl_cache: dict[str, list] = {}         # email → list[ServiceLine]
         self._load_errors: dict[str, str] = {}       # email → load error
-        self._fleet_cache_ttl_s = 60
-        self._summary_cache_ttl_s = 90
+        self._fleet_cache_ttl_s = 30
+        self._summary_cache_ttl_s = 30
         self._fleet_cache: tuple[float, list[Terminal]] | None = None
         self._terminal_summary_cache: dict[str, tuple[float, dict[str, Any]]] = {}
         self._summary_warm_task: asyncio.Task | None = None
@@ -567,6 +664,18 @@ class RemoteStarlinkService(MockStarlinkService):
         terminals = []
         service_address = sl.get("serviceAddress") or {}
         geo = service_address.get("geoLocation") or {}
+        account_type = _account_type_for_email(email)
+        site_type = {
+            "ranger": "ranger_gateway",
+            "community": "community_gateway",
+            "base_camp": "base_camp",
+        }.get(account_type, "operations")
+        site_id = str(
+            sl.get("serviceLineNumber")
+            or service_address.get("addressReferenceId")
+            or service_address.get("id")
+            or account_id
+        )
         for ut in sl.get("userTerminals") or []:
             try:
                 terminal_id = ut.get("userTerminalId")
@@ -584,6 +693,9 @@ class RemoteStarlinkService(MockStarlinkService):
                     id=terminal_id,
                     account_id=account_id,
                     account_email=email,
+                    account_type=account_type,
+                    site_id=f"site-{site_id}",
+                    site_type=site_type,
                     loc=self._ut_loc(ut, sl),
                     coords=(lat, lng),
                     status=status,
@@ -592,6 +704,7 @@ class RemoteStarlinkService(MockStarlinkService):
                     download_mbps=None,
                     connected_devices=None,
                     uptime_percent=100.0 if status == "ONLINE" else 0.0,
+                    data_sources=["starlink"],
                 ))
             except Exception as exc:
                 logger.warning("Failed to map UserTerminal %s: %s", ut.get("userTerminalId", "?"), exc)
@@ -778,8 +891,14 @@ class RemoteStarlinkService(MockStarlinkService):
                 email=email,
                 status="Active",
                 terminal_count=terminal_count,
+                account_type=_account_type_for_email(email),
+                display_name=email,
             ))
         return accounts
+
+    async def get_deployment_sites(self) -> list[DeploymentSite]:
+        terminals = await self.get_terminals()
+        return _build_deployment_sites(terminals)
 
     async def get_fleet_snapshot(self) -> FleetSnapshotResponse:
         terminals = await self.get_terminals()
@@ -793,6 +912,8 @@ class RemoteStarlinkService(MockStarlinkService):
                 email=email,
                 status="Active",
                 terminal_count=account_terminal_counts.get(email, 0),
+                account_type=_account_type_for_email(email),
+                display_name=email,
             )
             for idx, email in enumerate(self._clients.keys())
         ]

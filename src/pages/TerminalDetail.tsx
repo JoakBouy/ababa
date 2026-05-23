@@ -24,6 +24,7 @@ import { cn } from '../utils/cn';
 import { initLeafletIcons, createStatusIcon } from '../utils/leafletSetup';
 import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
 import { useToast } from '../contexts/ToastContext';
+import { accountTypeLabel, siteTypeLabel } from '../utils/platform';
 import {
   getDishConfig,
   getTerminal,
@@ -78,6 +79,13 @@ function mergeTerminal(previous: Terminal | null, next: Terminal): Terminal {
     latency_ms: next.latency_ms ?? previous.latency_ms,
     download_mbps: next.download_mbps ?? previous.download_mbps,
     connected_devices: next.connected_devices ?? previous.connected_devices,
+    account_type: next.account_type || previous.account_type,
+    site_id: next.site_id ?? previous.site_id,
+    site_type: next.site_type || previous.site_type,
+    data_sources: next.data_sources.length > 0 ? next.data_sources : previous.data_sources,
+    community_usage_sessions: next.community_usage_sessions ?? previous.community_usage_sessions,
+    ranger_voice_sessions: next.ranger_voice_sessions ?? previous.ranger_voice_sessions,
+    bluetti_soc_percent: next.bluetti_soc_percent ?? previous.bluetti_soc_percent,
   };
 }
 
@@ -407,6 +415,14 @@ export default function TerminalDetail() {
                 <div className="flex justify-between py-2 border-b border-outline-variant/10">
                   <span className="text-sm text-on-surface-variant font-body">Linked Account</span>
                   <span className="text-sm font-medium text-on-surface">{terminal?.account_email ?? '--'}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-outline-variant/10">
+                  <span className="text-sm text-on-surface-variant font-body">Deployment Type</span>
+                  <span className="text-sm font-medium text-on-surface">{terminal ? siteTypeLabel(terminal.site_type) : '--'}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-outline-variant/10">
+                  <span className="text-sm text-on-surface-variant font-body">Account Purpose</span>
+                  <span className="text-sm font-medium text-on-surface">{terminal ? accountTypeLabel(terminal.account_type) : '--'}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-outline-variant/10">
                   <span className="text-sm text-on-surface-variant font-body">Connection Mode</span>

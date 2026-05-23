@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 from pydantic import BaseModel, EmailStr
 
 
@@ -21,6 +21,9 @@ class Terminal(BaseModel):
     id: str
     account_id: str
     account_email: str
+    account_type: str = "operations"  # ranger | community | base_camp | operations
+    site_id: Optional[str] = None
+    site_type: str = "operations"
     loc: str
     coords: tuple[float, float]
     status: str  # ONLINE | OFFLINE | DEGRADED
@@ -29,6 +32,10 @@ class Terminal(BaseModel):
     download_mbps: Optional[float] = None
     connected_devices: Optional[int]
     uptime_percent: float
+    data_sources: list[str] = []
+    community_usage_sessions: Optional[int] = None
+    ranger_voice_sessions: Optional[int] = None
+    bluetti_soc_percent: Optional[float] = None
 
 
 class TerminalTelemetry(BaseModel):
@@ -85,13 +92,37 @@ class FleetStats(BaseModel):
     avg_uptime_percent: float
 
 
-# ─── Starlink Accounts ───────────────────────────────────────────────────────
+# ─── Platform Sites & Accounts ───────────────────────────────────────────────
 
 class StarlinkAccount(BaseModel):
     id: int
     email: str
     status: str
     terminal_count: int
+    account_type: str = "operations"
+    display_name: Optional[str] = None
+
+
+class DeploymentSite(BaseModel):
+    id: str
+    name: str
+    account_email: str
+    account_type: str
+    site_type: str
+    purpose: str
+    loc: str
+    coords: tuple[float, float]
+    terminal_ids: list[str]
+    data_sources: list[str]
+    metrics: dict[str, Any]
+
+
+class ExportManifest(BaseModel):
+    formats: list[str]
+    endpoints: dict[str, str]
+    openapi_json: str
+    swagger_docs: str
+    redoc_docs: str
 
 
 class FleetSnapshotResponse(BaseModel):

@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production-use-a-long-random-string"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 8  # 8 hours
+    # Development bypass for the PoC UI. Set DEV_AUTH_BYPASS=false before production use.
+    dev_auth_bypass: bool = True
 
     # Starlink
     # Set STARLINK_MODE=local  → connects to dish at STARLINK_LOCAL_IP via gRPC

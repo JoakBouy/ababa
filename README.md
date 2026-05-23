@@ -1,20 +1,34 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Enjojo Command Center
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/f59e0fd9-048d-499a-a358-53b9789dd9a4
+API-first operations platform for Enjojo connectivity deployments. The dashboard is a PoC UI, but raw telemetry, account metadata, site/project data, and exports are available independently through REST endpoints.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+1. Install frontend dependencies: `npm install`
+2. Install backend dependencies: `npm run backend:install`
+3. Start the backend: `npm run backend`
+4. Start the frontend: `npm run dev`
 
+Frontend: http://localhost:3000  
+Backend API: http://localhost:8000
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## API Deliverables
+
+- Swagger docs: http://localhost:8000/docs
+- Redoc docs: http://localhost:8000/redoc
+- Live OpenAPI JSON: http://localhost:8000/openapi.json
+- Checked-in OpenAPI contract: [openapi.yaml](./openapi.yaml)
+
+## Development Login
+
+Backend login is currently bypassed for PoC development via `DEV_AUTH_BYPASS=true` by default. Any email/password submitted from the UI will create a local operator session. Set `DEV_AUTH_BYPASS=false` before using configured bcrypt operator accounts in a production-like environment.
+
+## Export Endpoints
+
+- `GET /api/platform/exports/fleet.json`
+- `GET /api/platform/exports/fleet.csv`
+- `GET /api/platform/exports/sites.json`
+- `GET /api/platform/exports/sites.csv`
+- `GET /api/platform/sites`
+
+The platform distinguishes ranger gateways, community gateways, base-camp operations, and general operations so deployments are not flattened into one Starlink-only view.

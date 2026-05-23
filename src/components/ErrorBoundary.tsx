@@ -7,6 +7,8 @@ export default class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
   State
 > {
+  declare props: Readonly<{ children: React.ReactNode }>;
+
   state: State = { hasError: false, message: '' };
 
   static getDerivedStateFromError(error: Error): State {

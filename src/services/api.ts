@@ -38,6 +38,9 @@ export interface Terminal {
   id: string;
   account_id: string;
   account_email: string;
+  account_type: 'ranger' | 'community' | 'base_camp' | 'operations' | string;
+  site_id: string | null;
+  site_type: string;
   loc: string;
   coords: [number, number];
   status: 'ONLINE' | 'OFFLINE' | 'DEGRADED';
@@ -46,6 +49,10 @@ export interface Terminal {
   download_mbps: number | null;
   connected_devices: number | null;
   uptime_percent: number;
+  data_sources: string[];
+  community_usage_sessions: number | null;
+  ranger_voice_sessions: number | null;
+  bluetti_soc_percent: number | null;
 }
 
 export interface TerminalTelemetry {
@@ -145,6 +152,8 @@ export interface StarlinkAccount {
   email: string;
   status: string;
   terminal_count: number;
+  account_type: 'ranger' | 'community' | 'base_camp' | 'operations' | string;
+  display_name: string | null;
 }
 
 export function getStarlinkAccounts() {
@@ -160,4 +169,36 @@ export function linkStarlinkAccount(email: string, cookieJson: string) {
 
 export function removeStarlinkAccount(id: number) {
   return request<{ message: string }>(`/accounts/${id}`, { method: 'DELETE' });
+}
+
+// ─── Platform Exports ───────────────────────────────────────────────────────
+
+export interface DeploymentSite {
+  id: string;
+  name: string;
+  account_email: string;
+  account_type: string;
+  site_type: string;
+  purpose: string;
+  loc: string;
+  coords: [number, number];
+  terminal_ids: string[];
+  data_sources: string[];
+  metrics: Record<string, number | string>;
+}
+
+export interface ExportManifest {
+  formats: string[];
+  endpoints: Record<string, string>;
+  openapi_json: string;
+  swagger_docs: string;
+  redoc_docs: string;
+}
+
+export function getDeploymentSites() {
+  return request<DeploymentSite[]>('/platform/sites');
+}
+
+export function getExportManifest() {
+  return request<ExportManifest>('/platform/exports');
 }

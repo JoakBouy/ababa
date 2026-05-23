@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  getDeploymentSites,
   getFleetSnapshot,
+  type DeploymentSite,
   type FleetStats,
   type StarlinkAccount,
   type Terminal,
@@ -9,6 +11,7 @@ import {
 interface FleetSnapshotState {
   accounts: StarlinkAccount[];
   terminals: Terminal[];
+  sites: DeploymentSite[];
   fleetStats: FleetStats | null;
   isLoading: boolean;
   isRefreshing: boolean;
@@ -18,6 +21,7 @@ interface FleetSnapshotState {
 }
 
 const FleetSnapshotContext = createContext<FleetSnapshotState | null>(null);
+const SNAPSHOT_REFRESH_MS = 30_000;
 
 function mergeTerminals(previous: Terminal[], next: Terminal[]): Terminal[] {
   const previousById = new Map(previous.map((terminal) => [terminal.id, terminal]));
@@ -32,9 +36,16 @@ function mergeTerminals(previous: Terminal[], next: Terminal[]): Terminal[] {
       ...terminal,
       loc: terminal.loc || previousTerminal.loc,
       coords: terminal.coords ?? previousTerminal.coords,
+      account_type: terminal.account_type || previousTerminal.account_type,
+      site_id: terminal.site_id ?? previousTerminal.site_id,
+      site_type: terminal.site_type || previousTerminal.site_type,
       latency_ms: terminal.latency_ms ?? previousTerminal.latency_ms,
       download_mbps: terminal.download_mbps ?? previousTerminal.download_mbps,
       connected_devices: terminal.connected_devices ?? previousTerminal.connected_devices,
+      data_sources: terminal.data_sources.length > 0 ? terminal.data_sources : previousTerminal.data_sources,
+      community_usage_sessions: terminal.community_usage_sessions ?? previousTerminal.community_usage_sessions,
+      ranger_voice_sessions: terminal.ranger_voice_sessions ?? previousTerminal.ranger_voice_sessions,
+      bluetti_soc_percent: terminal.bluetti_soc_percent ?? previousTerminal.bluetti_soc_percent,
     };
   });
 }
@@ -61,6 +72,7 @@ function buildFleetStats(terminals: Terminal[], totalDataTb: number): FleetStats
 export function FleetSnapshotProvider({ children }: { children: React.ReactNode }) {
   const [accounts, setAccounts] = useState<StarlinkAccount[]>([]);
   const [terminals, setTerminals] = useState<Terminal[]>([]);
+  const [sites, setSites] = useState<DeploymentSite[]>([]);
   const [fleetStats, setFleetStats] = useState<FleetStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -68,14 +80,14 @@ export function FleetSnapshotProvider({ children }: { children: React.ReactNode 
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
 
   const inFlightRef = useRef(false);
-  const loadSnapshotRef = useRef<((reason: 'initial' | 'accounts' | 'manual', showLoader: boolean) => Promise<void>) | null>(null);
+  const loadSnapshotRef = useRef<((reason: 'initial' | 'accounts' | 'manual' | 'poll', showLoader: boolean) => Promise<void>) | null>(null);
   const terminalsRef = useRef<Terminal[]>([]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadSnapshot(
-      reason: 'initial' | 'accounts' | 'manual',
+      reason: 'initial' | 'accounts' | 'manual' | 'poll',
       showLoader: boolean,
     ) {
       if (inFlightRef.current) {
@@ -90,7 +102,10 @@ export function FleetSnapshotProvider({ children }: { children: React.ReactNode 
       setError(null);
 
       try {
-        const snapshot = await getFleetSnapshot();
+        const [snapshot, deploymentSites] = await Promise.all([
+          getFleetSnapshot(),
+          getDeploymentSites(),
+        ]);
         if (cancelled) {
           return;
         }
@@ -98,6 +113,7 @@ export function FleetSnapshotProvider({ children }: { children: React.ReactNode 
         terminalsRef.current = mergedTerminals;
         setAccounts(snapshot.accounts);
         setTerminals(mergedTerminals);
+        setSites(deploymentSites);
         setFleetStats(buildFleetStats(mergedTerminals, snapshot.fleet_stats.total_data_tb));
         setLastUpdatedAt(Date.now());
         setIsLoading(false);
@@ -122,11 +138,15 @@ export function FleetSnapshotProvider({ children }: { children: React.ReactNode 
     };
 
     void loadSnapshot('initial', true);
+    const pollingId = window.setInterval(() => {
+      void loadSnapshot('poll', false);
+    }, SNAPSHOT_REFRESH_MS);
 
     window.addEventListener('starlink-accounts-changed', refreshOnAccountsChange);
 
     return () => {
       cancelled = true;
+      window.clearInterval(pollingId);
       loadSnapshotRef.current = null;
       window.removeEventListener('starlink-accounts-changed', refreshOnAccountsChange);
     };
@@ -135,6 +155,7 @@ export function FleetSnapshotProvider({ children }: { children: React.ReactNode 
   const value = useMemo<FleetSnapshotState>(() => ({
     accounts,
     terminals,
+    sites,
     fleetStats,
     isLoading,
     isRefreshing,
@@ -143,7 +164,7 @@ export function FleetSnapshotProvider({ children }: { children: React.ReactNode 
     refreshFleetSnapshot: async (reason = 'manual') => {
       await loadSnapshotRef.current?.(reason, false);
     },
-  }), [accounts, terminals, fleetStats, isLoading, isRefreshing, error, lastUpdatedAt]);
+  }), [accounts, terminals, sites, fleetStats, isLoading, isRefreshing, error, lastUpdatedAt]);
 
   return (
     <FleetSnapshotContext.Provider value={value}>
