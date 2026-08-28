@@ -102,10 +102,9 @@ export default function Layout() {
 
   const navItems = [
     { name: 'Command Center', path: '/', icon: LayoutDashboard },
-    { name: 'Connected Endpoints', path: '/terminals', icon: Satellite },
-    { name: 'Analytics & Impact', path: '/analytics', icon: BarChart3 },
-    { name: 'Community Impact', path: '/impact', icon: HeartHandshake },
-    { name: 'Settings', path: '/settings', icon: Settings },
+    { name: 'Field Kits & Endpoints', path: '/terminals', icon: Satellite },
+    { name: 'Field Analytics', path: '/analytics', icon: BarChart3 },
+    { name: 'Settings & SLA', path: '/settings', icon: Settings },
   ];
 
   const userInitials = user?.name
