@@ -146,10 +146,12 @@ export default function Layout() {
       )}>
         <div className="p-6 pb-2 flex justify-between items-center">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-headline font-bold text-xl tracking-tight text-primary">Enjojo</span>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="font-headline font-bold text-xl tracking-tight text-primary">GPOC</span>
+              <span className="text-xs px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-label font-bold">South Sudan</span>
             </div>
-            <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">Operations Platform</p>
+            <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-wider">Unity Oil Field Monitor</p>
+            <p className="text-[9px] font-body text-primary/80 mt-0.5 font-medium">By Ababa Group Ltd</p>
           </div>
           <button 
             className="md:hidden p-2 text-on-surface-variant hover:bg-surface-container rounded-full"
@@ -179,23 +181,29 @@ export default function Layout() {
         </nav>
 
         <div className="p-4 space-y-4">
+          <div className="p-2.5 bg-surface-container rounded-md border border-outline-variant/40">
+            <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-wider">Contracted Provider</p>
+            <p className="text-xs font-headline font-bold text-on-surface">Ababa Group Ltd</p>
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">SLA Status: Optimal (99.8%)</p>
+          </div>
+
           <button 
             onClick={() => {
               setShowMobileMenu(false);
               navigate('/settings');
             }}
-            className="w-full bg-on-surface text-surface py-3 rounded-md font-label font-bold text-xs tracking-widest uppercase hover:bg-on-surface/90 transition-colors shadow-sm"
+            className="w-full bg-on-surface text-surface py-2.5 rounded-md font-label font-bold text-xs tracking-widest uppercase hover:bg-on-surface/90 transition-colors shadow-sm"
           >
             Link Data Source
           </button>
           
-          <div className="pt-4 border-t border-outline-variant/30 flex items-center gap-3">
+          <div className="pt-3 border-t border-outline-variant/30 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 font-bold text-sm">
-              {user?.name?.substring(0, 2).toUpperCase() ?? 'OP'}
+              {user?.name?.substring(0, 2).toUpperCase() ?? 'GP'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-label font-bold text-on-surface truncate">{user?.name ?? 'Operator'}</p>
-              <p className="text-xs font-body text-on-surface-variant truncate">{user?.role ?? 'Fleet Manager'}</p>
+              <p className="text-sm font-label font-bold text-on-surface truncate">{user?.name ?? 'GPOC Operator'}</p>
+              <p className="text-xs font-body text-on-surface-variant truncate">{user?.role ?? 'Unity Operations Manager'}</p>
             </div>
           </div>
         </div>
@@ -217,7 +225,7 @@ export default function Layout() {
               <Search className="w-4 h-4 text-on-surface-variant" />
               <input 
                 type="text" 
-                placeholder="Search endpoints, sites, or locations..." 
+                placeholder="Search Unity Oil Field kits, well pads, or sites..." 
                 className="bg-transparent border-none outline-none text-sm font-body w-full text-on-surface placeholder:text-on-surface-variant"
               />
             </div>

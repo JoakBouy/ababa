@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { authLogin } from '../services/api';
 
 interface User {
   email: string;
@@ -17,28 +18,19 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
-    const stored = sessionStorage.getItem('enjojo_user');
+    const stored = sessionStorage.getItem('gpoc_user');
     return stored ? JSON.parse(stored) : null;
   });
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'Login failed' }));
-      throw new Error(err.detail ?? 'Invalid credentials');
-    }
-    const data = await res.json();
+    const data = await authLogin(email, password);
     const loggedInUser: User = { email: data.email, name: data.name, role: data.role };
-    sessionStorage.setItem('enjojo_user', JSON.stringify(loggedInUser));
+    sessionStorage.setItem('gpoc_user', JSON.stringify(loggedInUser));
     setUser(loggedInUser);
   }, []);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem('enjojo_user');
+    sessionStorage.removeItem('gpoc_user');
     setUser(null);
   }, []);
 

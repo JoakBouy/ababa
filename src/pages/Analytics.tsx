@@ -66,9 +66,12 @@ export default function Analytics() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <div>
-        <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Live Fleet Analytics</p>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contractor: Ababa Group Ltd</span>
+        </div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Analytics Dashboard</h1>
+          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Unity Oilfield Telemetry & Analytics</h1>
           <div className="flex gap-2">
             <a
               href="/api/platform/exports/fleet.csv"

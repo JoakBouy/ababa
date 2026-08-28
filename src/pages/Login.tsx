@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Satellite, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { Satellite, ShieldCheck, ArrowRight, Loader2, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
@@ -29,6 +29,11 @@ export default function Login() {
     }
   };
 
+  const fillDemo = (demoEmail: string) => {
+    setEmail(demoEmail);
+    setPassword('demo1234');
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface relative overflow-hidden">
       {/* Background Elements */}
@@ -40,15 +45,44 @@ export default function Login() {
       </div>
 
       <div className="relative z-10 w-full max-w-md p-8 sm:p-12 glass-panel rounded-3xl border border-white/20 shadow-2xl mx-4">
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-primary text-on-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-primary text-on-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300">
             <Satellite className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-headline font-bold text-on-surface mb-2 tracking-tight">Access Portal</h1>
-          <p className="text-on-surface-variant font-body">Enjojo Foundation Command Centre</p>
+          <span className="inline-block px-3 py-1 bg-primary-container text-on-primary-container font-label text-[10px] font-bold tracking-widest uppercase rounded-full mb-3">
+            Unity Oil Field Monitor
+          </span>
+          <h1 className="text-3xl font-headline font-bold text-on-surface mb-1 tracking-tight">GPOC South Sudan</h1>
+          <p className="text-on-surface-variant text-xs font-body font-medium">
+            Managed & Deployed by <span className="font-bold text-on-surface">Ababa Group Ltd</span>
+          </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        {/* Demo Account Fill Buttons */}
+        <div className="mb-6 p-3 bg-surface-container-low rounded-xl border border-outline-variant/40 text-xs">
+          <p className="font-label font-bold text-on-surface mb-2 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            Quick Demo Login:
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => fillDemo('operations@gpoc.co.ss')}
+              className="flex-1 py-1.5 px-2 bg-surface-container text-on-surface text-[11px] font-medium rounded border border-outline-variant/50 hover:bg-primary-container hover:text-on-primary-container transition-colors"
+            >
+              GPOC Ops Manager
+            </button>
+            <button
+              type="button"
+              onClick={() => fillDemo('telemetry@gpoc.co.ss')}
+              className="flex-1 py-1.5 px-2 bg-surface-container text-on-surface text-[11px] font-medium rounded border border-outline-variant/50 hover:bg-primary-container hover:text-on-primary-container transition-colors"
+            >
+              Ababa Field Engineer
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-5">
           {error && (
             <div role="alert" className="px-4 py-3 rounded-xl bg-error/10 border border-error/30 text-sm text-error font-body">
               {error}
@@ -57,7 +91,7 @@ export default function Login() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-label font-medium text-on-surface-variant ml-1">
-              Operator ID
+              Operator ID / Email
             </label>
             <div className="relative">
               <input
@@ -67,8 +101,8 @@ export default function Login() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-surface-container-highest border border-outline-variant/50 rounded-xl px-4 py-3.5 pl-11 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body"
-                placeholder="operator@example.com"
+                className="w-full bg-surface-container-highest border border-outline-variant/50 rounded-xl px-4 py-3 pl-11 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body text-sm"
+                placeholder="operator@gpoc.co.ss"
               />
               <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5" />
             </div>
@@ -77,9 +111,8 @@ export default function Login() {
           <div className="space-y-2">
             <div className="flex justify-between items-center ml-1">
               <label htmlFor="password" className="text-sm font-label font-medium text-on-surface-variant">
-                Access Code
+                Access Passcode
               </label>
-              <a href="#" className="text-xs font-medium text-primary hover:text-primary/80 transition-colors">Recover</a>
             </div>
             <div className="relative">
               <input
@@ -89,7 +122,7 @@ export default function Login() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-surface-container-highest border border-outline-variant/50 rounded-xl px-4 py-3.5 pl-11 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body"
+                className="w-full bg-surface-container-highest border border-outline-variant/50 rounded-xl px-4 py-3 pl-11 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body text-sm"
                 placeholder="••••••••"
               />
               <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5 opacity-50" />
@@ -99,22 +132,22 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary text-on-primary font-label font-semibold py-4 rounded-xl shadow-md hover:shadow-lg hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 group mt-8 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-primary text-on-primary font-label font-semibold py-3.5 rounded-xl shadow-md hover:shadow-lg hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 group mt-6 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
               <>
-                Authenticate
+                Authenticate Access
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-xs text-on-surface-variant/70 font-body">
-            Secure connection established. End-to-end encrypted.
+        <div className="mt-6 text-center border-t border-outline-variant/30 pt-4">
+          <p className="text-[11px] text-on-surface-variant/80 font-body">
+            Unity Oil Field Network Operations &bull; Contracted by Ababa Group Ltd
           </p>
         </div>
       </div>

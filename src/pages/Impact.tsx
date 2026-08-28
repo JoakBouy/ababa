@@ -27,8 +27,8 @@ const STATUS_COLORS: Record<string, string> = {
 export default function Impact() {
   const { accounts, terminals, sites, isLoading, error } = useFleetSnapshot();
 
-  const mapCenter: [number, number] = terminals[0]?.coords ?? [4.0, 31.5];
-  const zoomLevel = terminals.length > 0 ? 6 : 5;
+  const mapCenter: [number, number] = terminals[0]?.coords ?? [9.485, 29.835];
+  const zoomLevel = terminals.length > 0 ? 11 : 10;
 
   const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
   const tileUrl = mapboxToken
@@ -56,17 +56,20 @@ export default function Impact() {
   const throughputByTerminal = terminals
     .filter((terminal) => terminal.download_mbps != null)
     .map((terminal) => ({
-      id: terminal.id.slice(0, 10),
+      id: terminal.id.replace('ABABA-GPOC-', ''),
       throughput: terminal.download_mbps ?? 0,
     }));
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
-        <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Field Coverage & Impact</p>
-        <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Network Footprint</h1>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contractor: Ababa Group Ltd</span>
+        </div>
+        <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Unity Field Operational & Welfare Footprint</h1>
         <p className="text-sm text-on-surface-variant mt-2">
-          Live connectivity coverage, community usage signals, ranger communications, and base-camp telemetry from API data.
+          Live satellite telemetry, wellhead SCADA connectivity, emergency dispatch communications, and worker welfare signals across Unity Oil Field.
         </p>
       </div>
 

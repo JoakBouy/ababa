@@ -248,7 +248,7 @@ class MockStarlinkService:
             fleet_stats=fleet_stats,
         )
 
-    async def link_account(self, email: str, password: str = "", cookie_json: str | None = None) -> StarlinkAccount:
+    async def link_account(self, email: str, password: str = "", cookie_json: Optional[str] = None) -> StarlinkAccount:
         new_id = max((a.id for a in _MOCK_ACCOUNTS), default=0) + 1
         account = StarlinkAccount(
             id=new_id,
@@ -417,9 +417,9 @@ class RemoteStarlinkService(MockStarlinkService):
         self._load_errors: dict[str, str] = {}       # email → load error
         self._fleet_cache_ttl_s = 30
         self._summary_cache_ttl_s = 30
-        self._fleet_cache: tuple[float, list[Terminal]] | None = None
+        self._fleet_cache: Optional[tuple[float, list[Terminal]]] = None
         self._terminal_summary_cache: dict[str, tuple[float, dict[str, Any]]] = {}
-        self._summary_warm_task: asyncio.Task | None = None
+        self._summary_warm_task: Optional[asyncio.Task] = None
         self._max_parallel_service_line_fetches = 4
         self._max_parallel_summary_warms = 3
         # terminal_id → (email, [router_id, ...])
@@ -938,7 +938,7 @@ class RemoteStarlinkService(MockStarlinkService):
             ),
         )
 
-    async def link_account(self, email: str, password: str = "", cookie_json: str | None = None) -> StarlinkAccount:
+    async def link_account(self, email: str, password: str = "", cookie_json: Optional[str] = None) -> StarlinkAccount:
         """
         Save cookie JSON (from Cookie-Editor) to disk and hot-reload the client.
         No backend restart needed.

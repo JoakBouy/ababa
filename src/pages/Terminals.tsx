@@ -37,8 +37,12 @@ export default function Terminals() {
     <div className="max-w-7xl mx-auto space-y-8 relative">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Connected Endpoints</h1>
-          <p className="text-on-surface-variant font-body mt-1">Live terminals grouped by ranger, community, and base-camp deployments</p>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contractor: Ababa Group Ltd</span>
+          </div>
+          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Unity Oil Field Kit Inventory</h1>
+          <p className="text-on-surface-variant font-body mt-1">Satellite & telemetry endpoints monitoring CPF, well pads, rig camps, and pipeline stations</p>
         </div>
         <button
           onClick={() => navigate('/settings')}
@@ -62,7 +66,7 @@ export default function Terminals() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by ID, location, account..."
+            placeholder="Search kit ID, well pad, location..."
             className="bg-transparent border-none outline-none text-sm font-body w-full text-on-surface placeholder:text-on-surface-variant"
           />
         </div>
@@ -99,12 +103,11 @@ export default function Terminals() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant/30 bg-surface-container-low/50">
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Terminal ID</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Site Type</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Account</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Location</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Download</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Latency</th>
+                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Kit / Terminal ID</th>
+                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Oilfield Site</th>
+                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Contractor</th>
+                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Speed / Devices</th>
+                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Power (Solar SOC)</th>
                 <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Status</th>
               </tr>
             </thead>
@@ -136,14 +139,28 @@ export default function Terminals() {
                       <div className="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
                         <Satellite className="w-5 h-5" />
                       </div>
-                      <span className="font-headline font-bold text-on-surface group-hover:text-primary transition-colors">{terminal.id}</span>
+                      <div>
+                        <span className="font-headline font-bold text-on-surface group-hover:text-primary transition-colors block">{terminal.id}</span>
+                        <span className="text-[11px] text-on-surface-variant font-mono">{siteTypeLabel(terminal.site_type)}</span>
+                      </div>
                     </div>
                   </td>
-                  <td className="p-4 font-body text-sm text-on-surface-variant">{siteTypeLabel(terminal.site_type)}</td>
-                  <td className="p-4 font-body text-sm text-on-surface-variant">{terminal.account_email}</td>
-                  <td className="p-4 font-body text-sm text-on-surface-variant">{terminal.loc}</td>
-                  <td className="p-4 font-body text-sm text-on-surface-variant">{terminal.download_mbps != null ? `${terminal.download_mbps.toFixed(1)} Mbps` : '--'}</td>
-                  <td className="p-4 font-body text-sm text-on-surface-variant">{terminal.latency_ms ? `${terminal.latency_ms} ms` : '--'}</td>
+                  <td className="p-4 font-body text-sm text-on-surface">
+                    <span className="font-medium block">{terminal.loc}</span>
+                    <span className="text-xs text-on-surface-variant">GPOC Unity Oilfield</span>
+                  </td>
+                  <td className="p-4 font-body text-xs text-on-surface-variant">
+                    <span className="font-bold text-on-surface block">{terminal.contractor ?? 'Ababa Group Ltd'}</span>
+                    <span className="text-[11px] text-on-surface-variant font-mono">{terminal.account_email}</span>
+                  </td>
+                  <td className="p-4 font-body text-sm text-on-surface">
+                    <span className="font-bold block">{terminal.download_mbps != null ? `${terminal.download_mbps.toFixed(1)} Mbps` : '--'}</span>
+                    <span className="text-xs text-on-surface-variant">{terminal.connected_devices ?? 0} active devices ({terminal.latency_ms ?? '--'} ms)</span>
+                  </td>
+                  <td className="p-4 font-body text-sm">
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 block">{terminal.bluetti_soc_percent != null ? `${terminal.bluetti_soc_percent}% SOC` : 'Grid Connected'}</span>
+                    <span className="text-xs text-on-surface-variant">Solar Battery Station</span>
+                  </td>
                   <td className="p-4">
                     <div
                       className={cn(

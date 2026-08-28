@@ -49,8 +49,8 @@ export default function Dashboard() {
   const rangerSessions = filteredTerminals.reduce((sum, terminal) => sum + (terminal.ranger_voice_sessions ?? 0), 0);
   const accountTypes = Array.from(new Set(accounts.map((account) => account.account_type).filter(Boolean))) as string[];
 
-  const mapCenter: [number, number] = filteredTerminals[0]?.coords ?? [4.0, 31.5];
-  const zoomLevel = filteredTerminals.length > 0 ? 6 : 5;
+  const mapCenter: [number, number] = filteredTerminals[0]?.coords ?? [9.485, 29.835];
+  const zoomLevel = filteredTerminals.length > 0 ? 11 : 10;
 
   const handleZoomIn = () => map?.zoomIn();
   const handleZoomOut = () => map?.zoomOut();
@@ -60,7 +60,7 @@ export default function Dashboard() {
     if (!map) {
       return;
     }
-    map.flyTo(coords, 9, { duration: 1.5 });
+    map.flyTo(coords, 12, { duration: 1.5 });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -78,8 +78,11 @@ export default function Dashboard() {
     <div className="max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <p className="text-[10px] font-label font-bold text-primary uppercase tracking-widest mb-1">Operational Overview</p>
-          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Command Center</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contracted by Ababa Group Ltd</span>
+          </div>
+          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Unity Oil Field Command Center</h1>
         </div>
         <div className="flex flex-wrap gap-3 items-center">
           <div className="relative">
