@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { FleetSnapshotProvider } from './contexts/FleetSnapshotContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { AlertProvider } from './contexts/AlertContext';
 import ToastContainer from './components/ToastContainer';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -23,30 +24,32 @@ export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <BrowserRouter>
-          <ErrorBoundary>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <FleetSnapshotProvider>
-                      <Layout />
-                    </FleetSnapshotProvider>
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Dashboard />} />
-                <Route path="terminals" element={<Terminals />} />
-                <Route path="terminals/:id" element={<TerminalDetail />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="settings" element={<Settings />} />
-              </Route>
-            </Routes>
-          </ErrorBoundary>
-        </BrowserRouter>
-        <ToastContainer />
+        <AlertProvider>
+          <BrowserRouter>
+            <ErrorBoundary>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <FleetSnapshotProvider>
+                        <Layout />
+                      </FleetSnapshotProvider>
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Dashboard />} />
+                  <Route path="terminals" element={<Terminals />} />
+                  <Route path="terminals/:id" element={<TerminalDetail />} />
+                  <Route path="analytics" element={<Analytics />} />
+                  <Route path="settings" element={<Settings />} />
+                </Route>
+              </Routes>
+            </ErrorBoundary>
+          </BrowserRouter>
+          <ToastContainer />
+        </AlertProvider>
       </ToastProvider>
     </AuthProvider>
   );

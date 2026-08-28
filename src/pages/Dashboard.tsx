@@ -363,7 +363,7 @@ export default function Dashboard() {
                         {terminal.connected_devices ?? 0} active clients • Solar: {terminal.bluetti_soc_percent ?? 90}% SOC
                       </div>
                       <button
-                        onClick={() => navigate(`/terminals/${terminal.id}`)}
+                        onClick={() => navigate(`/terminals/${encodeURIComponent(terminal.id)}`)}
                         className="text-xs bg-primary text-on-primary px-3 py-1.5 rounded-md font-medium w-full hover:bg-primary/90 transition-colors shadow-sm"
                       >
                         Inspect Kit Details
@@ -459,14 +459,14 @@ export default function Dashboard() {
                     </div>
                   </td>
                   <td className="p-4 text-right">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/terminals/${terminal.id}`);
-                      }}
-                      className="p-2 hover:bg-surface-container-high rounded-full transition-colors inline-flex"
-                      title="Inspect Kit"
-                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/terminals/${encodeURIComponent(terminal.id)}`);
+                        }}
+                        className="p-2 hover:bg-surface-container-high rounded-full transition-colors inline-flex"
+                        title="Inspect Kit"
+                      >
                       <ArrowRight className="w-4 h-4 text-on-surface-variant" />
                     </button>
                   </td>

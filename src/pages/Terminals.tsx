@@ -131,7 +131,7 @@ export default function Terminals() {
               {filteredTerminals.map((terminal) => (
                 <tr
                   key={terminal.id}
-                  onClick={() => navigate(`/terminals/${terminal.id}`)}
+                  onClick={() => navigate(`/terminals/${encodeURIComponent(terminal.id)}`)}
                   className="border-b border-outline-variant/10 hover:bg-surface-container/50 transition-colors cursor-pointer group"
                 >
                   <td className="p-4">
