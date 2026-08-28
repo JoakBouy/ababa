@@ -53,7 +53,7 @@ export default function TerminalDetail() {
     download_mbps: initialTerminal?.download_mbps ?? 124.5,
     signal_percent: 94,
     uptime: `${initialTerminal?.uptime_percent ?? 99.4}%`,
-    sw_version: 'GPOC-Starlink-v2.4.8',
+    sw_version: 'Ababa-Starlink-Edge v3.2.0',
     errors: initialTerminal?.status === 'DEGRADED' ? 2 : 0,
     warnings: initialTerminal?.status === 'DEGRADED' ? 3 : 0,
     location_type: 'Unity Wellsite Station',
@@ -92,7 +92,7 @@ export default function TerminalDetail() {
     { id: 'c1', name: 'Wellhead SCADA RTU Gateway (Pad Alpha)', ip: '192.168.1.102', mac: '00:1A:2B:3C:4D:5E', usage: '48.2 MB', blocked: false },
     { id: 'c2', name: 'Ababa Group Field Engineer Laptop', ip: '192.168.1.115', mac: '44:6D:57:9A:11:22', usage: '312.8 MB', blocked: false },
     { id: 'c3', name: 'Bluetti EP500 Solar BMS Telemetry', ip: '192.168.1.120', mac: '68:C6:3A:4F:99:81', usage: '12.4 MB', blocked: false },
-    { id: 'c4', name: 'GPOC Emergency VoIP Phone Post', ip: '192.168.1.144', mac: '70:88:6B:12:00:33', usage: '84.0 MB', blocked: false },
+    { id: 'c4', name: 'Ababa Field Emergency VoIP Post', ip: '192.168.1.144', mac: '70:88:6B:12:00:33', usage: '84.0 MB', blocked: false },
   ]);
 
   // Sync with snapshot updates
@@ -555,7 +555,7 @@ export default function TerminalDetail() {
                 <Wifi className="w-4 h-4 text-primary" />
                 Connected Field Nodes ({clients.filter(c => !c.blocked).length})
               </h4>
-              <span className="text-[10px] font-mono text-on-surface-variant">SSID: ABABA-GPOC-SECURE</span>
+              <span className="text-[10px] font-mono text-on-surface-variant">SSID: ABABA-GROUP-SECURE</span>
             </div>
 
             <div className="space-y-2">

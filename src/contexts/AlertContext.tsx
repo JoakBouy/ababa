@@ -57,9 +57,9 @@ const SIMULATED_SCENARIOS: Array<Omit<FieldAlert, 'id' | 'timestamp' | 'read' | 
   {
     kitId: 'Kit #29 (ABABA-SSD-29)',
     kitNumber: 'Kit #29',
-    location: 'GPOC Unity Oilfield Central Processing (CPF)',
+    location: 'Unity Oilfield Central Processing Facility (CPF)',
     state: 'Unity',
-    client: 'GPOC Oil Operations',
+    client: 'Unity Petroleum Operations',
     title: 'High Thermal Throttling Alert (72°C)',
     message: 'Internal dish thermistor alert at Unity CPF during high daytime temperatures. Automatic thermal dissipation protocol engaged.',
     severity: 'warning',

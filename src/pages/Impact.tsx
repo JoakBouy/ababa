@@ -56,7 +56,7 @@ export default function Impact() {
   const throughputByTerminal = terminals
     .filter((terminal) => terminal.download_mbps != null)
     .map((terminal) => ({
-      id: terminal.id.replace('ABABA-GPOC-', ''),
+      id: terminal.id.replace('ABABA-SSD-', ''),
       throughput: terminal.download_mbps ?? 0,
     }));
 
@@ -64,12 +64,12 @@ export default function Impact() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contractor: Ababa Group Ltd</span>
+          <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">Ababa Group Limited</span>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">South Sudan National Fleet</span>
         </div>
-        <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Unity Field Operational & Welfare Footprint</h1>
+        <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">National Operational & Connectivity Footprint</h1>
         <p className="text-sm text-on-surface-variant mt-2">
-          Live satellite telemetry, wellhead SCADA connectivity, emergency dispatch communications, and worker welfare signals across Unity Oil Field.
+          Live satellite telemetry, remote site connectivity, emergency dispatch communications, and regional operations across South Sudan.
         </p>
       </div>
 

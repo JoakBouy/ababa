@@ -397,8 +397,8 @@ export default function Layout() {
               {showProfileMenu && (
                 <div className="absolute right-0 mt-2 w-56 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
                   <div className="p-4 border-b border-outline-variant/30">
-                    <p className="text-sm font-bold text-on-surface">{user?.name ?? 'GPOC Operator'}</p>
-                    <p className="text-xs text-on-surface-variant truncate">{user?.email ?? 'operations@gpoc.co.ss'}</p>
+                    <p className="text-sm font-bold text-on-surface">{user?.name ?? 'Ababa NOC Engineer'}</p>
+                    <p className="text-xs text-on-surface-variant truncate">{user?.email ?? 'ops@ababagroup.com'}</p>
                   </div>
                   <div className="p-2">
                     <button 
