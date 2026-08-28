@@ -230,13 +230,16 @@ export default function TerminalDetail() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs px-2.5 py-0.5 rounded bg-primary/10 text-primary font-label font-bold uppercase tracking-wider">
-                {terminal.kit_number || 'GPOC Starlink Kit'}
+                {terminal.kit_number || terminal.id.slice(0, 7)}
               </span>
               <span className="text-xs text-on-surface-variant font-mono">{terminal.id}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-headline font-bold text-on-surface tracking-tight mt-0.5">
               {terminal.loc}
             </h1>
+            <p className="text-xs text-primary font-semibold mt-1">
+              Client: {terminal.client} &bull; {terminal.state}, South Sudan
+            </p>
           </div>
         </div>
 
@@ -256,7 +259,7 @@ export default function TerminalDetail() {
             {dishState === 'rebooting' ? 'REBOOTING...' : dishState === 'stowed' ? 'STOWED (SAFE)' : terminal.status}
           </span>
           <span className="text-xs text-on-surface-variant bg-surface-container-low px-2.5 py-1.5 rounded-lg border border-outline-variant/40 font-mono">
-            Contractor: Ababa Group Ltd
+            Maintained by: Ababa Group Limited
           </span>
         </div>
       </div>
@@ -406,7 +409,7 @@ export default function TerminalDetail() {
                   <TrendingUp className="w-5 h-5 text-primary" />
                   Live Speed & Jitter Benchmark
                 </h3>
-                <p className="text-xs text-on-surface-variant">Measure end-to-end throughput from Unity Wellsite to Starlink NOC</p>
+                <p className="text-xs text-on-surface-variant">Measure end-to-end throughput from field deployment to Ababa Group Master Juba NOC</p>
               </div>
               <button
                 type="button"

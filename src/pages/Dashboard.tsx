@@ -13,6 +13,8 @@ import {
   Zap,
   Activity,
   Wifi,
+  Globe,
+  MapPin,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Circle, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
@@ -40,11 +42,6 @@ export default function Dashboard() {
     const matchesType = selectedAccountType === 'all' || terminal.account_type === selectedAccountType;
     return matchesAccount && matchesType;
   });
-  const filteredSites = sites.filter((site) => {
-    const matchesAccount = selectedAccountEmail === 'all' || site.account_email === selectedAccountEmail;
-    const matchesType = selectedAccountType === 'all' || site.account_type === selectedAccountType;
-    return matchesAccount && matchesType;
-  });
 
   const wifiTerminals = filteredTerminals.filter((terminal) => terminal.connected_devices != null);
   const onlineCount = filteredTerminals.filter((terminal) => terminal.status === 'ONLINE').length;
@@ -59,9 +56,9 @@ export default function Dashboard() {
 
   const accountTypes = Array.from(new Set(accounts.map((account) => account.account_type).filter(Boolean))) as string[];
 
-  // Centered over Unity Oil Field region (South Sudan)
-  const mapCenter: [number, number] = [9.4800, 29.8350];
-  const zoomLevel = 10;
+  // Centered nationally over South Sudan (spreads across all 10 states)
+  const mapCenter: [number, number] = [7.2000, 30.2000];
+  const zoomLevel = 6;
 
   const handleZoomIn = () => map?.zoomIn();
   const handleZoomOut = () => map?.zoomOut();
@@ -69,7 +66,7 @@ export default function Dashboard() {
 
   const handleLocateTerminal = (coords: [number, number]) => {
     if (!map) return;
-    map.flyTo(coords, 12, { duration: 1.5 });
+    map.flyTo(coords, 10, { duration: 1.5 });
     if (!isFullscreen) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -83,7 +80,6 @@ export default function Dashboard() {
         await mapWrapperRef.current.requestFullscreen();
         setIsFullscreen(true);
       } catch {
-        // Fallback for environments where Fullscreen API is blocked
         setIsFullscreen((prev) => !prev);
       }
     } else {
@@ -120,15 +116,8 @@ export default function Dashboard() {
     }
   }, [isFullscreen, map]);
 
-  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-  const tileUrl = mapboxToken
-    ? `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  const attribution = mapboxToken
-    ? 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
-    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
-  const hasLiveFleet = accounts.length > 0 || terminals.length > 0;
+  const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -136,10 +125,12 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contractor: Ababa Group Ltd</span>
+            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">Ababa Group Limited</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold">South Sudan National NOC</span>
           </div>
-          <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">Unity Oil Field Command Center</h1>
+          <h1 className="text-3xl sm:text-4xl font-headline font-bold text-on-surface tracking-tight">
+            Nationwide Starlink Fleet Command
+          </h1>
         </div>
         <div className="flex flex-wrap gap-3 items-center">
           <div className="relative">
@@ -148,7 +139,7 @@ export default function Dashboard() {
               onChange={(e) => setSelectedAccountType(e.target.value)}
               className="appearance-none bg-surface-container-low border border-outline-variant/50 text-on-surface text-sm font-bold rounded-md pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
-              <option value="all">All Site Types</option>
+              <option value="all">All Sector Deployments</option>
               {accountTypes.map((type) => (
                 <option key={type} value={type}>{accountTypeLabel(type)}</option>
               ))}
@@ -161,7 +152,7 @@ export default function Dashboard() {
               onChange={(e) => setSelectedAccountEmail(e.target.value)}
               className="appearance-none bg-surface-container-low border border-outline-variant/50 text-on-surface text-sm font-bold rounded-md pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
-              <option value="all">All Streams ({accounts.length})</option>
+              <option value="all">All NOC Streams ({accounts.length})</option>
               {accounts.map((account) => (
                 <option key={account.id} value={account.email}>{account.email}</option>
               ))}
@@ -172,7 +163,7 @@ export default function Dashboard() {
             onClick={() => navigate('/settings')}
             className="flex items-center gap-2 px-6 py-3 rounded-md bg-on-surface text-surface font-label font-bold text-xs tracking-widest uppercase hover:bg-on-surface/90 transition-colors shadow-sm"
           >
-            Link Data Source
+            NOC Settings
           </button>
         </div>
       </div>
@@ -183,78 +174,80 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Oilfield KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Active Field Kits</h3>
+      {/* National Fleet KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Nationwide Fleet Status</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : filteredTerminals.length}</span>
-              <span className="text-sm font-bold text-on-surface-variant">kits</span>
+              <span className="text-sm font-bold text-on-surface-variant">kits in 10 states</span>
             </div>
             <span className="flex items-center gap-1 text-xs font-bold text-[#00875A]">
-              <CheckCircle2 className="w-3 h-3" />
-              {`${onlineCount} online • ${degradedCount} degraded • ${offlineCount} offline`}
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              {`${onlineCount} Online • ${degradedCount} Degraded • ${offlineCount} Offline`}
             </span>
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Connected SCADA & Devices</h3>
+        <div className="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Connected Client Nodes</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : connectedDevices}</span>
-              <span className="text-sm font-bold text-on-surface-variant">nodes</span>
+              <span className="text-sm font-bold text-on-surface-variant">active clients</span>
             </div>
             <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-              <Wifi className="w-3 h-3" />
-              {`${wifiTerminals.length}/${filteredTerminals.length} reporting active telemetry`}
+              <Wifi className="w-3.5 h-3.5" />
+              {`${wifiTerminals.length}/${filteredTerminals.length} kits transmitting telemetry`}
             </span>
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Total Live Throughput</h3>
+        <div className="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Total National Throughput</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-4xl font-headline font-bold text-on-surface">{isLoading ? '...' : (totalThroughput / 1000).toFixed(2)}</span>
               <span className="text-sm font-bold text-on-surface-variant">Gbps total</span>
             </div>
             <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-              <Activity className="w-3 h-3" />
+              <Activity className="w-3.5 h-3.5" />
               {`${(totalThroughput / (filteredTerminals.length || 1)).toFixed(1)} Mbps average per kit`}
             </span>
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
-          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Solar & Battery Storage</h3>
+        <div className="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[148px]">
+          <h3 className="text-on-surface-variant font-label font-bold text-xs uppercase tracking-wider mb-4">Fleet Solar Storage</h3>
           <div>
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-4xl font-headline font-bold text-emerald-600 dark:text-emerald-400">{isLoading ? '...' : `${avgSoc}%`}</span>
               <span className="text-sm font-bold text-on-surface-variant">Avg SOC</span>
             </div>
             <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-              <Zap className="w-3 h-3" />
-              Bluetti Solar Stations Optimal
+              <Zap className="w-3.5 h-3.5" />
+              Bluetti Solar Backups Operating
             </span>
           </div>
         </div>
       </div>
 
-      {/* Map Section with Working Fullscreen */}
+      {/* Map Section with Working Fullscreen & Nationwide South Sudan Coverage */}
       <div
         ref={mapWrapperRef}
         className={cn(
-          "bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col relative transition-all duration-300",
+          "bg-surface-container-lowest rounded-2xl sm:rounded-3xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col relative transition-all duration-300",
           isFullscreen ? "fixed inset-0 z-50 h-screen w-screen rounded-none border-none" : ""
         )}
       >
         {/* Top Left Focus Card */}
         <div className="absolute top-4 left-4 z-10 bg-surface-container-lowest/95 backdrop-blur-md p-3.5 rounded-xl border border-outline-variant/40 shadow-lg max-w-sm">
-          <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest mb-1">Unity Oil Field Grid</p>
+          <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest mb-1">
+            Ababa Group South Sudan Network
+          </p>
           <h3 className="text-sm font-headline font-bold text-on-surface mb-2">
-            50 Kits Deployed • Managed by Ababa Group Ltd
+            50 Kits Maintained Across 10 States
           </h3>
           <div className="flex flex-wrap gap-1.5">
             <span className="text-[10px] font-bold bg-[#00875A]/10 text-[#00875A] px-2 py-0.5 rounded">
@@ -269,7 +262,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Top Right Controls (Zoom, Reset, Real Fullscreen) */}
+        {/* Top Right Controls (Zoom, Reset, Fullscreen) */}
         <div className="absolute top-4 right-4 z-10 flex flex-col gap-1.5">
           <button
             onClick={handleZoomIn}
@@ -286,6 +279,13 @@ export default function Dashboard() {
             <Minus className="w-4 h-4" />
           </button>
           <button
+            onClick={handleResetView}
+            className="w-9 h-9 bg-surface-container-lowest/90 backdrop-blur-sm border border-outline-variant/40 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors shadow-md text-on-surface"
+            title="Reset National View"
+          >
+            <Globe className="w-4 h-4" />
+          </button>
+          <button
             onClick={toggleFullscreen}
             className="w-9 h-9 bg-surface-container-lowest/90 backdrop-blur-sm border border-outline-variant/40 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors shadow-md text-on-surface mt-1"
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Map"}
@@ -295,27 +295,23 @@ export default function Dashboard() {
         </div>
 
         {/* Bottom Legend */}
-        <div className="absolute bottom-4 left-4 z-10 flex items-center gap-4 bg-surface-container-lowest/95 backdrop-blur-md px-4 py-2 rounded-lg border border-outline-variant/40 shadow-md">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-[#005477] opacity-40 rounded-sm" />
-            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">3.5km Range</span>
+        <div className="absolute bottom-4 left-4 z-10 flex items-center gap-3 sm:gap-4 bg-surface-container-lowest/95 backdrop-blur-md px-3 sm:px-4 py-2 rounded-lg border border-outline-variant/40 shadow-md text-[10px] sm:text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-[#00875A] rounded-full border border-white" />
+            <span className="font-bold text-on-surface-variant">Online ({onlineCount})</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-[#00875A] rounded-full border-2 border-white" />
-            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Online</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-amber-500 rounded-full border border-white" />
+            <span className="font-bold text-on-surface-variant">Degraded ({degradedCount})</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-amber-500 rounded-full border-2 border-white" />
-            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Degraded</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-error rounded-full border-2 border-white" />
-            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Offline</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-error rounded-full border border-white" />
+            <span className="font-bold text-on-surface-variant">Offline ({offlineCount})</span>
           </div>
         </div>
 
         {/* Map Container */}
-        <div className={cn("relative bg-[#e5e7eb] z-0 transition-all", isFullscreen ? "h-full w-full" : "h-[540px]")}>
+        <div className={cn("relative bg-[#e5e7eb] z-0 transition-all", isFullscreen ? "h-full w-full" : "h-[480px] sm:h-[580px]")}>
           {isLoading && (
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-surface-container-lowest/70 backdrop-blur-sm">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -334,7 +330,7 @@ export default function Dashboard() {
               <React.Fragment key={terminal.id}>
                 <Circle
                   center={terminal.coords}
-                  radius={3500}
+                  radius={18000}
                   pathOptions={{
                     color: terminal.status === 'ONLINE' ? '#005477' : (terminal.status === 'DEGRADED' ? '#f59e0b' : '#ba1a1a'),
                     fillColor: terminal.status === 'ONLINE' ? '#005477' : (terminal.status === 'DEGRADED' ? '#f59e0b' : '#ba1a1a'),
@@ -344,7 +340,7 @@ export default function Dashboard() {
                 />
                 <Marker position={terminal.coords} icon={createStatusIcon(terminal.status.toLowerCase())}>
                   <Popup>
-                    <div className="p-1.5 font-body min-w-[210px]">
+                    <div className="p-1.5 font-body min-w-[220px]">
                       <div className="flex items-center justify-between mb-1 pb-1 border-b border-outline-variant/30">
                         <span className="font-bold text-sm text-primary">{terminal.kit_number || terminal.id}</span>
                         <span className={cn(
@@ -355,18 +351,19 @@ export default function Dashboard() {
                           {terminal.status}
                         </span>
                       </div>
-                      <div className="text-xs font-semibold text-on-surface mb-1">{terminal.loc}</div>
+                      <div className="text-xs font-semibold text-on-surface mb-0.5">{terminal.loc}</div>
+                      <div className="text-[11px] text-primary font-medium mb-1">Client: {terminal.client}</div>
                       <div className="text-[11px] text-on-surface-variant mb-1 font-mono">
                         {terminal.download_mbps != null ? `${terminal.download_mbps.toFixed(1)} Mbps • ${terminal.latency_ms} ms` : 'Telemetry offline'}
                       </div>
                       <div className="text-[11px] text-on-surface-variant mb-2">
-                        {terminal.connected_devices ?? 0} active clients • Solar: {terminal.bluetti_soc_percent ?? 90}% SOC
+                        {terminal.connected_devices ?? 0} active nodes • Solar: {terminal.bluetti_soc_percent ?? 90}% SOC
                       </div>
                       <button
                         onClick={() => navigate(`/terminals/${encodeURIComponent(terminal.id)}`)}
                         className="text-xs bg-primary text-on-primary px-3 py-1.5 rounded-md font-medium w-full hover:bg-primary/90 transition-colors shadow-sm"
                       >
-                        Inspect Kit Details
+                        Inspect Kit Telemetry
                       </button>
                     </div>
                   </Popup>
@@ -377,27 +374,27 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Field Kits Table */}
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm">
-        <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+      {/* Nationwide Field Kits Table */}
+      <div className="bg-surface-container-lowest rounded-2xl sm:rounded-3xl border border-outline-variant/30 shadow-sm overflow-hidden">
+        <div className="p-5 sm:p-6 border-b border-outline-variant/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h2 className="text-xl font-headline font-bold text-on-surface">Monitored Oilfield Kits (50 Total)</h2>
-            <p className="text-sm text-on-surface-variant font-body">Real-time Starlink & SCADA telemetry across Unity Oil Field pads, rigs, and stations</p>
+            <h2 className="text-xl font-headline font-bold text-on-surface">Ababa Group Fleet Inventory (50 Kits)</h2>
+            <p className="text-sm text-on-surface-variant font-body">Maintained Starlink stations across Central Equatoria, Unity, Upper Nile, Jonglei, and all 10 states</p>
           </div>
           <button
             onClick={() => navigate('/terminals')}
-            className="px-4 py-2 rounded-md bg-primary/10 text-primary font-label font-bold text-xs tracking-widest uppercase hover:bg-primary/20 transition-colors"
+            className="px-4 py-2 rounded-xl bg-primary/10 text-primary font-label font-bold text-xs tracking-widest uppercase hover:bg-primary/20 transition-colors"
           >
-            View All 50 Kits
+            View Full Inventory
           </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant/30 bg-surface-container-low/30">
-                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Kit Number & ID</th>
-                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Site Location</th>
-                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Contractor</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Kit ID</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Location & State</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Client Contract</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Speed / Latency</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Power (Solar SOC)</th>
                 <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
@@ -412,7 +409,7 @@ export default function Dashboard() {
                   </td>
                 </tr>
               )}
-              {filteredTerminals.slice(0, 12).map((terminal) => (
+              {filteredTerminals.slice(0, 15).map((terminal) => (
                 <tr
                   key={terminal.id}
                   onClick={() => handleLocateTerminal(terminal.coords)}
@@ -424,15 +421,15 @@ export default function Dashboard() {
                   </td>
                   <td className="p-4 text-sm text-on-surface font-body">
                     <span className="font-medium block">{terminal.loc}</span>
-                    <span className="text-xs text-on-surface-variant">{siteTypeLabel(terminal.site_type)}</span>
+                    <span className="text-xs text-on-surface-variant font-mono">{terminal.state}</span>
                   </td>
                   <td className="p-4 text-xs text-on-surface-variant font-body">
-                    <span className="font-bold text-on-surface block">{terminal.contractor ?? 'Ababa Group Ltd'}</span>
-                    <span className="text-[11px] text-on-surface-variant font-mono">{terminal.account_email}</span>
+                    <span className="font-bold text-on-surface block">{terminal.client}</span>
+                    <span className="text-[11px] text-on-surface-variant font-mono">Maintained by Ababa Group</span>
                   </td>
                   <td className="p-4 text-sm font-medium text-on-surface">
                     <span className="block font-bold">{terminal.download_mbps != null ? `${terminal.download_mbps.toFixed(1)} Mbps` : '--'}</span>
-                    <span className="text-xs text-on-surface-variant">{terminal.latency_ms ? `${terminal.latency_ms} ms` : 'Offline'} ({terminal.connected_devices ?? 0} devices)</span>
+                    <span className="text-xs text-on-surface-variant">{terminal.latency_ms ? `${terminal.latency_ms} ms` : 'Offline'} ({terminal.connected_devices ?? 0} clients)</span>
                   </td>
                   <td className="p-4 text-sm font-medium">
                     <span className="font-bold text-emerald-600 dark:text-emerald-400 block">{terminal.bluetti_soc_percent != null ? `${terminal.bluetti_soc_percent}% SOC` : 'Grid'}</span>
@@ -459,14 +456,14 @@ export default function Dashboard() {
                     </div>
                   </td>
                   <td className="p-4 text-right">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/terminals/${encodeURIComponent(terminal.id)}`);
-                        }}
-                        className="p-2 hover:bg-surface-container-high rounded-full transition-colors inline-flex"
-                        title="Inspect Kit"
-                      >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/terminals/${encodeURIComponent(terminal.id)}`);
+                      }}
+                      className="p-2 hover:bg-surface-container-high rounded-full transition-colors inline-flex"
+                      title="Inspect Kit"
+                    >
                       <ArrowRight className="w-4 h-4 text-on-surface-variant" />
                     </button>
                   </td>

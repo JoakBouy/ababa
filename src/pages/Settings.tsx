@@ -142,11 +142,11 @@ export default function Settings() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contractor: Ababa Group Ltd</span>
+            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">Ababa Group Limited</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">South Sudan National Fleet NOC</span>
           </div>
-          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Account & SLA Settings</h1>
-          <p className="text-on-surface-variant font-body mt-1">Manage GPOC enterprise telemetry feeds, Ababa Group Ltd service configuration, and API data exports</p>
+          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Master NOC & SLA Settings</h1>
+          <p className="text-on-surface-variant font-body mt-1">Manage Starlink Enterprise credentials, client SLA thresholds, and nationwide telemetry exports</p>
         </div>
       </div>
 

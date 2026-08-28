@@ -5,6 +5,10 @@ import {
   Search,
   Server,
   Satellite,
+  Globe,
+  MapPin,
+  Wifi,
+  Zap,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useFleetSnapshot } from '../contexts/FleetSnapshotContext';
@@ -23,14 +27,18 @@ export default function Terminals() {
     const matchesType = selectedAccountType === 'all' || terminal.account_type === selectedAccountType;
     const matchesQuery = normalizedQuery.length === 0 || [
       terminal.id,
+      terminal.kit_number,
       terminal.account_email,
+      terminal.client,
+      terminal.state,
       accountTypeLabel(terminal.account_type),
       siteTypeLabel(terminal.site_type),
       terminal.loc,
       terminal.status,
-    ].some((value) => value.toLowerCase().includes(normalizedQuery));
+    ].some((value) => value?.toLowerCase().includes(normalizedQuery));
     return matchesAccount && matchesType && matchesQuery;
   });
+
   const accountTypes = Array.from(new Set(accounts.map((account) => account.account_type).filter(Boolean))) as string[];
 
   return (
@@ -38,18 +46,18 @@ export default function Terminals() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">GPOC South Sudan</span>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">Contractor: Ababa Group Ltd</span>
+            <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">Ababa Group Limited</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">South Sudan Nationwide Fleet</span>
           </div>
-          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Unity Oil Field Kit Inventory</h1>
-          <p className="text-on-surface-variant font-body mt-1">Satellite & telemetry endpoints monitoring CPF, well pads, rig camps, and pipeline stations</p>
+          <h1 className="text-3xl font-headline font-bold text-on-surface tracking-tight">Maintained Kit Inventory (50 Deployments)</h1>
+          <p className="text-on-surface-variant font-body mt-1">Managed Starlink stations supporting enterprise, oilfields, humanitarian hubs, border posts, and government sites</p>
         </div>
         <button
           onClick={() => navigate('/settings')}
           className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-on-primary font-label font-medium hover:bg-primary/90 transition-colors shadow-sm"
         >
           <Server className="w-4 h-4" />
-          Link Data Source
+          Link Starlink Account
         </button>
       </div>
 
@@ -66,64 +74,67 @@ export default function Terminals() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search kit ID, well pad, location..."
+            placeholder="Search kit ID, state, city, client..."
             className="bg-transparent border-none outline-none text-sm font-body w-full text-on-surface placeholder:text-on-surface-variant"
           />
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border border-outline-variant text-on-surface font-label font-medium bg-surface-container-lowest">
             <Filter className="w-4 h-4" />
-            {filteredTerminals.length} shown
+            <select
+              value={selectedAccountType}
+              onChange={(e) => setSelectedAccountType(e.target.value)}
+              className="bg-transparent border-none outline-none text-sm font-label cursor-pointer text-on-surface"
+            >
+              <option value="all">All Sectors</option>
+              {accountTypes.map((type) => (
+                <option key={type} value={type}>{accountTypeLabel(type)}</option>
+              ))}
+            </select>
           </div>
-          <select
-            value={selectedAccountType}
-            onChange={(e) => setSelectedAccountType(e.target.value)}
-            className="flex-1 sm:flex-none px-4 py-2.5 rounded-full border border-outline-variant text-on-surface font-label font-medium bg-surface-container-lowest hover:bg-surface-container transition-colors outline-none focus:border-primary"
-          >
-            <option value="all">All Site Types</option>
-            {accountTypes.map((type) => (
-              <option key={type} value={type}>{accountTypeLabel(type)}</option>
-            ))}
-          </select>
-          <select
-            value={selectedAccountEmail}
-            onChange={(e) => setSelectedAccountEmail(e.target.value)}
-            className="flex-1 sm:flex-none px-4 py-2.5 rounded-full border border-outline-variant text-on-surface font-label font-medium bg-surface-container-lowest hover:bg-surface-container transition-colors outline-none focus:border-primary"
-          >
-            <option value="all">All Accounts</option>
-            {accounts.map((account) => (
-              <option key={account.id} value={account.email}>{account.email}</option>
-            ))}
-          </select>
+
+          <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border border-outline-variant text-on-surface font-label font-medium bg-surface-container-lowest">
+            <Filter className="w-4 h-4" />
+            <select
+              value={selectedAccountEmail}
+              onChange={(e) => setSelectedAccountEmail(e.target.value)}
+              className="bg-transparent border-none outline-none text-sm font-label cursor-pointer text-on-surface"
+            >
+              <option value="all">All NOC Accounts</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.email}>{account.email}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 shadow-sm overflow-hidden">
+      <div className="bg-surface-container-lowest rounded-2xl sm:rounded-3xl border border-outline-variant/30 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-outline-variant/30 bg-surface-container-low/50">
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Kit / Terminal ID</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Oilfield Site</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Contractor</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Speed / Devices</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Power (Solar SOC)</th>
-                <th className="p-4 font-label font-medium text-sm text-on-surface-variant">Status</th>
+              <tr className="border-b border-outline-variant/30 bg-surface-container-low/30">
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Kit ID</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Deployment Location & State</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Client Contract</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Speed / Latency</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Power (Solar SOC)</th>
+                <th className="p-4 text-xs font-label font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan={7} className="p-8">
-                    <div className="flex items-center justify-center gap-3 text-on-surface-variant">Loading terminals...</div>
+                  <td colSpan={6} className="p-8 text-center text-sm text-on-surface-variant">
+                    Loading nationwide Starlink kit telemetry...
                   </td>
                 </tr>
               )}
 
               {!isLoading && filteredTerminals.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-sm text-on-surface-variant">
-                    No live terminals found. If you&apos;re in remote mode, link a Starlink account with valid cookie JSON in Settings.
+                  <td colSpan={6} className="p-8 text-center text-sm text-on-surface-variant">
+                    No matching kits found. Try changing your search query or filter.
                   </td>
                 </tr>
               )}
@@ -140,17 +151,17 @@ export default function Terminals() {
                         <Satellite className="w-5 h-5" />
                       </div>
                       <div>
-                        <span className="font-headline font-bold text-on-surface group-hover:text-primary transition-colors block">{terminal.id}</span>
-                        <span className="text-[11px] text-on-surface-variant font-mono">{siteTypeLabel(terminal.site_type)}</span>
+                        <span className="font-headline font-bold text-on-surface group-hover:text-primary transition-colors block">{terminal.kit_number || terminal.id.slice(0, 7)}</span>
+                        <span className="text-[11px] text-on-surface-variant font-mono">{terminal.id}</span>
                       </div>
                     </div>
                   </td>
                   <td className="p-4 font-body text-sm text-on-surface">
                     <span className="font-medium block">{terminal.loc}</span>
-                    <span className="text-xs text-on-surface-variant">GPOC Unity Oilfield</span>
+                    <span className="text-xs text-primary font-bold">{terminal.state}, South Sudan</span>
                   </td>
                   <td className="p-4 font-body text-xs text-on-surface-variant">
-                    <span className="font-bold text-on-surface block">{terminal.contractor ?? 'Ababa Group Ltd'}</span>
+                    <span className="font-bold text-on-surface block">{terminal.client}</span>
                     <span className="text-[11px] text-on-surface-variant font-mono">{terminal.account_email}</span>
                   </td>
                   <td className="p-4 font-body text-sm text-on-surface">
@@ -166,7 +177,7 @@ export default function Terminals() {
                       className={cn(
                         'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider',
                         terminal.status === 'ONLINE' ? 'bg-[#00875A]/10 text-[#00875A]' :
-                          terminal.status === 'DEGRADED' ? 'bg-[#F2994A]/10 text-[#F2994A]' :
+                          terminal.status === 'DEGRADED' ? 'bg-amber-500/10 text-amber-600' :
                             'bg-error/10 text-error',
                       )}
                     >
@@ -174,7 +185,7 @@ export default function Terminals() {
                         className={cn(
                           'w-1.5 h-1.5 rounded-full',
                           terminal.status === 'ONLINE' ? 'bg-[#00875A]' :
-                            terminal.status === 'DEGRADED' ? 'bg-[#F2994A]' :
+                            terminal.status === 'DEGRADED' ? 'bg-amber-500' :
                               'bg-error',
                         )}
                       />

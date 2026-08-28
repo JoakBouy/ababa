@@ -50,11 +50,11 @@ export default function Login() {
             <Satellite className="w-8 h-8" />
           </div>
           <span className="inline-block px-3 py-1 bg-primary-container text-on-primary-container font-label text-[10px] font-bold tracking-widest uppercase rounded-full mb-3">
-            Unity Oil Field Monitor
+            National NOC Portal • South Sudan
           </span>
-          <h1 className="text-3xl font-headline font-bold text-on-surface mb-1 tracking-tight">GPOC South Sudan</h1>
+          <h1 className="text-3xl font-headline font-bold text-on-surface mb-1 tracking-tight">Ababa Group Limited</h1>
           <p className="text-on-surface-variant text-xs font-body font-medium">
-            Managed & Deployed by <span className="font-bold text-on-surface">Ababa Group Ltd</span>
+            Managed Starlink Telemetry & Fleet Maintenance Center
           </p>
         </div>
 
@@ -62,22 +62,22 @@ export default function Login() {
         <div className="mb-6 p-3 bg-surface-container-low rounded-xl border border-outline-variant/40 text-xs">
           <p className="font-label font-bold text-on-surface mb-2 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
             <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            Quick Demo Login:
+            Quick Demo Access:
           </p>
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => fillDemo('operations@gpoc.co.ss')}
+              onClick={() => fillDemo('ops@ababagroup.com')}
               className="flex-1 py-1.5 px-2 bg-surface-container text-on-surface text-[11px] font-medium rounded border border-outline-variant/50 hover:bg-primary-container hover:text-on-primary-container transition-colors"
             >
-              GPOC Ops Manager
+              Master NOC Lead
             </button>
             <button
               type="button"
-              onClick={() => fillDemo('telemetry@gpoc.co.ss')}
+              onClick={() => fillDemo('energy.telemetry@ababagroup.com')}
               className="flex-1 py-1.5 px-2 bg-surface-container text-on-surface text-[11px] font-medium rounded border border-outline-variant/50 hover:bg-primary-container hover:text-on-primary-container transition-colors"
             >
-              Ababa Field Engineer
+              Field Operations
             </button>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function Login() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-label font-medium text-on-surface-variant ml-1">
-              Operator ID / Email
+              Engineer ID / Email
             </label>
             <div className="relative">
               <input
@@ -102,7 +102,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-surface-container-highest border border-outline-variant/50 rounded-xl px-4 py-3 pl-11 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-body text-sm"
-                placeholder="operator@gpoc.co.ss"
+                placeholder="ops@ababagroup.com"
               />
               <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5" />
             </div>
@@ -138,7 +138,7 @@ export default function Login() {
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
               <>
-                Authenticate Access
+                Enter NOC Command
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </>
             )}
@@ -147,7 +147,7 @@ export default function Login() {
 
         <div className="mt-6 text-center border-t border-outline-variant/30 pt-4">
           <p className="text-[11px] text-on-surface-variant/80 font-body">
-            Unity Oil Field Network Operations &bull; Contracted by Ababa Group Ltd
+            Ababa Group Limited &bull; Juba, South Sudan &bull; 24/7 Satellite Fleet NOC
           </p>
         </div>
       </div>

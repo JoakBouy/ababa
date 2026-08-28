@@ -1,5 +1,5 @@
 {
-  "name": "GPOC South Sudan Unity Field Kit Monitoring",
-  "description": "Starlink telemetry & kit monitoring dashboard for GPOC South Sudan in Unity Oil Field, contracted and operated by Ababa Group Ltd.",
+  "name": "Ababa Group Limited Starlink Fleet Command",
+  "description": "Nationwide Starlink telemetry and fleet monitoring dashboard for Ababa Group Limited maintaining client kits across South Sudan.",
   "requestFramePermissions": []
 }

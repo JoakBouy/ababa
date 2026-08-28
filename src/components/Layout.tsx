@@ -133,13 +133,12 @@ export default function Layout() {
         <div className="p-6 pb-3 flex justify-between items-center border-b border-outline-variant/20">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="font-headline font-black text-2xl tracking-tight text-primary">GPOC</span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-label font-bold uppercase">South Sudan</span>
+              <span className="font-headline font-black text-2xl tracking-tight text-primary">Ababa Group</span>
             </div>
-            <p className="text-[11px] font-label font-bold text-on-surface-variant uppercase tracking-wider">Unity Oil Field Grid</p>
+            <p className="text-[11px] font-label font-bold text-on-surface-variant uppercase tracking-wider">Limited &bull; South Sudan</p>
             <p className="text-[10px] font-body text-primary font-semibold mt-0.5 flex items-center gap-1">
               <Radio className="w-3 h-3 text-emerald-500 animate-pulse" />
-              Contracted by Ababa Group Ltd
+              National Starlink NOC (50 Kits)
             </p>
           </div>
           <button 
@@ -199,11 +198,11 @@ export default function Layout() {
         <div className="p-4 space-y-3 border-t border-outline-variant/30">
           <div className="p-2.5 bg-surface-container rounded-xl border border-outline-variant/40">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-wider">Contractor Status</span>
-              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded">99.8% SLA</span>
+              <span className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-wider">Fleet Coverage</span>
+              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded">10 States</span>
             </div>
-            <p className="text-xs font-headline font-bold text-on-surface">Ababa Group Ltd</p>
-            <p className="text-[10px] text-on-surface-variant">50 Kits • 24/7 Satellite NOC</p>
+            <p className="text-xs font-headline font-bold text-on-surface">Ababa Group Limited</p>
+            <p className="text-[10px] text-on-surface-variant">50 Kits Maintained • Tier-1 Starlink NOC</p>
           </div>
 
           <div className="pt-2 flex items-center gap-3">
@@ -211,8 +210,8 @@ export default function Layout() {
               {userInitials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-label font-bold text-on-surface truncate">{user?.name ?? 'GPOC Operator'}</p>
-              <p className="text-xs font-body text-on-surface-variant truncate">{user?.role ?? 'Unity Operations Manager'}</p>
+              <p className="text-sm font-label font-bold text-on-surface truncate">{user?.name ?? 'Ababa NOC Engineer'}</p>
+              <p className="text-xs font-body text-on-surface-variant truncate">{user?.role ?? 'Fleet Operations Lead'}</p>
             </div>
           </div>
         </div>
@@ -234,7 +233,7 @@ export default function Layout() {
               <Search className="w-4 h-4 text-on-surface-variant" />
               <input 
                 type="text" 
-                placeholder="Search Unity Oil Field kits (1-50)..." 
+                placeholder="Search South Sudan kits (1-50), states, clients..." 
                 className="bg-transparent border-none outline-none text-xs font-body w-full text-on-surface placeholder:text-on-surface-variant"
               />
             </div>

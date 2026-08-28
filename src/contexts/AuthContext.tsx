@@ -18,19 +18,19 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
-    const stored = sessionStorage.getItem('gpoc_user');
+    const stored = sessionStorage.getItem('ababa_user');
     return stored ? JSON.parse(stored) : null;
   });
 
   const login = useCallback(async (email: string, password: string) => {
     const data = await authLogin(email, password);
     const loggedInUser: User = { email: data.email, name: data.name, role: data.role };
-    sessionStorage.setItem('gpoc_user', JSON.stringify(loggedInUser));
+    sessionStorage.setItem('ababa_user', JSON.stringify(loggedInUser));
     setUser(loggedInUser);
   }, []);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem('gpoc_user');
+    sessionStorage.removeItem('ababa_user');
     setUser(null);
   }, []);
 

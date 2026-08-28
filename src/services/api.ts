@@ -21,9 +21,10 @@ export interface Terminal {
   kit_number: string;
   account_id: string;
   account_email: string;
-  account_type: 'ranger' | 'community' | 'base_camp' | 'operations' | string;
+  account_type: 'enterprise' | 'energy' | 'humanitarian' | 'government' | 'logistics' | string;
   site_id: string | null;
   site_type: string;
+  state: string;
   loc: string;
   coords: [number, number];
   status: 'ONLINE' | 'OFFLINE' | 'DEGRADED';
@@ -36,7 +37,8 @@ export interface Terminal {
   community_usage_sessions: number | null;
   ranger_voice_sessions: number | null;
   bluetti_soc_percent: number | null;
-  contractor?: string;
+  contractor: string;
+  client: string;
 }
 
 export interface TerminalTelemetry {
@@ -80,9 +82,9 @@ export interface StarlinkAccount {
   email: string;
   status: string;
   terminal_count: number;
-  account_type: 'ranger' | 'community' | 'base_camp' | 'operations' | string;
+  account_type: string;
   display_name: string | null;
-  contractor?: string;
+  contractor: string;
 }
 
 export interface FleetSnapshot {
@@ -97,13 +99,15 @@ export interface DeploymentSite {
   account_email: string;
   account_type: string;
   site_type: string;
+  state: string;
   purpose: string;
   loc: string;
   coords: [number, number];
   terminal_ids: string[];
   data_sources: string[];
   metrics: Record<string, number | string>;
-  contractor?: string;
+  contractor: string;
+  client: string;
 }
 
 export interface ExportManifest {
@@ -114,106 +118,127 @@ export interface ExportManifest {
   redoc_docs: string;
 }
 
-// ─── GPOC South Sudan & Ababa Group Ltd Mock Data (50 Field Kits) ────────────
+// ─── Ababa Group Limited Nationwide South Sudan Fleet Mock Data (50 Kits) ─────
 
-const CONTRACTOR_NAME = 'Ababa Group Ltd';
+const OPERATOR_NAME = 'Ababa Group Limited';
 
 const mockAccounts: StarlinkAccount[] = [
   {
     id: 1,
-    email: 'operations@gpoc.co.ss',
+    email: 'ops@ababagroup.com',
     status: 'connected',
     terminal_count: 32,
-    account_type: 'operations',
-    display_name: 'GPOC Unity Field Operations Network',
-    contractor: CONTRACTOR_NAME,
+    account_type: 'enterprise',
+    display_name: 'Ababa Group Master NOC - National Fleet (South Sudan)',
+    contractor: OPERATOR_NAME,
   },
   {
     id: 2,
-    email: 'telemetry@gpoc.co.ss',
+    email: 'energy.telemetry@ababagroup.com',
     status: 'connected',
     terminal_count: 18,
-    account_type: 'base_camp',
-    display_name: 'GPOC SCADA & Wellhead Telemetry Stream',
-    contractor: CONTRACTOR_NAME,
+    account_type: 'energy',
+    display_name: 'Ababa Group - Energy & Oilfield Remote Telemetry',
+    contractor: OPERATOR_NAME,
   },
 ];
 
-// Raw site definitions for the 50 spaced-out field kits across Unity Oil Field
+// Raw site definitions for 50 kits distributed across all 10 states of South Sudan
 const rawKitConfigs = [
-  { num: '01', name: 'Unity Central Processing Facility (CPF Main Rig)', type: 'operations', site: 'wellhead', lat: 9.4920, lng: 29.8410, status: 'ONLINE', mbps: 148.5, lat_ms: 58, dev: 48, soc: 96, up: 99.9 },
-  { num: '02', name: 'Well Pad 01 - Alpha North', type: 'operations', site: 'wellhead', lat: 9.5280, lng: 29.8150, status: 'ONLINE', mbps: 112.4, lat_ms: 64, dev: 16, soc: 88, up: 99.4 },
-  { num: '03', name: 'Well Pad 02 - Alpha East', type: 'operations', site: 'wellhead', lat: 9.5140, lng: 29.8520, status: 'ONLINE', mbps: 104.2, lat_ms: 69, dev: 14, soc: 84, up: 98.9 },
-  { num: '04', name: 'Well Pad 03 - Bravo Central', type: 'operations', site: 'wellhead', lat: 9.4710, lng: 29.8730, status: 'ONLINE', mbps: 98.7, lat_ms: 72, dev: 12, soc: 91, up: 99.1 },
-  { num: '05', name: 'Well Pad 04 - Bravo South', type: 'operations', site: 'wellhead', lat: 9.4530, lng: 29.8210, status: 'ONLINE', mbps: 118.0, lat_ms: 61, dev: 19, soc: 92, up: 99.5 },
-  { num: '06', name: 'Well Pad 05 - Charlie West', type: 'operations', site: 'wellhead', lat: 9.5390, lng: 29.7890, status: 'ONLINE', mbps: 92.5, lat_ms: 76, dev: 11, soc: 78, up: 98.2 },
-  { num: '07', name: 'Well Pad 06 - Charlie Far North', type: 'operations', site: 'wellhead', lat: 9.5580, lng: 29.8340, status: 'DEGRADED', mbps: 42.1, lat_ms: 118, dev: 9, soc: 39, up: 94.6 },
-  { num: '08', name: 'Well Pad 07 - Delta Cluster A', type: 'operations', site: 'wellhead', lat: 9.5020, lng: 29.8910, status: 'ONLINE', mbps: 124.6, lat_ms: 59, dev: 22, soc: 94, up: 99.7 },
-  { num: '09', name: 'Well Pad 08 - Delta Cluster B', type: 'operations', site: 'wellhead', lat: 9.4380, lng: 29.8650, status: 'ONLINE', mbps: 108.3, lat_ms: 67, dev: 15, soc: 86, up: 99.0 },
-  { num: '10', name: 'Well Pad 09 - Echo South Basin', type: 'operations', site: 'wellhead', lat: 9.4120, lng: 29.8100, status: 'ONLINE', mbps: 95.8, lat_ms: 74, dev: 13, soc: 82, up: 98.8 },
-  { num: '11', name: 'Well Pad 10 - Echo West Ridge', type: 'operations', site: 'wellhead', lat: 9.4670, lng: 29.7740, status: 'ONLINE', mbps: 115.2, lat_ms: 63, dev: 18, soc: 90, up: 99.3 },
-  { num: '12', name: 'Well Pad 11 - Foxtrot Northwest', type: 'operations', site: 'wellhead', lat: 9.5620, lng: 29.7610, status: 'ONLINE', mbps: 88.9, lat_ms: 81, dev: 10, soc: 75, up: 97.9 },
-  { num: '13', name: 'Well Pad 12 - Foxtrot North Peak', type: 'operations', site: 'wellhead', lat: 9.5840, lng: 29.8120, status: 'ONLINE', mbps: 102.7, lat_ms: 70, dev: 14, soc: 85, up: 98.9 },
-  { num: '14', name: 'Well Pad 13 - Golf East Sector', type: 'operations', site: 'wellhead', lat: 9.5310, lng: 29.9180, status: 'OFFLINE', mbps: null, lat_ms: null, dev: 0, soc: 14, up: 89.4 },
-  { num: '15', name: 'Well Pad 14 - Golf Spur', type: 'operations', site: 'wellhead', lat: 9.4890, lng: 29.9320, status: 'ONLINE', mbps: 110.1, lat_ms: 66, dev: 16, soc: 89, up: 99.2 },
-  { num: '16', name: 'Well Pad 15 - Hotel Southeast', type: 'operations', site: 'wellhead', lat: 9.3950, lng: 29.8820, status: 'ONLINE', mbps: 94.3, lat_ms: 75, dev: 12, soc: 80, up: 98.5 },
-  { num: '17', name: 'Well Pad 16 - Hotel Lowlands', type: 'operations', site: 'wellhead', lat: 9.3780, lng: 29.8240, status: 'ONLINE', mbps: 106.8, lat_ms: 68, dev: 15, soc: 87, up: 99.0 },
-  { num: '18', name: 'Well Pad 17 - India Southwest', type: 'operations', site: 'wellhead', lat: 9.4230, lng: 29.7420, status: 'ONLINE', mbps: 99.4, lat_ms: 73, dev: 13, soc: 83, up: 98.7 },
-  { num: '19', name: 'Well Pad 18 - India West Boundary', type: 'operations', site: 'wellhead', lat: 9.4850, lng: 29.7190, status: 'DEGRADED', mbps: 38.5, lat_ms: 125, dev: 8, soc: 35, up: 93.8 },
-  { num: '20', name: 'Well Pad 19 - Juliet Highlands', type: 'operations', site: 'wellhead', lat: 9.5710, lng: 29.7280, status: 'ONLINE', mbps: 114.7, lat_ms: 62, dev: 17, soc: 91, up: 99.4 },
-  { num: '21', name: 'Well Pad 20 - Juliet North Rim', type: 'operations', site: 'wellhead', lat: 9.6100, lng: 29.7850, status: 'ONLINE', mbps: 101.5, lat_ms: 71, dev: 14, soc: 84, up: 98.8 },
-  { num: '22', name: 'Well Pad 21 - Kilo Northeast', type: 'operations', site: 'wellhead', lat: 9.5950, lng: 29.8640, status: 'ONLINE', mbps: 121.3, lat_ms: 58, dev: 20, soc: 93, up: 99.6 },
-  { num: '23', name: 'Well Pad 22 - Kilo Deep Well', type: 'operations', site: 'wellhead', lat: 9.5200, lng: 29.9540, status: 'ONLINE', mbps: 97.6, lat_ms: 74, dev: 13, soc: 81, up: 98.6 },
-  { num: '24', name: 'Well Pad 23 - Lima East Border', type: 'operations', site: 'wellhead', lat: 9.4480, lng: 29.9670, status: 'ONLINE', mbps: 105.4, lat_ms: 69, dev: 15, soc: 86, up: 99.1 },
-  { num: '25', name: 'Well Pad 24 - Lima Southeast Marsh', type: 'operations', site: 'wellhead', lat: 9.3610, lng: 29.9120, status: 'ONLINE', mbps: 91.2, lat_ms: 78, dev: 11, soc: 76, up: 98.1 },
-  { num: '26', name: 'Well Pad 25 - Mike South Well', type: 'operations', site: 'wellhead', lat: 9.3420, lng: 29.8450, status: 'ONLINE', mbps: 109.8, lat_ms: 65, dev: 16, soc: 88, up: 99.2 },
-  { num: '27', name: 'Well Pad 26 - Mike Southwest', type: 'operations', site: 'wellhead', lat: 9.3890, lng: 29.7630, status: 'ONLINE', mbps: 96.5, lat_ms: 72, dev: 12, soc: 82, up: 98.7 },
-  { num: '28', name: 'Drilling Rig Site 01 (Exploration Alpha)', type: 'base_camp', site: 'drilling_rig', lat: 9.5450, lng: 29.8680, status: 'OFFLINE', mbps: null, lat_ms: null, dev: 0, soc: 11, up: 91.2 },
-  { num: '29', name: 'Drilling Rig Site 02 (Heavy Workover)', type: 'base_camp', site: 'drilling_rig', lat: 9.4620, lng: 29.7950, status: 'ONLINE', mbps: 138.4, lat_ms: 55, dev: 36, soc: 95, up: 99.7 },
-  { num: '30', name: 'Drilling Rig Site 03 (North Extension)', type: 'base_camp', site: 'drilling_rig', lat: 9.6020, lng: 29.8250, status: 'ONLINE', mbps: 126.9, lat_ms: 61, dev: 32, soc: 92, up: 99.3 },
-  { num: '31', name: 'Drilling Rig Site 04 (South Exploration)', type: 'base_camp', site: 'drilling_rig', lat: 9.3720, lng: 29.8750, status: 'DEGRADED', mbps: 45.2, lat_ms: 112, dev: 14, soc: 41, up: 95.1 },
-  { num: '32', name: 'Drilling Rig Site 05 (West Appraisal)', type: 'base_camp', site: 'drilling_rig', lat: 9.5100, lng: 29.7450, status: 'ONLINE', mbps: 131.7, lat_ms: 57, dev: 34, soc: 94, up: 99.6 },
-  { num: '33', name: 'Drilling Rig Site 06 (East Appraisal)', type: 'base_camp', site: 'drilling_rig', lat: 9.4250, lng: 29.9350, status: 'ONLINE', mbps: 119.5, lat_ms: 64, dev: 28, soc: 89, up: 99.2 },
-  { num: '34', name: 'Flow Station 01 - North Central Manifold', type: 'operations', site: 'pipeline', lat: 9.5050, lng: 29.8350, status: 'ONLINE', mbps: 142.1, lat_ms: 52, dev: 24, soc: 97, up: 99.8 },
-  { num: '35', name: 'Flow Station 02 - Central Gathering Unit', type: 'operations', site: 'pipeline', lat: 9.4750, lng: 29.8550, status: 'ONLINE', mbps: 135.6, lat_ms: 56, dev: 22, soc: 95, up: 99.7 },
-  { num: '36', name: 'Flow Station 03 - Northwest Collector', type: 'operations', site: 'pipeline', lat: 9.5350, lng: 29.8050, status: 'ONLINE', mbps: 122.8, lat_ms: 60, dev: 19, soc: 92, up: 99.4 },
-  { num: '37', name: 'Flow Station 04 - South Central Collector', type: 'operations', site: 'pipeline', lat: 9.4450, lng: 29.8450, status: 'ONLINE', mbps: 128.4, lat_ms: 58, dev: 21, soc: 93, up: 99.5 },
-  { num: '38', name: 'Flow Station 05 - North Valley Separator', type: 'operations', site: 'pipeline', lat: 9.5650, lng: 29.8550, status: 'ONLINE', mbps: 117.3, lat_ms: 65, dev: 18, soc: 88, up: 99.1 },
-  { num: '39', name: 'Flow Station 06 - South Valley Separator', type: 'operations', site: 'pipeline', lat: 9.4050, lng: 29.8250, status: 'ONLINE', mbps: 111.0, lat_ms: 67, dev: 17, soc: 86, up: 99.0 },
-  { num: '40', name: 'Pipeline Pump Station 01 (Main Trunkline)', type: 'operations', site: 'pipeline', lat: 9.4300, lng: 29.9100, status: 'ONLINE', mbps: 152.4, lat_ms: 50, dev: 30, soc: 98, up: 99.9 },
-  { num: '41', name: 'Pipeline Pump Station 02 (South Spur Hub)', type: 'operations', site: 'pipeline', lat: 9.3550, lng: 29.9550, status: 'ONLINE', mbps: 125.0, lat_ms: 62, dev: 20, soc: 91, up: 99.3 },
-  { num: '42', name: 'Pipeline Pump Station 03 (North Delivery Hub)', type: 'operations', site: 'pipeline', lat: 9.5850, lng: 29.9250, status: 'ONLINE', mbps: 133.2, lat_ms: 59, dev: 23, soc: 94, up: 99.5 },
-  { num: '43', name: 'Pipeline Pump Station 04 (Bentiu Terminal Valve)', type: 'operations', site: 'pipeline', lat: 9.2950, lng: 30.0100, status: 'ONLINE', mbps: 108.9, lat_ms: 70, dev: 16, soc: 85, up: 98.9 },
-  { num: '44', name: 'Unity Base Camp 01 (Field Headquarters)', type: 'base_camp', site: 'field_camp', lat: 9.4880, lng: 29.8310, status: 'ONLINE', mbps: 165.8, lat_ms: 48, dev: 68, soc: 99, up: 99.9 },
-  { num: '45', name: 'Unity Base Camp 02 (Logistics & Supply Depot)', type: 'base_camp', site: 'field_camp', lat: 9.4720, lng: 29.8150, status: 'ONLINE', mbps: 144.2, lat_ms: 54, dev: 52, soc: 96, up: 99.8 },
-  { num: '46', name: 'Unity Base Camp 03 (Heavy Equipment Yard)', type: 'base_camp', site: 'field_camp', lat: 9.5250, lng: 29.8850, status: 'ONLINE', mbps: 132.6, lat_ms: 58, dev: 44, soc: 93, up: 99.4 },
-  { num: '47', name: 'Unity Base Camp 04 (Field Airfield / Helipad)', type: 'base_camp', site: 'field_camp', lat: 9.4600, lng: 29.8600, status: 'ONLINE', mbps: 128.5, lat_ms: 61, dev: 38, soc: 92, up: 99.5 },
-  { num: '48', name: 'Security Post 01 (North Perimeter Checkpoint)', type: 'operations', site: 'security', lat: 9.6250, lng: 29.7500, status: 'OFFLINE', mbps: null, lat_ms: null, dev: 0, soc: 18, up: 90.5 },
-  { num: '49', name: 'Security Post 02 (South Road Barrier Checkpoint)', type: 'operations', site: 'security', lat: 9.3300, lng: 29.8900, status: 'DEGRADED', mbps: 48.0, lat_ms: 108, dev: 12, soc: 44, up: 95.8 },
-  { num: '50', name: 'Security Post 03 (East River Gate Control)', type: 'operations', site: 'security', lat: 9.4950, lng: 29.9800, status: 'ONLINE', mbps: 98.2, lat_ms: 73, dev: 18, soc: 84, up: 98.7 },
+  // Central Equatoria
+  { num: '01', name: 'Ababa Group Master NOC & HQ (Airport Road)', state: 'Central Equatoria', client: 'Ababa Group Internal', type: 'enterprise', site: 'noc_hub', lat: 4.8594, lng: 31.5713, status: 'ONLINE', mbps: 188.5, lat_ms: 46, dev: 64, soc: 99, up: 99.9 },
+  { num: '02', name: 'Juba International Airport Aviation Terminal', state: 'Central Equatoria', client: 'Civil Aviation Authority', type: 'logistics', site: 'airfield', lat: 4.8720, lng: 31.6011, status: 'ONLINE', mbps: 165.2, lat_ms: 48, dev: 42, soc: 98, up: 99.8 },
+  { num: '03', name: 'Gumbo Central Warehousing & Freight Depot', state: 'Central Equatoria', client: 'National Freight Lines', type: 'logistics', site: 'logistics', lat: 4.8320, lng: 31.6320, status: 'ONLINE', mbps: 142.0, lat_ms: 52, dev: 36, soc: 95, up: 99.6 },
+  { num: '04', name: 'UNMISS Tongping Humanitarian Hub', state: 'Central Equatoria', client: 'UN Operations', type: 'humanitarian', site: 'humanitarian', lat: 4.8690, lng: 31.5840, status: 'ONLINE', mbps: 154.6, lat_ms: 50, dev: 58, soc: 97, up: 99.7 },
+  { num: '05', name: 'Luri Heavy Equipment & Quarry Base', state: 'Central Equatoria', client: 'Rhino Infrastructure', type: 'enterprise', site: 'industrial', lat: 4.9120, lng: 31.4890, status: 'ONLINE', mbps: 118.4, lat_ms: 58, dev: 18, soc: 91, up: 99.2 },
+  { num: '06', name: 'Terekeka River Nile Barge Terminal', state: 'Central Equatoria', client: 'River Navigation Corp', type: 'logistics', site: 'port', lat: 5.4410, lng: 31.7520, status: 'ONLINE', mbps: 112.5, lat_ms: 62, dev: 22, soc: 89, up: 99.1 },
+  { num: '07', name: 'Yei Commercial Banking & NGO Gateway', state: 'Central Equatoria', client: 'Equity Bank & NGOs', type: 'enterprise', site: 'commercial', lat: 4.0950, lng: 30.6740, status: 'ONLINE', mbps: 135.0, lat_ms: 54, dev: 38, soc: 94, up: 99.5 },
+  { num: '08', name: 'Kajo-Keji Cross-Border Customs Station', state: 'Central Equatoria', client: 'South Sudan Customs', type: 'government', site: 'security', lat: 3.8560, lng: 31.6580, status: 'ONLINE', mbps: 104.2, lat_ms: 65, dev: 19, soc: 86, up: 98.9 },
+
+  // Eastern Equatoria
+  { num: '09', name: 'Nimule One-Stop Border Post & Customs', state: 'Eastern Equatoria', client: 'Revenue Authority', type: 'government', site: 'customs', lat: 3.6003, lng: 32.0478, status: 'ONLINE', mbps: 172.4, lat_ms: 49, dev: 78, soc: 98, up: 99.9 },
+  { num: '10', name: 'Torit State Administration Telecom Backhaul', state: 'Eastern Equatoria', client: 'State Secretariat', type: 'government', site: 'government', lat: 4.4120, lng: 32.5690, status: 'ONLINE', mbps: 128.5, lat_ms: 57, dev: 32, soc: 92, up: 99.4 },
+  { num: '11', name: 'Kapoeta Commercial Gold Mining Camp', state: 'Eastern Equatoria', client: 'Equator Gold Mining Ltd', type: 'enterprise', site: 'mining', lat: 4.7730, lng: 33.5870, status: 'ONLINE', mbps: 138.2, lat_ms: 55, dev: 28, soc: 94, up: 99.6 },
+  { num: '12', name: 'Budi Hills Agricultural Research Station', state: 'Eastern Equatoria', client: 'Agri-Development Fund', type: 'humanitarian', site: 'field_camp', lat: 4.3210, lng: 33.1200, status: 'DEGRADED', mbps: 44.8, lat_ms: 114, dev: 12, soc: 42, up: 95.1 },
+  { num: '13', name: 'Narus Transit Logistics & Fuel Depot', state: 'Eastern Equatoria', client: 'Great Lakes Transport', type: 'logistics', site: 'logistics', lat: 4.8420, lng: 33.9120, status: 'ONLINE', mbps: 119.6, lat_ms: 61, dev: 20, soc: 90, up: 99.3 },
+
+  // Western Equatoria
+  { num: '14', name: 'Yambio Regional Agro-Processing Hub', state: 'Western Equatoria', client: 'Greenbelt Agro Ltd', type: 'enterprise', site: 'industrial', lat: 4.5680, lng: 28.3950, status: 'ONLINE', mbps: 124.0, lat_ms: 59, dev: 30, soc: 93, up: 99.4 },
+  { num: '15', name: 'Maridi Water & Power Utility Telemetry', state: 'Western Equatoria', client: 'State Power Utility', type: 'enterprise', site: 'utility', lat: 4.9120, lng: 29.4750, status: 'ONLINE', mbps: 108.5, lat_ms: 66, dev: 16, soc: 88, up: 99.0 },
+  { num: '16', name: 'Tambura Health Clinic & Frontier Post', state: 'Western Equatoria', client: 'MSF Healthcare', type: 'humanitarian', site: 'humanitarian', lat: 5.6020, lng: 27.4680, status: 'ONLINE', mbps: 98.4, lat_ms: 72, dev: 24, soc: 85, up: 98.8 },
+  { num: '17', name: 'Nzara Teak Timber & Forest Station', state: 'Western Equatoria', client: 'Equatoria Forestry Co', type: 'enterprise', site: 'field_camp', lat: 4.6420, lng: 28.2560, status: 'ONLINE', mbps: 112.0, lat_ms: 63, dev: 18, soc: 89, up: 99.2 },
+
+  // Jonglei State
+  { num: '18', name: 'Bor River Port & Humanitarian Dock', state: 'Jonglei', client: 'World Food Programme', type: 'humanitarian', site: 'port', lat: 6.2072, lng: 31.5591, status: 'ONLINE', mbps: 156.0, lat_ms: 51, dev: 52, soc: 97, up: 99.8 },
+  { num: '19', name: 'Pibor Relief Emergency Base', state: 'Jonglei', client: 'UN Humanitarian Fund', type: 'humanitarian', site: 'humanitarian', lat: 6.7950, lng: 33.1310, status: 'DEGRADED', mbps: 41.5, lat_ms: 122, dev: 14, soc: 38, up: 94.2 },
+  { num: '20', name: 'Akobo Eastern Border Communications Hub', state: 'Jonglei', client: 'Border Security & UN', type: 'government', site: 'security', lat: 7.7890, lng: 33.0040, status: 'ONLINE', mbps: 105.8, lat_ms: 68, dev: 22, soc: 87, up: 98.9 },
+  { num: '21', name: 'Ayod Sudd Wetland Environmental Station', state: 'Jonglei', client: 'Ministry of Environment', type: 'government', site: 'utility', lat: 8.0940, lng: 31.4120, status: 'ONLINE', mbps: 94.2, lat_ms: 75, dev: 11, soc: 82, up: 98.5 },
+  { num: '22', name: 'Pochalla Mineral Exploration Compound', state: 'Jonglei', client: 'Nile Mining Exploration', type: 'enterprise', site: 'mining', lat: 6.8620, lng: 34.1120, status: 'OFFLINE', mbps: null, lat_ms: null, dev: 0, soc: 14, up: 90.1 },
+
+  // Lakes State
+  { num: '23', name: 'Rumbek Central Commercial & Telecom Base', state: 'Lakes', client: 'Ababa Group Regional NOC', type: 'enterprise', site: 'noc_hub', lat: 6.8062, lng: 29.6774, status: 'ONLINE', mbps: 148.0, lat_ms: 53, dev: 46, soc: 96, up: 99.7 },
+  { num: '24', name: 'Yirol Commercial Fisheries Telemetry', state: 'Lakes', client: 'Lakes Fish Corporation', type: 'enterprise', site: 'commercial', lat: 6.5540, lng: 30.5020, status: 'ONLINE', mbps: 114.2, lat_ms: 61, dev: 19, soc: 91, up: 99.3 },
+  { num: '25', name: 'Cueibet Transport Corridor Relay Node', state: 'Lakes', client: 'Inter-State Logistics', type: 'logistics', site: 'logistics', lat: 6.9940, lng: 29.2890, status: 'ONLINE', mbps: 102.6, lat_ms: 69, dev: 15, soc: 86, up: 98.9 },
+  { num: '26', name: 'Awerial Nile Crossing Ferry Terminal', state: 'Lakes', client: 'River Nile Ferries', type: 'logistics', site: 'port', lat: 6.1820, lng: 31.3210, status: 'ONLINE', mbps: 121.5, lat_ms: 58, dev: 26, soc: 93, up: 99.5 },
+
+  // Unity State (Oilfields & Regional Centers)
+  { num: '27', name: 'Bentiu State Operations Base & Gateway', state: 'Unity', client: 'Ababa Group Unity Ops', type: 'enterprise', site: 'noc_hub', lat: 9.2333, lng: 29.8333, status: 'ONLINE', mbps: 162.0, lat_ms: 50, dev: 54, soc: 98, up: 99.8 },
+  { num: '28', name: 'Rubkona Airfield Cargo & Fuel Hub', state: 'Unity', client: 'United Nations Aviation', type: 'logistics', site: 'airfield', lat: 9.2780, lng: 29.7950, status: 'ONLINE', mbps: 144.5, lat_ms: 54, dev: 38, soc: 95, up: 99.6 },
+  { num: '29', name: 'GPOC Unity Oilfield Central Processing (CPF)', state: 'Unity', client: 'GPOC Oil Operations', type: 'energy', site: 'oilfield', lat: 9.4920, lng: 29.8410, status: 'ONLINE', mbps: 178.0, lat_ms: 48, dev: 62, soc: 99, up: 99.9 },
+  { num: '30', name: 'GPOC Well Pad Alpha Telemetry Station', state: 'Unity', client: 'GPOC Oil Operations', type: 'energy', site: 'oilfield', lat: 9.5280, lng: 29.8150, status: 'ONLINE', mbps: 122.4, lat_ms: 59, dev: 18, soc: 92, up: 99.4 },
+  { num: '31', name: 'GPOC Well Pad Bravo Telemetry Station', state: 'Unity', client: 'GPOC Oil Operations', type: 'energy', site: 'oilfield', lat: 9.4710, lng: 29.8730, status: 'ONLINE', mbps: 116.8, lat_ms: 62, dev: 16, soc: 90, up: 99.2 },
+  { num: '32', name: 'GPOC Exploration Drilling Rig #1 Camp', state: 'Unity', client: 'GPOC Oil Operations', type: 'energy', site: 'oilfield', lat: 9.5450, lng: 29.8680, status: 'ONLINE', mbps: 136.5, lat_ms: 56, dev: 34, soc: 94, up: 99.6 },
+  { num: '33', name: 'Pariang North Oilfield Logistics Yard', state: 'Unity', client: 'GPOC & Dar Petroleum', type: 'energy', site: 'logistics', lat: 9.7620, lng: 30.1240, status: 'ONLINE', mbps: 126.0, lat_ms: 58, dev: 28, soc: 93, up: 99.4 },
+  { num: '34', name: 'Mankien Security & Telecom Outpost', state: 'Unity', client: 'Field Security Ops', type: 'government', site: 'security', lat: 9.0520, lng: 29.2150, status: 'OFFLINE', mbps: null, lat_ms: null, dev: 0, soc: 12, up: 90.4 },
+  { num: '35', name: 'Mayom Commercial Transport Depot', state: 'Unity', client: 'Nile Petroleum Distribution', type: 'logistics', site: 'logistics', lat: 9.2840, lng: 29.3620, status: 'ONLINE', mbps: 108.0, lat_ms: 66, dev: 17, soc: 88, up: 99.0 },
+
+  // Upper Nile State (Oilfields & Nile Corridor)
+  { num: '36', name: 'Malakal River Port & Regional NOC', state: 'Upper Nile', client: 'Ababa Group Upper Nile', type: 'enterprise', site: 'noc_hub', lat: 9.5334, lng: 31.6605, status: 'ONLINE', mbps: 168.0, lat_ms: 49, dev: 58, soc: 98, up: 99.8 },
+  { num: '37', name: 'Dar Petroleum Paloch CPF Main Terminal', state: 'Upper Nile', client: 'Dar Petroleum (DPOC)', type: 'energy', site: 'oilfield', lat: 9.9850, lng: 32.5420, status: 'ONLINE', mbps: 182.5, lat_ms: 47, dev: 72, soc: 99, up: 99.9 },
+  { num: '38', name: 'Paloch Oilfield Airfield & Operations Camp', state: 'Upper Nile', client: 'Dar Petroleum (DPOC)', type: 'energy', site: 'airfield', lat: 10.0210, lng: 32.5890, status: 'ONLINE', mbps: 158.4, lat_ms: 51, dev: 48, soc: 97, up: 99.7 },
+  { num: '39', name: 'Renk Northern Agricultural Grain Silos', state: 'Upper Nile', client: 'Sudan-South Sudan Trade', type: 'enterprise', site: 'commercial', lat: 11.8310, lng: 32.7980, status: 'ONLINE', mbps: 132.0, lat_ms: 56, dev: 36, soc: 94, up: 99.5 },
+  { num: '40', name: 'Melut Crude Oil Pumping Station #2', state: 'Upper Nile', client: 'Petroleum Pipeline Corp', type: 'energy', site: 'oilfield', lat: 10.4420, lng: 32.2010, status: 'ONLINE', mbps: 145.2, lat_ms: 53, dev: 26, soc: 96, up: 99.7 },
+  { num: '41', name: 'Maban Humanitarian Refugee Operations', state: 'Upper Nile', client: 'UNHCR Refugee Mission', type: 'humanitarian', site: 'humanitarian', lat: 9.9320, lng: 33.8210, status: 'ONLINE', mbps: 124.8, lat_ms: 60, dev: 44, soc: 92, up: 99.3 },
+  { num: '42', name: 'Bunj Field Health & Water Logistics Hub', state: 'Upper Nile', client: 'Relief International', type: 'humanitarian', site: 'humanitarian', lat: 9.9650, lng: 33.6420, status: 'DEGRADED', mbps: 39.4, lat_ms: 128, dev: 11, soc: 36, up: 93.8 },
+  { num: '43', name: 'Kodok Nile Shipping Checkpoint', state: 'Upper Nile', client: 'River Navigation Security', type: 'government', site: 'port', lat: 9.8920, lng: 32.1120, status: 'ONLINE', mbps: 106.2, lat_ms: 67, dev: 15, soc: 87, up: 98.9 },
+
+  // Warrap State
+  { num: '44', name: 'Kuajok State Capital Telecom Node', state: 'Warrap', client: 'Warrap State Ministry', type: 'government', site: 'government', lat: 8.3090, lng: 27.9940, status: 'ONLINE', mbps: 136.0, lat_ms: 55, dev: 38, soc: 94, up: 99.6 },
+  { num: '45', name: 'Tonj Solar Health & Community Gateway', state: 'Warrap', client: 'Catholic Health Mission', type: 'humanitarian', site: 'humanitarian', lat: 7.2780, lng: 28.6820, status: 'ONLINE', mbps: 118.5, lat_ms: 61, dev: 29, soc: 91, up: 99.3 },
+  { num: '46', name: 'Gogrial Cattle & Trade Market Network', state: 'Warrap', client: 'Rural Commerce Initiative', type: 'enterprise', site: 'commercial', lat: 8.5320, lng: 28.1150, status: 'ONLINE', mbps: 104.0, lat_ms: 68, dev: 19, soc: 86, up: 98.9 },
+
+  // Western Bahr el Ghazal
+  { num: '47', name: 'Wau Commercial Logistics & Rail Hub', state: 'Western Bahr el Ghazal', client: 'Ababa Group Bahr el Ghazal', type: 'enterprise', site: 'noc_hub', lat: 7.7028, lng: 27.9953, status: 'ONLINE', mbps: 164.0, lat_ms: 49, dev: 60, soc: 98, up: 99.8 },
+  { num: '48', name: 'Raja Western Frontier Border Post', state: 'Western Bahr el Ghazal', client: 'Border Defense Unit', type: 'government', site: 'security', lat: 8.4590, lng: 25.6780, status: 'DEGRADED', mbps: 46.2, lat_ms: 118, dev: 13, soc: 40, up: 94.8 },
+  { num: '49', name: 'Bussere University Telemetry Station', state: 'Western Bahr el Ghazal', client: 'University of Bahr el Ghazal', type: 'enterprise', site: 'commercial', lat: 7.5120, lng: 27.8420, status: 'ONLINE', mbps: 122.0, lat_ms: 60, dev: 42, soc: 92, up: 99.4 },
+
+  // Northern Bahr el Ghazal
+  { num: '50', name: 'Aweil Central Rail & Trade Terminal', state: 'Northern Bahr el Ghazal', client: 'Cross-Border Commerce Corp', type: 'logistics', site: 'logistics', lat: 8.7680, lng: 27.4010, status: 'ONLINE', mbps: 142.5, lat_ms: 54, dev: 45, soc: 95, up: 99.6 },
 ];
 
 const mockTerminals: Terminal[] = rawKitConfigs.map((cfg) => ({
-  id: `Kit #${cfg.num} (ABABA-GPOC-${cfg.num})`,
+  id: `Kit #${cfg.num} (ABABA-SSD-${cfg.num})`,
   kit_number: `Kit #${cfg.num}`,
-  account_id: cfg.type === 'operations' ? 'GPOC-OPS' : 'GPOC-FIELD',
-  account_email: cfg.type === 'operations' ? 'operations@gpoc.co.ss' : 'telemetry@gpoc.co.ss',
+  account_id: cfg.type === 'energy' ? 'ABABA-ENERGY' : 'ABABA-ENTERPRISE',
+  account_email: cfg.type === 'energy' ? 'energy.telemetry@ababagroup.com' : 'ops@ababagroup.com',
   account_type: cfg.type,
-  site_id: `UOF-SITE-${cfg.num}`,
+  site_id: `ABABA-SITE-${cfg.num}`,
   site_type: cfg.site,
+  state: cfg.state,
   loc: `Kit #${cfg.num} - ${cfg.name}`,
   coords: [cfg.lat, cfg.lng],
   status: cfg.status as 'ONLINE' | 'OFFLINE' | 'DEGRADED',
-  data_usage_gb: cfg.status === 'OFFLINE' ? 120.4 : Number((450 + parseInt(cfg.num, 10) * 28.5).toFixed(1)),
+  data_usage_gb: cfg.status === 'OFFLINE' ? 140.2 : Number((520 + parseInt(cfg.num, 10) * 32.4).toFixed(1)),
   latency_ms: cfg.lat_ms,
   download_mbps: cfg.mbps,
   connected_devices: cfg.dev,
   uptime_percent: cfg.up,
-  data_sources: ['network', 'power', 'scada'],
+  data_sources: ['network', 'power', 'telemetry'],
   community_usage_sessions: null,
-  ranger_voice_sessions: cfg.dev > 20 ? cfg.dev * 2 : null,
+  ranger_voice_sessions: cfg.dev > 25 ? cfg.dev * 2 : null,
   bluetti_soc_percent: cfg.soc,
-  contractor: CONTRACTOR_NAME,
+  contractor: OPERATOR_NAME,
+  client: cfg.client,
 }));
 
 const mockFleetStats: FleetStats = {
@@ -232,23 +257,25 @@ const mockSites: DeploymentSite[] = mockTerminals.map((t) => ({
   account_email: t.account_email,
   account_type: t.account_type,
   site_type: t.site_type,
-  purpose: `${t.kit_number} telemetry & high-speed link for GPOC Unity Oil Field (${t.site_type})`,
+  state: t.state,
+  purpose: `${t.kit_number} deployed for ${t.client} in ${t.state}, maintained by Ababa Group Limited`,
   loc: t.loc,
   coords: t.coords,
   terminal_ids: [t.id],
   data_sources: t.data_sources,
   metrics: { uptime_percent: t.uptime_percent, connected_devices: t.connected_devices ?? 0 },
-  contractor: CONTRACTOR_NAME,
+  contractor: OPERATOR_NAME,
+  client: t.client,
 }));
 
 function mockResponse<T>(path: string, options?: RequestInit): T {
   if (path === '/auth/login') {
     const body = JSON.parse(String(options?.body ?? '{}'));
-    const email = body.email || 'operator@gpoc.co.ss';
+    const email = body.email || 'ops@ababagroup.com';
     return {
       email,
-      name: email.includes('ababa') ? 'Ababa Field Engineer' : 'GPOC Operations Manager',
-      role: 'Unity Oilfield Operations Manager',
+      name: email.includes('admin') ? 'Ababa NOC Administrator' : 'Ababa Network Engineer',
+      role: 'Ababa Group Fleet Operations Lead',
     } as T;
   }
   if (path === '/analytics/fleet-snapshot') {
@@ -263,21 +290,21 @@ function mockResponse<T>(path: string, options?: RequestInit): T {
     const id = parts[2];
     const term = mockTerminals.find((t) => t.id === id || encodeURIComponent(t.id) === id) || mockTerminals[0];
     return {
-      latency_ms: term.latency_ms ?? 65,
-      download_mbps: term.download_mbps ?? 110,
-      signal_percent: 94,
+      latency_ms: term.latency_ms ?? 55,
+      download_mbps: term.download_mbps ?? 135,
+      signal_percent: 96,
       uptime: `${term.uptime_percent}%`,
-      sw_version: 'GPOC-Ababa-Edge v2.4.1',
+      sw_version: 'Ababa-Starlink-Edge v3.2.0',
       errors: term.status === 'DEGRADED' ? 2 : 0,
       warnings: term.status === 'DEGRADED' ? 3 : 0,
-      location_type: 'Unity Oilfield Kit Station',
-      location_value: 'Unity Oil Field, South Sudan',
+      location_type: 'Ababa Maintained Station',
+      location_value: `${term.state}, South Sudan`,
       lat: term.coords[0],
       lng: term.coords[1],
     } as T;
   }
   if (path.startsWith('/terminals/') && path.endsWith('/wifi')) {
-    return { ssid: 'ABABA-GPOC-UNITY-SECURE', hide_ssid: false, bypass_mode: false, connected_clients: 24 } as T;
+    return { ssid: 'ABABA-GROUP-SECURE', hide_ssid: false, bypass_mode: false, connected_clients: 28 } as T;
   }
   if (path.startsWith('/terminals/') && path.endsWith('/dish')) {
     return { snow_melt_mode: 'auto', power_saving: false } as T;
