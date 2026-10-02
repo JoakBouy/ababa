@@ -76,7 +76,7 @@ While real stories are being collected, the map runs on **fictional test persona
 npm run validate
 ```
 
-This catches broken links between records and published stories without consent. When the real stories are in, delete the demo records (`"status": "demo"`) or set `SHOW_DEMO_STORIES = false` in `src/data/index.ts`.
+This catches broken links between records and published stories without consent. When the real stories are in, set `CONTENT_MODE` to `'live'` in `src/data/index.ts`.
 
 ## Adding a place
 
