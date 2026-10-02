@@ -2,7 +2,7 @@ import { AlertCircle, MapPin } from 'lucide-react';
 import { programmesForPlace, sectorsForPlace, storiesForPlace, yearsLabel } from '../data';
 import { SECTORS } from '../data/sectors';
 import type { Place, Programme, SectorId } from '../data/types';
-import { DemoTag, Portrait, SectionHeading, SectorDot, SectorList, SourceLinks, formatCoords } from './bits';
+import { DemoTag, Portrait, SectionHeading, SectorDot, SectorList, SourceLinks } from './bits';
 import { cn } from '../utils/cn';
 import { sources } from '../data';
 
@@ -26,24 +26,17 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
 
   return (
     <div className="flex flex-col gap-7">
-      <header className="flex flex-col gap-3">
+      <header className="flex flex-col gap-2">
         <h1 className="font-headline text-2xl leading-tight font-bold tracking-tight text-on-surface">{place.name}</h1>
-        <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-on-surface-variant">
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-            {place.county} County · {place.state}
-          </span>
-          <span className="font-mono text-[11.5px] tabular" title={place.coordsPrecision === 'county' ? 'County centre: exact sites to be added' : 'Town location'}>
-            {formatCoords(place.coords)}
-            {place.coordsPrecision === 'county' && ' (county centre)'}
-          </span>
+        <p className="inline-flex items-center gap-1 text-sm text-on-surface-variant">
+          <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+          {place.state}, South Sudan
         </p>
-        <p className="max-w-[60ch] text-sm leading-relaxed text-on-surface">{place.summary}</p>
-        <SectorList sectors={sectors} />
+        <SectorList sectors={sectors} className="pt-1" />
       </header>
 
       <section className="flex flex-col gap-4" aria-labelledby="place-people">
-        <SectionHeading aside={people.length ? `${people.length} ${people.length === 1 ? 'person' : 'people'}` : undefined}>
+        <SectionHeading>
           <span id="place-people">People from {place.name}</span>
         </SectionHeading>
         {people.length > 0 ? (
@@ -53,12 +46,12 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
               return (
                 <li key={s.id} className={cn('min-w-0 transition-opacity', dim && 'opacity-45')}>
                   <button type="button" onClick={() => onOpenStory(s.id)} className="group flex w-full flex-col gap-2.5 text-left">
-                    <span className="block aspect-[4/5] w-full max-w-full overflow-hidden rounded-2xl border border-outline-variant/30 ring-[#005477] transition group-hover:ring-2">
+                    <span className="block aspect-[4/5] w-full max-w-full overflow-hidden rounded-2xl border border-outline-variant/30 ring-[#A84A23] transition group-hover:ring-2">
                       <Portrait story={s} />
                     </span>
                     <span className="flex flex-col gap-1">
                       <span className="flex items-center gap-2">
-                        <span className="font-headline text-base font-bold leading-tight text-on-surface group-hover:text-[#005477]">{s.name}</span>
+                        <span className="font-headline text-base font-bold leading-tight text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
                         {s.status === 'demo' && <DemoTag />}
                       </span>
                       <span className="text-[12.5px] leading-snug text-on-surface-variant">{s.role}</span>
@@ -72,16 +65,16 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
           <div className="flex flex-col gap-2 rounded-2xl border border-dashed border-outline-variant px-4 py-5">
             <p className="font-headline text-base font-bold text-on-surface">No stories from {place.name} yet</p>
             <p className="text-[13.5px] leading-snug text-on-surface-variant">
-              PRDA's {Array.from(new Set(work)).join(' and ')} work here has no recorded story. A person reached by this work, with
-              their consent, belongs here.
+              PRDA's {Array.from(new Set(work)).join(' and ')} work here reaches people here. When someone is ready to share their
+              story, with their consent, it will appear here.
             </p>
           </div>
         )}
       </section>
 
       <section className="flex flex-col gap-1" aria-labelledby="place-work">
-        <SectionHeading aside={`${progs.length} ${progs.length === 1 ? 'programme' : 'programmes'}`}>
-          <span id="place-work">What PRDA does here</span>
+        <SectionHeading>
+          <span id="place-work">How PRDA helps here</span>
         </SectionHeading>
         <ul className="flex flex-col">
           {progs.map((p) => {
@@ -95,7 +88,7 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
                     className={cn(
                       'shrink-0 rounded px-2 py-0.5 text-[10px] font-bold whitespace-nowrap',
                       p.status === 'active'
-                        ? 'bg-[#00875A]/10 text-[#00875A]'
+                        ? 'bg-[#4E7A2C]/10 text-[#4E7A2C]'
                         : p.status === 'completed'
                           ? 'bg-surface-container text-on-surface-variant'
                           : 'bg-amber-500/10 text-amber-600',
@@ -111,14 +104,14 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
                       <SectorDot key={s} sector={s} size={7} />
                     ))}
                   </span>
-                  {p.partners.length > 0 && <span>With {p.partners.join(', ')}</span>}
+                  {p.partners.length > 0 && <span>Alongside {p.partners.join(', ')}</span>}
                 </div>
                 {p.facts.length > 0 && (
                   <ul className="flex flex-col gap-1 pt-1">
                     {p.facts.map((f) => (
                       <li key={f.text} className="text-[13px] leading-snug text-on-surface">
                         {f.text}{' '}
-                        <a href={sources[f.sourceId]?.url} target="_blank" rel="noreferrer" className="text-[11.5px] text-[#005477] hover:underline">
+                        <a href={sources[f.sourceId]?.url} target="_blank" rel="noreferrer" className="text-[11.5px] text-[#A84A23] hover:underline">
                           {sources[f.sourceId]?.publisher}
                         </a>
                       </li>
@@ -146,7 +139,7 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
       )}
 
       <section className="flex flex-col gap-3 pb-6">
-        <SectionHeading>Sources</SectionHeading>
+        <SectionHeading>Where this comes from</SectionHeading>
         <SourceLinks ids={[...place.sourceIds, ...progs.flatMap((p) => p.sourceIds)]} />
       </section>
     </div>

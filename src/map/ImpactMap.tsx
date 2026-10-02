@@ -47,24 +47,15 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 }
 
-export const PRDA_BLUE = '#005477';
+export const PRDA_ACCENT = '#A84A23';
 
-function placeIcon(opts: {
-  place: Place;
-  storyCount: number;
-  sectors: SectorId[];
-  selected: boolean;
-  hovered: boolean;
-  dim: boolean;
-  showLabel: boolean;
-}) {
-  const { place, storyCount, sectors, selected, hovered, dim, showLabel } = opts;
+/**
+ * Each marker's DOM is built once. Selection, hover, filter and label visibility are then
+ * toggled as classes on that element, so the marker is never swapped out mid-click.
+ */
+function placeIcon(place: Place, storyCount: number, sectors: SectorId[]) {
   const people = storyCount > 0;
-  const color = people ? PRDA_BLUE : SECTORS[sectors[0] ?? 'relief'].color;
-  const cls = ['pm', people ? 'pm--people' : 'pm--quiet', selected && 'is-selected', hovered && 'is-hover', dim && 'is-dim']
-    .filter(Boolean)
-    .join(' ');
-  const label = showLabel ? `<span class="pm-label pm-label--${place.labelSide}">${escapeHtml(place.name)}</span>` : '';
+  const color = people ? PRDA_ACCENT : SECTORS[sectors[0] ?? 'relief'].color;
   const body = people
     ? `<span class="pm-persona">${PERSON_GLYPH}<span class="pm-count">${storyCount}</span></span>`
     : '<span class="pm-dot"></span>';
@@ -73,7 +64,7 @@ function placeIcon(opts: {
     className: 'place-icon',
     iconSize: [size, size],
     popupAnchor: [0, -size / 2],
-    html: `<div class="${cls}" style="--pm-color:${color}"><span class="pm-ping"></span>${body}${label}</div>`,
+    html: `<div class="pm ${people ? 'pm--people' : 'pm--quiet'}" style="--pm-color:${color}"><span class="pm-ping"></span>${body}<span class="pm-label pm-label--${place.labelSide} is-hidden">${escapeHtml(place.name)}</span></div>`,
   });
 }
 
@@ -132,6 +123,10 @@ export default function ImpactMap({
     [],
   );
   const infoByCounty = useMemo(() => new Map(placeInfo.map((i) => [i.place.county, i])), [placeInfo]);
+  const icons = useMemo(() => new Map(placeInfo.map((i) => [i.place.id, placeIcon(i.place, i.storyCount, i.sectors)])), [placeInfo]);
+  const stateIcons = useMemo(() => new Map(states.features.map((f) => [f.properties.name, labelIcon(f.properties.name, 'state')])), []);
+  const countryIcons = useMemo(() => new Map(COUNTRY_LABELS.map(([n]) => [n, labelIcon(n, 'country')])), []);
+  const markerRefs = useRef(new Map<string, L.Marker>());
   const [viewTick, setViewTick] = useState(0);
   const onView = useCallback((z: number) => {
     setZoom(z);
@@ -192,6 +187,21 @@ export default function ImpactMap({
     if (map) onMapReady(map);
   }, [map, onMapReady]);
 
+  // Sync marker state onto the existing marker elements
+  useEffect(() => {
+    placeInfo.forEach(({ place, sectors, storyCount }) => {
+      const marker = markerRefs.current.get(place.id);
+      const el = marker?.getElement()?.querySelector('.pm');
+      if (!marker || !el) return;
+      const selected = place.id === selectedPlaceId;
+      el.classList.toggle('is-selected', selected);
+      el.classList.toggle('is-hover', place.id === hoveredPlaceId);
+      el.classList.toggle('is-dim', !!sector && !sectors.includes(sector));
+      el.querySelector('.pm-label')?.classList.toggle('is-hidden', !labels.has(place.id));
+      marker.setZIndexOffset(selected ? 1000 : storyCount ? 500 : 0);
+    });
+  });
+
   // Keep callbacks fresh for Leaflet handlers that are bound once
   const selectRef = useRef(onSelectPlace);
   const hoverRef = useRef(onHoverPlace);
@@ -202,15 +212,15 @@ export default function ImpactMap({
   const countyStyle = useCallback(
     (feature?: Feature<Geometry, { name: string }>): L.PathOptions => {
       const info = feature ? infoByCounty.get(feature.properties.name) : undefined;
-      if (!info) return { fillColor: '#fff', fillOpacity: 0, color: '#d3d6da', weight: 0.7, opacity: 1, interactive: false };
+      if (!info) return { fillColor: '#fff', fillOpacity: 0, color: '#e6dccd', weight: 0.7, opacity: 1, interactive: false };
       const match = !sector || info.sectors.includes(sector);
       const selected = info.place.id === selectedPlaceId;
       const hovered = info.place.id === hoveredPlaceId;
       return {
         className: 'county-lit',
-        fillColor: PRDA_BLUE,
+        fillColor: PRDA_ACCENT,
         fillOpacity: selected ? 0.22 : hovered ? 0.16 : match ? (info.storyCount ? 0.1 : 0.06) : 0.02,
-        color: PRDA_BLUE,
+        color: PRDA_ACCENT,
         weight: selected ? 2 : 1,
         opacity: selected ? 0.9 : match ? 0.4 : 0.1,
       };
@@ -245,6 +255,9 @@ export default function ImpactMap({
       bounds={NATIONAL_BOUNDS}
       boundsOptions={{ padding: [24, 24] }}
       zoomControl={false}
+      // Leaflet's keyboard handler focuses the map on mousedown, which scrolls the page
+      // mid-click (our scroll container is not the window) and makes marker clicks miss.
+      keyboard={false}
       zoomSnap={0.25}
       zoomDelta={0.5}
       minZoom={4.5}
@@ -258,32 +271,28 @@ export default function ImpactMap({
       <GeoJSON
         data={neighbours}
         interactive={false}
-        style={{ fillColor: '#eef1f3', fillOpacity: 1, color: '#c4c6cc', weight: 1 }}
+        style={{ fillColor: '#f5eee3', fillOpacity: 1, color: '#d9ccba', weight: 1 }}
         attribution='Boundaries <a href="https://www.geoboundaries.org" target="_blank" rel="noreferrer">geoBoundaries</a> (CC BY 4.0) · <a href="https://www.naturalearthdata.com" target="_blank" rel="noreferrer">Natural Earth</a>'
       />
-      <GeoJSON data={outline} interactive={false} style={{ fillColor: '#ffffff', fillOpacity: 1, color: '#74777d', weight: 1.4 }} />
+      <GeoJSON data={outline} interactive={false} style={{ fillColor: '#fffdf9', fillOpacity: 1, color: '#8b7d6c', weight: 1.4 }} />
       <GeoJSON ref={countiesRef} data={counties} style={countyStyle as L.StyleFunction} onEachFeature={onEachCounty as any} />
-      <GeoJSON data={states} interactive={false} style={{ fill: false, color: '#a9adb3', weight: 1.1, opacity: 1 }} />
+      <GeoJSON data={states} interactive={false} style={{ fill: false, color: '#c4b6a3', weight: 1.1, opacity: 1 }} />
       <GeoJSON
         data={rivers}
         interactive={false}
-        style={(f) => ({ color: '#67bafd', weight: (f?.properties?.scalerank ?? 9) <= 1 ? 2.4 : 1.3, opacity: 0.95 })}
+        style={(f) => ({ color: '#7fb3cf', weight: (f?.properties?.scalerank ?? 9) <= 1 ? 2.4 : 1.3, opacity: 0.95 })}
       />
 
       {zoom < 7.25 &&
         states.features.map((f) => (
-          <Marker key={f.properties.name} position={STATE_LABEL_POS[f.properties.name] ?? f.properties.label} icon={labelIcon(f.properties.name, 'state')} interactive={false} keyboard={false} />
+          <Marker key={f.properties.name} position={STATE_LABEL_POS[f.properties.name] ?? f.properties.label} icon={stateIcons.get(f.properties.name)!} interactive={false} keyboard={false} />
         ))}
       {zoom < 6.75 &&
         COUNTRY_LABELS.map(([name, pos]) => (
-          <Marker key={name} position={pos} icon={labelIcon(name, 'country')} interactive={false} keyboard={false} />
+          <Marker key={name} position={pos} icon={countryIcons.get(name)!} interactive={false} keyboard={false} />
         ))}
 
       {placeInfo.map(({ place, sectors, storyCount }) => {
-        const selected = place.id === selectedPlaceId;
-        const hovered = place.id === hoveredPlaceId;
-        const dim = !!sector && !sectors.includes(sector);
-        const showLabel = labels.has(place.id);
         const people = storiesForPlace(place.id);
         return (
           <Marker
@@ -291,8 +300,11 @@ export default function ImpactMap({
             position={place.coords}
             title={`${place.name}${storyCount ? `: ${storyCount} ${storyCount === 1 ? 'story' : 'stories'}` : ''}`}
             alt={place.name}
-            zIndexOffset={selected ? 1000 : storyCount ? 500 : 0}
-            icon={placeIcon({ place, storyCount, sectors, selected, hovered, dim, showLabel })}
+            ref={(m) => {
+              if (m) markerRefs.current.set(place.id, m);
+              else markerRefs.current.delete(place.id);
+            }}
+            icon={icons.get(place.id)!}
             eventHandlers={{
               click: () => selectRef.current(place.id),
               mouseover: () => hoverRef.current(place.id),
@@ -309,14 +321,14 @@ export default function ImpactMap({
                   <span
                     className={cn(
                       'rounded px-1.5 py-0.5 text-[9px] font-bold uppercase',
-                      storyCount ? 'bg-[#005477]/10 text-[#005477]' : 'bg-surface-container text-on-surface-variant',
+                      storyCount ? 'bg-[#A84A23]/10 text-[#A84A23]' : 'bg-surface-container text-on-surface-variant',
                     )}
                   >
-                    {storyCount ? `${storyCount} ${storyCount === 1 ? 'person' : 'people'}` : 'No stories yet'}
+                    {storyCount ? `${storyCount} to meet` : 'Stories to come'}
                   </span>
                 </div>
                 <div className="mb-1 text-[11px] font-medium text-on-surface-variant">
-                  {place.county} County • {place.state}
+                  {place.state}, South Sudan
                 </div>
                 <div className="mb-2 flex flex-wrap gap-1">
                   {sectors.map((s) => (
@@ -334,7 +346,7 @@ export default function ImpactMap({
                           onClick={() => onOpenStory(p.id)}
                           className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1 text-left transition-colors hover:bg-surface-container"
                         >
-                          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#005477]/10 text-[#005477]">
+                          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#A84A23]/10 text-[#A84A23]">
                             <User className="h-3.5 w-3.5" />
                           </span>
                           <span className="min-w-0 flex-1 truncate text-xs font-semibold text-on-surface">{p.name}</span>
@@ -348,9 +360,9 @@ export default function ImpactMap({
                 <button
                   type="button"
                   onClick={() => selectRef.current(place.id, true)}
-                  className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-on-primary shadow-sm transition-colors hover:bg-primary/90"
+                  className="w-full rounded-lg bg-[#A84A23] px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#8f3d1c]"
                 >
-                  {storyCount ? 'View place & people' : "View PRDA's work here"}
+                  {storyCount ? `Meet the people of ${place.name}` : 'See PRDA’s work here'}
                 </button>
               </div>
             </Popup>

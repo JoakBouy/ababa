@@ -22,7 +22,7 @@ interface Props {
 function Chapter({ index, title, text, demo, children }: { index: number; title: string; text: string; demo: boolean; children?: React.ReactNode }) {
   return (
     <section className="grid grid-cols-[28px_1fr] gap-x-3">
-      <span className="font-mono text-[12px] text-[#005477] tabular pt-1">0{index}</span>
+      <span className="font-mono text-[12px] text-[#A84A23] tabular pt-1">0{index}</span>
       <div className="flex min-w-0 flex-col gap-3">
         <h3 className="font-headline text-lg font-bold text-on-surface">{title}</h3>
         <p className={cn('max-w-[60ch] text-sm leading-relaxed', demo ? 'placeholder-copy' : 'text-on-surface')}>{text}</p>
@@ -63,7 +63,7 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
           <button
             type="button"
             onClick={() => onOpenPlace(place.id)}
-            className="inline-flex w-fit items-center gap-1 text-[13px] text-[#005477] hover:underline"
+            className="inline-flex w-fit items-center gap-1 text-[13px] text-[#A84A23] hover:underline"
           >
             <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
             {place.name}, {place.state}
@@ -72,8 +72,8 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
 
         {demo && (
           <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-3 text-xs leading-snug text-amber-800">
-            <strong className="font-semibold">Demo profile.</strong> This is not a real person. It shows how a PRDA story
-            from {place.name} will read once the real case, photo and consent are added.
+            <strong className="font-semibold">Demo profile.</strong> This is not a real person. It shows how a story
+            from {place.name} will read once a real person, with their consent, shares theirs.
           </p>
         )}
 
@@ -83,10 +83,10 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
       <figure
         className={cn(
           'flex gap-3 border-l-2 pl-4',
-          story.quote ? 'border-[#005477]' : 'border-dashed border-outline-variant',
+          story.quote ? 'border-[#A84A23]' : 'border-dashed border-outline-variant',
         )}
       >
-        <Quote className={cn('h-5 w-5 shrink-0', story.quote ? 'text-[#005477]' : 'text-on-surface-variant')} aria-hidden="true" />
+        <Quote className={cn('h-5 w-5 shrink-0', story.quote ? 'text-[#A84A23]' : 'text-on-surface-variant')} aria-hidden="true" />
         <blockquote className={cn('font-headline text-lg leading-snug font-semibold', story.quote ? 'text-on-surface' : 'text-on-surface-variant italic')}>
           {story.quote ?? 'Their own words go here, in one or two sentences.'}
         </blockquote>
@@ -96,7 +96,7 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
 
       <div className="flex flex-col gap-8">
         <Chapter index={1} title="Before" text={story.chapters.before} demo={demo} />
-        <Chapter index={2} title="What PRDA supported" text={story.chapters.supported} demo={demo}>
+        <Chapter index={2} title="How PRDA helped" text={story.chapters.supported} demo={demo}>
           <ul className="flex flex-col gap-2">
             {story.support.map((s) => (
               <li key={s.label} className="flex flex-col rounded-xl border border-outline-variant/30 bg-surface-container-low px-3.5 py-2.5">
@@ -129,13 +129,13 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
                       {i.unit && <span className="ml-1 text-[13px] text-on-surface-variant">{i.unit}</span>}
                     </span>
                   ) : (
-                    <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold whitespace-nowrap text-amber-600">Awaiting evidence</span>
+                    <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold whitespace-nowrap text-amber-600">Evidence to come</span>
                   )}
                   <span className="col-span-2 inline-flex items-center gap-1.5 text-[12px] text-on-surface-variant">
                     <FileText className="h-3 w-3" aria-hidden="true" />
                     {EVIDENCE_LABEL[i.evidence.type]} · {i.evidence.note}
                     {src && (
-                      <a href={src.url} target="_blank" rel="noreferrer" className="text-[#005477] hover:underline">
+                      <a href={src.url} target="_blank" rel="noreferrer" className="text-[#A84A23] hover:underline">
                         {src.publisher}
                       </a>
                     )}
@@ -147,10 +147,12 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
         </Chapter>
       </div>
 
-      <section className="flex flex-col gap-3">
-        <SectionHeading>About this record</SectionHeading>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[13px]">
-          <dt className="text-on-surface-variant">Status</dt>
+      <details className="group rounded-2xl border border-outline-variant/40 bg-surface-container-low px-4 py-3">
+        <summary className="cursor-pointer list-none text-sm font-semibold text-on-surface">
+          About this story <span className="text-on-surface-variant group-open:hidden">+</span>
+        </summary>
+        <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[13px]">
+          <dt className="text-on-surface-variant">Story</dt>
           <dd className="text-on-surface">{demo ? 'Demo profile' : story.status === 'draft' ? 'Draft, not yet approved' : 'Published'}</dd>
           <dt className="text-on-surface-variant">Consent</dt>
           <dd className="text-on-surface">
@@ -158,12 +160,12 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
           </dd>
           <dt className="text-on-surface-variant">Recorded by</dt>
           <dd className="text-on-surface">{story.recordedBy ? `${story.recordedBy}${story.recordedOn ? `, ${story.recordedOn}` : ''}` : '—'}</dd>
-          <dt className="text-on-surface-variant">Sectors</dt>
+          <dt className="text-on-surface-variant">Work</dt>
           <dd>
             <SectorList sectors={story.sectors} className="text-[13px]" />
           </dd>
         </dl>
-      </section>
+      </details>
 
       {more.length > 0 && (
         <section className="flex flex-col gap-3 pb-6">
@@ -181,12 +183,12 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
                   </span>
                   <span className="min-w-0">
                     <span className="flex items-center gap-2">
-                      <span className="font-headline text-base font-bold text-on-surface group-hover:text-[#005477]">{s.name}</span>
+                      <span className="font-headline text-base font-bold text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
                       {s.status === 'demo' && <DemoTag />}
                     </span>
                     <span className="block truncate text-[12.5px] text-on-surface-variant">{s.role}</span>
                   </span>
-                  <ArrowRight className="h-4 w-4 text-on-surface-variant group-hover:text-[#005477]" />
+                  <ArrowRight className="h-4 w-4 text-on-surface-variant group-hover:text-[#A84A23]" />
                 </button>
               </li>
             ))}

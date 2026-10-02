@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HashRouter, Link, useLocation, useNavigate } from 'react-router-dom';
 import type { Map as LeafletMap } from 'leaflet';
-import { ArrowRight, ChevronRight, Filter, Globe, Maximize, Minimize, Minus, Plus, Search, User } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Filter, Globe, MapPin, Maximize, Minimize, Minus, Plus, Search, User } from 'lucide-react';
 
 import ImpactMap, { NATIONAL_BOUNDS } from './map/ImpactMap';
 import NationalPanel from './ui/NationalPanel';
 import PlacePanel from './ui/PlacePanel';
 import StoryPanel from './ui/StoryPanel';
-import { DemoTag, SectorDot } from './ui/bits';
+import { DemoTag, Portrait, SectorDot } from './ui/bits';
 import ErrorBoundary from './components/ErrorBoundary';
 import {
   getPlace,
@@ -93,7 +93,7 @@ function SearchBox() {
             if (e.key === 'Enter' && hits[0]) go(hits[0]);
             if (e.key === 'Escape') setOpen(false);
           }}
-          placeholder="Search places, people, programmes…"
+          placeholder="Find a person or a place…"
           aria-label="Search places, people and programmes"
           className="w-full border-none bg-transparent text-xs text-on-surface outline-none placeholder:text-on-surface-variant"
         />
@@ -220,7 +220,8 @@ function Shell() {
 
   const allDemo = stories.every((s) => s.status === 'demo');
   const placesWithPeople = places.filter((p) => storiesForPlace(p.id).length).length;
-  const filteredPlaces = places.filter((p) => !sector || sectorsForPlace(p).includes(sector));
+  const galleryStories = stories.filter((x) => !sector || x.sectors.includes(sector));
+  const quietPlaces = places.filter((p) => storiesForPlace(p.id).length === 0 && (!sector || sectorsForPlace(p).includes(sector)));
   const ctrl =
     'w-9 h-9 bg-surface-container-lowest/90 backdrop-blur-sm border border-outline-variant/40 rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors shadow-md text-on-surface';
 
@@ -229,9 +230,9 @@ function Shell() {
       {/* Top App Bar */}
       <header className="z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-outline-variant/30 bg-surface-container-lowest px-4 md:px-8">
         <Link to="/" className="flex shrink-0 flex-col" aria-label="PRDA Impact Map home">
-          <span className="font-headline text-xl font-black tracking-tight text-primary sm:text-2xl">PRDA</span>
+          <span className="font-headline text-xl font-black tracking-tight text-[#A84A23] sm:text-2xl">PRDA</span>
           <span className="-mt-0.5 hidden font-label text-[10px] font-bold tracking-wider text-on-surface-variant uppercase sm:block">
-            Impact Map • South Sudan
+            Stories from South Sudan
           </span>
         </Link>
         <SearchBox />
@@ -240,21 +241,22 @@ function Shell() {
       <main className="flex-1 overflow-y-auto p-4 md:p-8">
         <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8">
           {/* Page Header */}
-          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-            <div className="min-w-0">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
+            <div className="min-w-0 max-w-3xl">
               <div className="mb-1 flex flex-wrap items-center gap-2">
-                <span className="font-label text-[10px] font-bold tracking-widest text-primary uppercase">Presbyterian Relief and Development Agency</span>
-                <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">South Sudan Impact Map</span>
+                <span className="font-label text-[10px] font-bold tracking-widest text-[#A84A23] uppercase">Presbyterian Relief and Development Agency</span>
                 {allDemo && <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-700">Demo stories</span>}
               </div>
               <h1 className="font-headline text-3xl font-bold tracking-tight text-on-surface sm:text-4xl">
-                {story ? story.name : place ? place.name : 'Where PRDA works, and who it reaches'}
+                {story ? story.name : place ? `People of ${place.name}` : 'Meet the people behind PRDA’s work'}
               </h1>
-              {(place || story) && (
-                <p className="mt-1 text-xs font-semibold text-primary">
-                  {story ? `${story.role} • ${place?.name}, ${place?.state}` : `${place?.county} County • ${place?.state}`}
-                </p>
-              )}
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant sm:text-base">
+                {story
+                  ? `${story.role}, ${place?.name}.`
+                  : place
+                    ? place.summary
+                    : 'Across South Sudan, PRDA trains midwives and nurses, supports farming, water and schools, and stands with families when conflict and floods strike. Choose a place to meet the people there.'}
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative">
@@ -262,10 +264,10 @@ function Shell() {
                   id="sector-filter"
                   value={sector ?? 'all'}
                   onChange={(e) => setSector(e.target.value === 'all' ? null : (e.target.value as SectorId))}
-                  aria-label="Filter by type of work"
-                  className="appearance-none rounded-md border border-outline-variant/50 bg-surface-container-low py-3 pr-10 pl-4 text-sm font-bold text-on-surface focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
+                  aria-label="Show a type of work"
+                  className="appearance-none rounded-xl border border-outline-variant/60 bg-surface-container-lowest py-3 pr-10 pl-4 text-sm font-semibold text-on-surface focus:border-transparent focus:ring-2 focus:ring-[#A84A23] focus:outline-none"
                 >
-                  <option value="all">All Types of Work</option>
+                  <option value="all">All kinds of work</option>
                   {SECTOR_ORDER.map((s) => (
                     <option key={s} value={s}>
                       {SECTORS[s].label}
@@ -274,14 +276,16 @@ function Shell() {
                 </select>
                 <Filter className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-on-surface-variant" />
               </div>
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                disabled={!place}
-                className="flex items-center gap-2 rounded-md bg-on-surface px-6 py-3 font-label text-xs font-bold tracking-widest text-surface uppercase shadow-sm transition-colors hover:bg-on-surface/90 disabled:opacity-40"
-              >
-                All of South Sudan
-              </button>
+              {place && (
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="flex items-center gap-2 rounded-xl bg-on-surface px-5 py-3 font-label text-sm font-semibold text-surface shadow-sm transition-colors hover:bg-on-surface/90"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  All of South Sudan
+                </button>
+              )}
             </div>
           </div>
 
@@ -296,32 +300,21 @@ function Shell() {
             >
               {/* Top Left Focus Card */}
               <div className={cn("absolute top-4 left-4 z-[500] max-w-[calc(100%-80px)] rounded-xl border border-outline-variant/40 bg-surface-container-lowest/95 p-3.5 shadow-lg backdrop-blur-md sm:max-w-sm", place && "hidden sm:block")}>
-                <p className="mb-1 font-label text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">
-                  {place ? place.state : 'PRDA across South Sudan'}
+                <p className="mb-1 font-label text-[10px] font-bold tracking-widest text-[#A84A23] uppercase">
+                  {place ? `${place.state}, South Sudan` : 'Start here'}
                 </p>
-                <h3 className="mb-2 font-headline text-sm font-bold text-on-surface">
-                  {story ? `${story.name} • ${place?.name}` : place ? `${place.name}, ${place.county} County` : `${places.length} Locations Across 6 States`}
+                <h3 className="font-headline text-sm font-bold text-on-surface">
+                  {story ? `${story.name} from ${place?.name}` : place ? place.name : 'Tap a face on the map'}
                 </h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {place ? (
-                    <>
-                      <span className="rounded bg-[#005477]/10 px-2 py-0.5 text-[10px] font-bold text-[#005477]">
-                        {storiesForPlace(place.id).length} {storiesForPlace(place.id).length === 1 ? 'person' : 'people'}
-                      </span>
-                      <span className="rounded bg-[#00875A]/10 px-2 py-0.5 text-[10px] font-bold text-[#00875A]">
-                        {programmesForPlace(place).length} {programmesForPlace(place).length === 1 ? 'programme' : 'programmes'}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="rounded bg-[#005477]/10 px-2 py-0.5 text-[10px] font-bold text-[#005477]">
-                        {placesWithPeople} with {allDemo ? 'demo ' : ''}stories
-                      </span>
-                      <span className="rounded bg-[#00875A]/10 px-2 py-0.5 text-[10px] font-bold text-[#00875A]">{programmes.length} programmes</span>
-                      <span className="rounded bg-surface-container px-2 py-0.5 text-[10px] font-bold text-on-surface-variant">Tap a marker</span>
-                    </>
-                  )}
-                </div>
+                <p className="mt-0.5 text-xs leading-snug text-on-surface-variant">
+                  {story
+                    ? 'Their story is open beside the map.'
+                    : place
+                      ? storiesForPlace(place.id).length
+                        ? `${storiesForPlace(place.id).map((x) => x.name).join(' and ')} ${storiesForPlace(place.id).length === 1 ? 'is' : 'are'} waiting to share their story.`
+                        : 'No one from here has shared their story yet.'
+                      : `${placesWithPeople} places have someone you can meet.`}
+                </p>
               </div>
 
               {/* Top Right Controls (Zoom, Reset, Fullscreen) */}
@@ -355,10 +348,10 @@ function Shell() {
               {/* Bottom Legend: doubles as a quick filter */}
               <div className="absolute bottom-6 left-4 z-[500] flex max-w-[calc(100%-32px)] flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/95 px-3 py-2 text-[10px] shadow-md backdrop-blur-md sm:gap-x-4 sm:px-4 sm:text-xs">
                 <span className="flex items-center gap-1.5">
-                  <span className="grid h-4 w-4 place-items-center rounded-full border-2 border-[#005477] bg-white text-[#005477]">
+                  <span className="grid h-4 w-4 place-items-center rounded-full border-2 border-[#A84A23] bg-white text-[#A84A23]">
                     <User className="h-2.5 w-2.5" />
                   </span>
-                  <span className="font-bold text-on-surface-variant">People's stories ({placesWithPeople})</span>
+                  <span className="font-bold text-on-surface-variant">Someone to meet</span>
                 </span>
                 {SECTOR_ORDER.map((s) => (
                   <button
@@ -375,7 +368,7 @@ function Shell() {
                 ))}
               </div>
 
-              <div className={cn('relative z-0 bg-[#dfe6ea]', isFullscreen ? 'h-full w-full' : 'h-[480px] sm:h-[580px] lg:h-[660px]')}>
+              <div className={cn('relative z-0 bg-[#efe6d8]', isFullscreen ? 'h-full w-full' : 'h-[480px] sm:h-[580px] lg:h-[660px]')}>
                 <ImpactMap
                   selectedPlaceId={place?.id}
                   selectedStory={story}
@@ -428,109 +421,97 @@ function Shell() {
             </aside>
           </div>
 
-          {/* Locations table: rows fly to the place on the map, as in Ababa's kit inventory */}
-          <div className="overflow-hidden rounded-2xl border border-outline-variant/30 bg-surface-container-lowest shadow-sm sm:rounded-3xl">
-            <div className="flex flex-col items-start justify-between gap-3 border-b border-outline-variant/30 p-5 sm:flex-row sm:items-center sm:p-6">
+          {/* People gallery: selecting someone flies the map to them, as Ababa's rows did */}
+          <section className="space-y-4" aria-labelledby="gallery-heading">
+            <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-end">
               <div>
-                <h2 className="font-headline text-xl font-bold text-on-surface">PRDA Locations ({filteredPlaces.length})</h2>
-                <p className="font-body text-sm text-on-surface-variant">
-                  {sector ? `Showing ${SECTORS[sector].label.toLowerCase()}. ` : ''}Select a row to fly to it on the map.
+                <h2 id="gallery-heading" className="font-headline text-xl font-bold text-on-surface sm:text-2xl">
+                  People you can meet
+                </h2>
+                <p className="text-sm text-on-surface-variant">
+                  {sector ? `Stories about ${SECTORS[sector].label.toLowerCase()}. ` : ''}Choose someone to fly to their home on the map.
                 </p>
               </div>
               {sector && (
-                <button
-                  type="button"
-                  onClick={() => setSector(null)}
-                  className="rounded-xl bg-primary/10 px-4 py-2 font-label text-xs font-bold tracking-widest text-primary uppercase transition-colors hover:bg-primary/20"
-                >
-                  Show all work
+                <button type="button" onClick={() => setSector(null)} className="text-sm font-semibold text-[#A84A23] hover:underline">
+                  Show everyone
                 </button>
               )}
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-outline-variant/30 bg-surface-container-low/30">
-                    <th className="p-4 font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">Location & State</th>
-                    <th className="p-4 font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">Type of Work</th>
-                    <th className="p-4 font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">Programmes</th>
-                    <th className="p-4 font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">People</th>
-                    <th className="p-4 text-right font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">Open</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPlaces.map((p) => {
-                    const people = storiesForPlace(p.id);
-                    const progs = programmesForPlace(p);
-                    return (
-                      <tr
-                        key={p.id}
-                        onClick={() => handleLocate(p.id)}
-                        onMouseEnter={() => setHovered(p.id)}
-                        onMouseLeave={() => setHovered(undefined)}
-                        className={cn('cursor-pointer border-b border-outline-variant/10 transition-colors hover:bg-surface-container/50', place?.id === p.id && 'bg-[#005477]/5')}
-                      >
-                        <td className="p-4 font-body text-sm text-on-surface">
-                          <span className="block font-bold">{p.name}</span>
-                          <span className="text-xs text-on-surface-variant">
-                            {p.county} County • {p.state}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <span className="flex min-w-[160px] flex-wrap gap-1">
-                            {sectorsForPlace(p).map((s) => (
-                              <span
-                                key={s}
-                                className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold"
-                                style={{ color: SECTORS[s].color, background: `${SECTORS[s].color}14` }}
-                              >
-                                <SectorDot sector={s} size={6} />
-                                {SECTORS[s].short}
-                              </span>
-                            ))}
-                          </span>
-                        </td>
-                        <td className="p-4 text-xs text-on-surface-variant">
-                          <span className="block max-w-[260px] min-w-[160px] font-bold text-on-surface">{progs[0]?.name}</span>
-                          {progs.length > 1 && <span>+{progs.length - 1} more</span>}
-                        </td>
-                        <td className="p-4">
-                          {people.length ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#005477]/10 px-2.5 py-1 text-[10px] font-bold tracking-wider whitespace-nowrap text-[#005477] uppercase">
-                              <User className="h-3 w-3" />
-                              {people.length} {people.length === 1 ? 'person' : 'people'}
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container px-2.5 py-1 text-[10px] font-bold tracking-wider whitespace-nowrap text-on-surface-variant uppercase">
-                              No stories yet
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-4 text-right">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openPlace(p.id, true);
-                              if (isDesktop()) cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }}
-                            className="inline-flex rounded-full p-2 transition-colors hover:bg-surface-container-high"
-                            title={`Open ${p.name}`}
-                            aria-label={`Open ${p.name}`}
-                          >
-                            <ArrowRight className="h-4 w-4 text-on-surface-variant" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+            <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+              {galleryStories.map((s) => {
+                const home = getPlace(s.locationId)!;
+                return (
+                  <li key={s.id} className="min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        openStory(s.id);
+                        cardRef.current?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+                      }}
+                      onMouseEnter={() => setHovered(home.id)}
+                      onMouseLeave={() => setHovered(undefined)}
+                      className={cn(
+                        'group flex w-full flex-col overflow-hidden rounded-2xl border bg-surface-container-lowest text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md',
+                        story?.id === s.id ? 'border-[#A84A23] ring-2 ring-[#A84A23]/30' : 'border-outline-variant/40',
+                      )}
+                    >
+                      <span className="block aspect-[4/5] w-full max-w-full">
+                        <Portrait story={s} />
+                      </span>
+                      <span className="flex flex-col gap-1 p-3">
+                        <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                          <span className="font-headline text-sm leading-tight font-bold text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
+                          {s.status === 'demo' && <DemoTag />}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-xs text-on-surface-variant">
+                          <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
+                          {home.name}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          <section className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-sm sm:rounded-3xl sm:p-6" aria-labelledby="others-heading">
+            <h2 id="others-heading" className="font-headline text-lg font-bold text-on-surface">
+              Places still waiting for their stories
+            </h2>
+            <p className="mb-4 text-sm text-on-surface-variant">
+              PRDA works here too, but no one has shared their story yet. Choose a place to see the work.
+            </p>
+            <ul className="flex flex-wrap gap-2">
+              {quietPlaces.map((p) => (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleLocate(p.id)}
+                    onMouseEnter={() => setHovered(p.id)}
+                    onMouseLeave={() => setHovered(undefined)}
+                    className={cn(
+                      'inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
+                      place?.id === p.id
+                        ? 'border-[#A84A23] bg-[#A84A23]/10 text-[#A84A23]'
+                        : 'border-outline-variant/60 text-on-surface hover:border-[#A84A23] hover:text-[#A84A23]',
+                    )}
+                  >
+                    <span className="flex gap-0.5">
+                      {sectorsForPlace(p).map((sx) => (
+                        <SectorDot key={sx} sector={sx} size={6} />
+                      ))}
+                    </span>
+                    {p.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
 
           <p className="pb-4 text-center text-[11px] text-on-surface-variant">
-            Places and programmes from PRDA's published materials and partner reports. Boundaries: geoBoundaries (CC BY 4.0), Natural Earth.
+            Places and programmes come from PRDA's published materials and partner reports. Map: geoBoundaries (CC BY 4.0), Natural Earth.
           </p>
         </div>
       </main>
