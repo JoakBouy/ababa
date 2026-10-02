@@ -1,0 +1,351 @@
+[
+  {
+    "id": "leer",
+    "name": "Leer",
+    "county": "Leer",
+    "state": "Unity",
+    "coords": [
+      8.3,
+      30.14
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "left",
+    "summary": "Home of PRDA's community midwifery school, and from 2006 to 2012 an EU-funded primary health care project.",
+    "programmeIds": [
+      "leer-midwifery",
+      "leer-phc"
+    ],
+    "notes": [
+      {
+        "kind": "verify",
+        "text": "Public sources place the midwifery school in Leer from 2006, show its students at Kakuma in Kenya in 2018, and describe the Presbyterian Health Science Institute in Juba today. PRDA to confirm how these connect."
+      }
+    ],
+    "sourceIds": [
+      "prda-legacy-site",
+      "m21-partner",
+      "m21-midwifery"
+    ]
+  },
+  {
+    "id": "juba",
+    "name": "Juba",
+    "county": "Juba",
+    "state": "Central Equatoria",
+    "coords": [
+      4.85,
+      31.58
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "PRDA's head office, the \"Dream House\" in Thongpiny, and the Presbyterian Health Science Institute, where PRDA trains midwives and nurses. PRDA also lists emergency relief work in Juba.",
+    "programmeIds": [
+      "phsi",
+      "emergency-relief"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-home",
+      "prda-mission",
+      "prda-about"
+    ]
+  },
+  {
+    "id": "pochalla",
+    "name": "Pochalla",
+    "county": "Pochalla",
+    "state": "Jonglei",
+    "coords": [
+      7.18,
+      34.1
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Farming, water and education through the Pochalla Integrated Programme since 2011, and flood response under ACT Alliance appeal SSD241.",
+    "programmeIds": [
+      "pochalla-integrated",
+      "act-ssd241"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-legacy-site",
+      "prda-about",
+      "act-ssd241"
+    ]
+  },
+  {
+    "id": "uror",
+    "name": "Uror",
+    "county": "Uror",
+    "state": "Jonglei",
+    "coords": [
+      7.684,
+      32.181
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "bottom",
+    "summary": "Agriculture, and water, sanitation and hygiene work.",
+    "programmeIds": [
+      "uror-agri-wash"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about"
+    ]
+  },
+  {
+    "id": "akobo",
+    "name": "Akobo",
+    "county": "Akobo",
+    "state": "Jonglei",
+    "coords": [
+      7.78,
+      33.0
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "An integrated agriculture and health programme, community-based work, and emergency relief.",
+    "programmeIds": [
+      "akobo-integrated",
+      "community-programmes",
+      "emergency-relief"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-home",
+      "prda-about"
+    ]
+  },
+  {
+    "id": "bor",
+    "name": "Bor",
+    "county": "Bor South",
+    "state": "Jonglei",
+    "coords": [
+      6.21,
+      31.56
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Community-based programmes, and flood response under ACT Alliance appeal SSD241.",
+    "programmeIds": [
+      "community-programmes",
+      "act-ssd241"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about",
+      "act-ssd241"
+    ]
+  },
+  {
+    "id": "maiwut",
+    "name": "Maiwut",
+    "county": "Maiwut",
+    "state": "Upper Nile",
+    "coords": [
+      8.61,
+      33.93
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "A ten-year farming programme from 2003 to 2013, and community-based programmes listed today.",
+    "programmeIds": [
+      "maiwut-agriculture",
+      "community-programmes"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-legacy-site",
+      "prda-about"
+    ]
+  },
+  {
+    "id": "pibor",
+    "name": "Pibor & Boma",
+    "county": "Pibor",
+    "state": "Greater Pibor Administrative Area",
+    "coords": [
+      6.8,
+      33.13
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Emergency relief in Pibor, community-based programmes in Boma, and flood response under ACT Alliance appeal SSD241.",
+    "programmeIds": [
+      "emergency-relief",
+      "community-programmes",
+      "act-ssd241"
+    ],
+    "notes": [
+      {
+        "kind": "verify",
+        "text": "PRDA lists emergency relief in \"Pieri/Pibor\". Pieri is in Uror County, so PRDA to confirm which place is meant."
+      }
+    ],
+    "sourceIds": [
+      "prda-about",
+      "act-ssd241"
+    ]
+  },
+  {
+    "id": "fangak",
+    "name": "Fangak",
+    "county": "Fangak",
+    "state": "Jonglei",
+    "coords": [
+      9.07,
+      30.88
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "left",
+    "summary": "Emergency relief.",
+    "programmeIds": [
+      "emergency-relief"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about"
+    ]
+  },
+  {
+    "id": "nasir",
+    "name": "Nasir",
+    "county": "Luakpiny/Nasir",
+    "state": "Upper Nile",
+    "coords": [
+      8.6,
+      33.07
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "top",
+    "summary": "Emergency relief.",
+    "programmeIds": [
+      "emergency-relief"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about"
+    ]
+  },
+  {
+    "id": "ulang",
+    "name": "Ulang",
+    "county": "Ulang",
+    "state": "Upper Nile",
+    "coords": [
+      8.62,
+      32.75
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "left",
+    "summary": "Emergency relief.",
+    "programmeIds": [
+      "emergency-relief"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about"
+    ]
+  },
+  {
+    "id": "kodok",
+    "name": "Kodok",
+    "county": "Fashoda",
+    "state": "Upper Nile",
+    "coords": [
+      9.88,
+      32.11
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "top",
+    "summary": "Emergency relief.",
+    "programmeIds": [
+      "emergency-relief"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about"
+    ]
+  },
+  {
+    "id": "malakal",
+    "name": "Malakal",
+    "county": "Malakal",
+    "state": "Upper Nile",
+    "coords": [
+      9.53,
+      31.66
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Flood response under ACT Alliance appeal SSD241.",
+    "programmeIds": [
+      "act-ssd241"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "act-ssd241"
+    ]
+  },
+  {
+    "id": "renk",
+    "name": "Renk",
+    "county": "Renk",
+    "state": "Upper Nile",
+    "coords": [
+      11.271,
+      32.921
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "right",
+    "summary": "Flood response under ACT Alliance appeal SSD241.",
+    "programmeIds": [
+      "act-ssd241"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "act-ssd241"
+    ]
+  },
+  {
+    "id": "twic-east",
+    "name": "Twic East",
+    "county": "Twic East",
+    "state": "Jonglei",
+    "coords": [
+      7.111,
+      31.294
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "left",
+    "summary": "Flood response under ACT Alliance appeal SSD241.",
+    "programmeIds": [
+      "act-ssd241"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "act-ssd241"
+    ]
+  },
+  {
+    "id": "duk",
+    "name": "Duk",
+    "county": "Duk",
+    "state": "Jonglei",
+    "coords": [
+      7.665,
+      31.116
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "left",
+    "summary": "Flood response under ACT Alliance appeal SSD241.",
+    "programmeIds": [
+      "act-ssd241"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "act-ssd241"
+    ]
+  }
+]

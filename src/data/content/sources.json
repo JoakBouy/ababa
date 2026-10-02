@@ -1,0 +1,43 @@
+{
+  "prda-about": {
+    "title": "About PRDA — who we are, where we work, partners",
+    "publisher": "PRDA (prda-ss.org)",
+    "url": "https://prda-ss.org/about/"
+  },
+  "prda-home": {
+    "title": "PRDA home page — programmes and partnerships",
+    "publisher": "PRDA (prda-ss.org)",
+    "url": "https://prda-ss.org/"
+  },
+  "prda-mission": {
+    "title": "PRDA mission and the Presbyterian Health Science Institute",
+    "publisher": "PRDA (prda-ss.org)",
+    "url": "https://prda-ss.org/mission/"
+  },
+  "prda-legacy-site": {
+    "title": "PRDA project table (older website)",
+    "publisher": "PRDA (prdasouthsudan.org)",
+    "url": "https://www.prdasouthsudan.org/"
+  },
+  "m21-partner": {
+    "title": "PRDA partner page",
+    "publisher": "Mission 21",
+    "url": "https://www.mission-21.org/en/partner/prda-presbyterian-aid-and-development-organization/"
+  },
+  "m21-midwifery": {
+    "title": "Medicus Mundi reports on midwifery training in South Sudan",
+    "publisher": "Mission 21",
+    "url": "https://www.mission-21.org/en/health-network-medicus-mundi-reports-on-midwifery-training-in-south-sudan/"
+  },
+  "act-ssd241": {
+    "title": "Appeal SSD241 — flood-affected IDPs, refugees and host communities",
+    "publisher": "ACT Alliance",
+    "url": "https://actalliance.org/wp-content/uploads/2024/12/SSD-241-Emergency-Response-development-and-peace-initiatives-among-flood-affected-IDPs-Refugees-and-host-communities-FINAL-1.pdf",
+    "date": "December 2024"
+  },
+  "pcusa-wash": {
+    "title": "Improving water access in South Sudan",
+    "publisher": "Presbyterian Church (U.S.A.)",
+    "url": "https://pcusa.org/improving-water-access-in-south-sudan"
+  }
+}

@@ -1,0 +1,319 @@
+[
+  {
+    "id": "phsi",
+    "name": "Presbyterian Health Science Institute",
+    "summary": "PRDA's training institute in Juba. It runs diploma programmes in midwifery and nursing and sends graduates to hospitals, health centres and rural clinics. PRDA also trains community health workers.",
+    "sectors": [
+      "health",
+      "education"
+    ],
+    "years": {
+      "start": null,
+      "end": null
+    },
+    "status": "active",
+    "partners": [],
+    "locationIds": [
+      "juba"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-about"
+    ]
+  },
+  {
+    "id": "leer-midwifery",
+    "name": "Leer Community Midwifery Training School",
+    "summary": "A community midwifery school training midwives to care for mothers and newborns in a medically underserved part of South Sudan.",
+    "sectors": [
+      "health",
+      "education"
+    ],
+    "years": {
+      "start": 2006,
+      "end": null
+    },
+    "status": "active",
+    "partners": [
+      "Mission 21",
+      "Uniting World (Australia)",
+      "UNFPA"
+    ],
+    "locationIds": [
+      "leer"
+    ],
+    "facts": [
+      {
+        "text": "Each course trains up to 30 midwives.",
+        "sourceId": "m21-midwifery"
+      },
+      {
+        "text": "Mission 21 dates the school's founding to 2005; PRDA's project table lists the programme from 2006.",
+        "sourceId": "m21-midwifery"
+      }
+    ],
+    "sourceIds": [
+      "prda-legacy-site",
+      "m21-partner",
+      "m21-midwifery"
+    ]
+  },
+  {
+    "id": "leer-phc",
+    "name": "Leer Primary Health Care",
+    "summary": "Primary health care services in Leer, funded by the European Union.",
+    "sectors": [
+      "health"
+    ],
+    "years": {
+      "start": 2006,
+      "end": 2012
+    },
+    "status": "completed",
+    "partners": [
+      "European Union"
+    ],
+    "locationIds": [
+      "leer"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-legacy-site",
+      "prda-home"
+    ]
+  },
+  {
+    "id": "pochalla-integrated",
+    "name": "Pochalla Integrated Programme",
+    "summary": "Farming, water and sanitation, and education support in Pochalla County.",
+    "sectors": [
+      "food",
+      "water",
+      "education"
+    ],
+    "years": {
+      "start": 2011,
+      "end": null
+    },
+    "status": "active",
+    "partners": [
+      "Mission 21"
+    ],
+    "locationIds": [
+      "pochalla"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-legacy-site",
+      "prda-about"
+    ]
+  },
+  {
+    "id": "uror-agri-wash",
+    "name": "Agriculture and WASH in Uror",
+    "summary": "Farming support and water, sanitation and hygiene work in Uror County.",
+    "sectors": [
+      "food",
+      "water"
+    ],
+    "years": {
+      "start": null,
+      "end": null
+    },
+    "status": "active",
+    "partners": [],
+    "locationIds": [
+      "uror"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-about"
+    ]
+  },
+  {
+    "id": "akobo-integrated",
+    "name": "Akobo Integrated Programme",
+    "summary": "Combined agriculture and health programme in Akobo.",
+    "sectors": [
+      "food",
+      "health"
+    ],
+    "years": {
+      "start": null,
+      "end": null
+    },
+    "status": "unconfirmed",
+    "partners": [
+      "EED",
+      "ECO",
+      "ICCO",
+      "IMC",
+      "UNICEF",
+      "WHO"
+    ],
+    "locationIds": [
+      "akobo"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-home"
+    ]
+  },
+  {
+    "id": "community-programmes",
+    "name": "Community-based programmes",
+    "summary": "PRDA lists community-based programmes in Akobo, Bor, Maiwut and Boma. Details per location still to be added.",
+    "sectors": [
+      "protection"
+    ],
+    "years": {
+      "start": null,
+      "end": null
+    },
+    "status": "active",
+    "partners": [],
+    "locationIds": [
+      "akobo",
+      "bor",
+      "maiwut",
+      "pibor"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-about"
+    ]
+  },
+  {
+    "id": "maiwut-agriculture",
+    "name": "Maiwut Agriculture Programme",
+    "summary": "A ten-year farming programme in Maiwut.",
+    "sectors": [
+      "food"
+    ],
+    "years": {
+      "start": 2003,
+      "end": 2013
+    },
+    "status": "completed",
+    "partners": [
+      "Mission 21"
+    ],
+    "locationIds": [
+      "maiwut"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-legacy-site"
+    ]
+  },
+  {
+    "id": "emergency-relief",
+    "name": "Emergency relief",
+    "summary": "Responding to humanitarian needs with food, shelter and medical aid.",
+    "sectors": [
+      "relief"
+    ],
+    "years": {
+      "start": null,
+      "end": null
+    },
+    "status": "active",
+    "partners": [],
+    "locationIds": [
+      "fangak",
+      "akobo",
+      "pibor",
+      "nasir",
+      "ulang",
+      "juba",
+      "kodok"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-about",
+      "prda-mission"
+    ]
+  },
+  {
+    "id": "act-ssd241",
+    "name": "Flood response (ACT Alliance appeal SSD241)",
+    "summary": "Joint ACT Alliance response for flood-affected displaced people, refugees, returnees and host communities. PRDA's listed work covers shelter and household items, food security, preparedness, psychosocial support, WASH, gender, education and advocacy.",
+    "sectors": [
+      "relief",
+      "food",
+      "water",
+      "education",
+      "protection"
+    ],
+    "years": {
+      "start": 2024,
+      "end": 2026
+    },
+    "status": "active",
+    "partners": [
+      "ACT Alliance"
+    ],
+    "locationIds": [
+      "twic-east",
+      "bor",
+      "duk",
+      "malakal",
+      "renk",
+      "pochalla",
+      "pibor"
+    ],
+    "facts": [
+      {
+        "text": "Appeal period: December 2024 to December 2026.",
+        "sourceId": "act-ssd241"
+      }
+    ],
+    "sourceIds": [
+      "act-ssd241"
+    ]
+  },
+  {
+    "id": "smart-centre",
+    "name": "SMART Training Centre",
+    "summary": "Set up by PRDA to train local metalworkers and water-supply workers to build businesses providing water and sanitation products and services.",
+    "sectors": [
+      "water"
+    ],
+    "years": {
+      "start": null,
+      "end": null
+    },
+    "status": "active",
+    "partners": [
+      "Presbyterian Hunger Program (PC(USA))"
+    ],
+    "locationIds": [],
+    "facts": [],
+    "sourceIds": [
+      "pcusa-wash"
+    ]
+  },
+  {
+    "id": "wash-in-schools",
+    "name": "WASH in Schools",
+    "summary": "Drilling wells at three schools for safe drinking water and better hygiene, including so girls can stay in school during menstruation.",
+    "sectors": [
+      "water",
+      "education"
+    ],
+    "years": {
+      "start": null,
+      "end": null
+    },
+    "status": "unconfirmed",
+    "partners": [
+      "Presbyterian Hunger Program (PC(USA))"
+    ],
+    "locationIds": [],
+    "facts": [],
+    "sourceIds": [
+      "pcusa-wash"
+    ]
+  }
+]

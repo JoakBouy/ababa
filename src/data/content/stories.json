@@ -1,0 +1,201 @@
+[
+  {
+    "id": "leer-midwife",
+    "status": "demo",
+    "name": "Midwife",
+    "role": "Graduate of the Leer midwifery school",
+    "locationId": "leer",
+    "programmeIds": ["leer-midwifery"],
+    "sectors": ["health", "education"],
+    "headline": "The story of a midwife trained at the Leer school, still to be recorded.",
+    "portrait": null,
+    "video": null,
+    "quote": null,
+    "chapters": {
+      "before": "Replace with their own account of life in Leer before training: where women gave birth, who helped them, and why they chose midwifery.",
+      "supported": "Replace with what PRDA provided: the course, how long it ran, materials or kit, and any placement after graduating.",
+      "changed": "Replace with what is different now, for them and for the mothers they care for. Back every claim with evidence below."
+    },
+    "support": [
+      { "label": "Midwifery training", "detail": "Course name, year and length." },
+      { "label": "After training", "detail": "Where they were placed, and by whom." }
+    ],
+    "impact": [
+      { "label": "Births attended since qualifying", "value": null, "unit": null, "evidence": { "type": "record", "note": "From facility or PRDA records", "sourceId": null } },
+      { "label": "Where they work today", "value": null, "unit": null, "evidence": { "type": "testimony", "note": "From interview", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": null,
+    "recordedOn": null,
+    "relatedStoryIds": ["leer-mother"]
+  },
+  {
+    "id": "leer-mother",
+    "status": "demo",
+    "name": "Mother",
+    "role": "Cared for by a PRDA-trained midwife",
+    "locationId": "leer",
+    "programmeIds": ["leer-midwifery"],
+    "sectors": ["health"],
+    "headline": "The other side of the midwifery story: a mother and her birth, still to be recorded.",
+    "portrait": null,
+    "video": null,
+    "quote": null,
+    "chapters": {
+      "before": "Replace with her account of earlier births, or of what other women in her family faced without a trained midwife.",
+      "supported": "Replace with how a PRDA-trained midwife cared for her: during pregnancy, at the birth and after.",
+      "changed": "Replace with what that care meant for her and her child, in her own words."
+    },
+    "support": [
+      { "label": "Care from a trained midwife", "detail": "Who cared for her, and where." }
+    ],
+    "impact": [
+      { "label": "Outcome for mother and baby", "value": null, "unit": null, "evidence": { "type": "testimony", "note": "From interview, with consent", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": null,
+    "recordedOn": null,
+    "relatedStoryIds": ["leer-midwife"]
+  },
+  {
+    "id": "juba-phsi-graduate",
+    "status": "demo",
+    "name": "Nursing graduate",
+    "role": "Diploma graduate, Presbyterian Health Science Institute",
+    "locationId": "juba",
+    "programmeIds": ["phsi"],
+    "sectors": ["health", "education"],
+    "headline": "A PHSI graduate's path from the classroom in Juba to a clinic, still to be recorded.",
+    "portrait": null,
+    "video": null,
+    "quote": null,
+    "chapters": {
+      "before": "Replace with where they grew up and what led them to nursing or midwifery.",
+      "supported": "Replace with their training at PHSI: diploma, years, practical placements, any support with fees or housing.",
+      "changed": "Replace with where they work now and what they do there."
+    },
+    "support": [
+      { "label": "Diploma training at PHSI", "detail": "Programme and graduation year." }
+    ],
+    "impact": [
+      { "label": "Facility where they now work", "value": null, "unit": null, "evidence": { "type": "record", "note": "From PHSI graduate tracking", "sourceId": null } },
+      { "label": "People they serve", "value": null, "unit": null, "evidence": { "type": "record", "note": "From facility records", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": null,
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "pochalla-farmer",
+    "status": "demo",
+    "name": "Farmer",
+    "role": "Pochalla Integrated Programme participant",
+    "locationId": "pochalla",
+    "programmeIds": ["pochalla-integrated"],
+    "sectors": ["food"],
+    "headline": "A farming household in Pochalla, still to be recorded.",
+    "portrait": null,
+    "video": null,
+    "quote": null,
+    "chapters": {
+      "before": "Replace with what farming and food looked like for this household before PRDA's support.",
+      "supported": "Replace with what PRDA provided: seeds, tools, training, storage or market links.",
+      "changed": "Replace with what changed in harvests, food through the year, or income."
+    },
+    "support": [
+      { "label": "Farming support", "detail": "Inputs, training and season." }
+    ],
+    "impact": [
+      { "label": "Harvest before and after", "value": null, "unit": null, "evidence": { "type": "survey", "note": "From programme monitoring", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": null,
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "uror-water",
+    "status": "demo",
+    "name": "Water point user",
+    "role": "Community member, Uror County",
+    "locationId": "uror",
+    "programmeIds": ["uror-agri-wash"],
+    "sectors": ["water"],
+    "headline": "What safe water changed for one household in Uror, still to be recorded.",
+    "portrait": null,
+    "video": null,
+    "quote": null,
+    "chapters": {
+      "before": "Replace with where the household collected water before, how far it was, and who carried it.",
+      "supported": "Replace with what PRDA built or trained: borehole, repairs, hygiene training, water committee.",
+      "changed": "Replace with time saved, health or school attendance, in their words and backed by evidence."
+    },
+    "support": [
+      { "label": "Water point", "detail": "Type, location and year." }
+    ],
+    "impact": [
+      { "label": "Time spent collecting water", "value": null, "unit": null, "evidence": { "type": "survey", "note": "From baseline and follow-up", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": null,
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "bor-flood",
+    "status": "demo",
+    "name": "Flood-affected parent",
+    "role": "Displaced by flooding, Bor",
+    "locationId": "bor",
+    "programmeIds": ["act-ssd241"],
+    "sectors": ["relief", "protection"],
+    "headline": "A family's story of displacement and recovery after the floods, still to be recorded.",
+    "portrait": null,
+    "video": null,
+    "quote": null,
+    "chapters": {
+      "before": "Replace with what the floods took, and where the family went.",
+      "supported": "Replace with what PRDA provided: shelter, household items, food, psychosocial support, schooling for children.",
+      "changed": "Replace with where the family stands today."
+    },
+    "support": [
+      { "label": "Flood response", "detail": "Items or services received, and when." }
+    ],
+    "impact": [
+      { "label": "Family's situation today", "value": null, "unit": null, "evidence": { "type": "testimony", "note": "From follow-up interview", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": null,
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "akobo-health-worker",
+    "status": "demo",
+    "name": "Health worker",
+    "role": "Akobo Integrated Programme",
+    "locationId": "akobo",
+    "programmeIds": ["akobo-integrated"],
+    "sectors": ["health"],
+    "headline": "A health worker's account of care in Akobo, still to be recorded.",
+    "portrait": null,
+    "video": null,
+    "quote": null,
+    "chapters": {
+      "before": "Replace with what health care was available in their area before.",
+      "supported": "Replace with what PRDA and its partners provided: training, medicines, facility support.",
+      "changed": "Replace with what they can now do for patients, with evidence."
+    },
+    "support": [
+      { "label": "Health programme support", "detail": "Training or supplies, and year." }
+    ],
+    "impact": [
+      { "label": "Patients seen", "value": null, "unit": null, "evidence": { "type": "record", "note": "From facility records", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": null,
+    "recordedOn": null,
+    "relatedStoryIds": []
+  }
+]
