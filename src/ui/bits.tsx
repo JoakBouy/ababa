@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, ExternalLink, Play, User } from 'lucide-react';
+import { ExternalLink, Play, User } from 'lucide-react';
 import { SECTORS } from '../data/sectors';
 import { sources } from '../data';
 import type { SectorId, Story } from '../data/types';
@@ -8,7 +8,7 @@ import { cn } from '../utils/cn';
 export function DemoTag({ className }: { className?: string }) {
   return (
     <span
-      className={cn('eyebrow inline-flex items-center rounded-[3px] bg-demo-bg px-1.5 py-0.5 text-[10px] font-semibold text-demo-ink', className)}
+      className={cn('inline-flex items-center rounded bg-amber-500/10 px-1.5 py-0.5 font-label text-[9px] font-bold tracking-wider text-amber-700 uppercase', className)}
       title="Demo profile: not a real person"
     >
       Demo
@@ -28,7 +28,7 @@ export function SectorDot({ sector, size = 8 }: { sector: SectorId; size?: numbe
 
 export function SectorList({ sectors, className }: { sectors: SectorId[]; className?: string }) {
   return (
-    <ul className={cn('flex flex-wrap gap-x-3 gap-y-1 text-[12.5px] text-ink-2', className)}>
+    <ul className={cn('flex flex-wrap gap-x-3 gap-y-1 text-[12.5px] text-on-surface-variant', className)}>
       {sectors.map((s) => (
         <li key={s} className="inline-flex items-center gap-1.5">
           <SectorDot sector={s} />
@@ -61,16 +61,18 @@ export function Portrait({
   }
   return (
     <div
-      className={cn('media-placeholder flex h-full w-full flex-col items-center justify-center gap-1.5 text-ink-2', className)}
+      className={cn('media-placeholder flex h-full w-full flex-col items-center justify-center gap-1.5 text-on-surface-variant', className)}
       role="img"
       aria-label={`Portrait of ${story.name} still to come`}
     >
       {size === 'thumb' ? (
-        <User className="h-4 w-4" aria-hidden="true" />
+        <User className="h-4 w-4 text-[#005477]" aria-hidden="true" />
       ) : (
         <>
-          <Camera className={size === 'hero' ? 'h-6 w-6' : 'h-5 w-5'} aria-hidden="true" />
-          <span className="eyebrow text-[10px]">Portrait to come</span>
+          <span className={cn('grid place-items-center rounded-full border-2 border-[#005477] bg-white text-[#005477] shadow-md', size === 'hero' ? 'h-16 w-16' : 'h-12 w-12')}>
+            <User className={size === 'hero' ? 'h-8 w-8' : 'h-6 w-6'} aria-hidden="true" />
+          </span>
+          <span className="mt-1 font-label text-[10px] font-bold tracking-wider uppercase">Portrait to come</span>
         </>
       )}
     </div>
@@ -81,11 +83,11 @@ export function VideoBlock({ story }: { story: Story }) {
   const v = story.video;
   if (!v) {
     return (
-      <div className="media-placeholder flex aspect-video w-full max-w-full flex-col items-center justify-center gap-2 rounded-md text-ink-2">
-        <span className="grid h-11 w-11 place-items-center rounded-full border border-line bg-paper">
+      <div className="media-placeholder flex aspect-video w-full max-w-full flex-col items-center justify-center gap-2 rounded-2xl text-on-surface-variant">
+        <span className="grid h-11 w-11 place-items-center rounded-full bg-primary text-on-primary shadow-md">
           <Play className="h-4 w-4" aria-hidden="true" />
         </span>
-        <span className="eyebrow text-[10px]">Video to come</span>
+        <span className="font-label text-[10px] font-bold tracking-wider uppercase">Video to come</span>
       </div>
     );
   }
@@ -95,7 +97,7 @@ export function VideoBlock({ story }: { story: Story }) {
         <video controls preload="metadata" poster={v.poster} className="aspect-video w-full max-w-full rounded-md bg-black">
           <source src={v.src} />
         </video>
-        {v.caption && <figcaption className="text-[12.5px] text-ink-2">{v.caption}</figcaption>}
+        {v.caption && <figcaption className="text-[12.5px] text-on-surface-variant">{v.caption}</figcaption>}
       </figure>
     );
   }
@@ -113,9 +115,9 @@ export function VideoBlock({ story }: { story: Story }) {
         allow="accelerometer; encrypted-media; picture-in-picture"
         allowFullScreen
       />
-      <figcaption className="flex items-center justify-between gap-3 text-[12.5px] text-ink-2">
+      <figcaption className="flex items-center justify-between gap-3 text-[12.5px] text-on-surface-variant">
         <span>{v.caption}</span>
-        <a href={watch} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-accent hover:underline">
+        <a href={watch} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[#005477] hover:underline">
           Watch on {v.kind === 'youtube' ? 'YouTube' : 'Vimeo'} <ExternalLink className="h-3 w-3" />
         </a>
       </figcaption>
@@ -134,11 +136,11 @@ export function SourceLinks({ ids, className }: { ids: string[]; className?: str
             href={sources[id].url}
             target="_blank"
             rel="noreferrer"
-            className="group inline-flex items-baseline gap-1.5 text-ink-2 hover:text-accent"
+            className="group inline-flex items-baseline gap-1.5 text-on-surface-variant hover:text-[#005477]"
           >
             <ExternalLink className="h-3 w-3 shrink-0 translate-y-[1px]" aria-hidden="true" />
             <span>
-              <span className="font-medium text-ink group-hover:text-accent">{sources[id].publisher}</span>
+              <span className="font-medium text-on-surface group-hover:text-[#005477]">{sources[id].publisher}</span>
               {' · '}
               {sources[id].title}
             </span>
@@ -151,9 +153,9 @@ export function SourceLinks({ ids, className }: { ids: string[]; className?: str
 
 export function SectionHeading({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">
-      <h2 className="eyebrow font-semibold text-ink">{children}</h2>
-      {aside && <span className="text-[12px] text-ink-2">{aside}</span>}
+    <div className="flex items-baseline justify-between gap-3 border-b border-outline-variant/20 pb-2">
+      <h2 className="font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">{children}</h2>
+      {aside && <span className="text-[11px] font-bold text-on-surface-variant/80">{aside}</span>}
     </div>
   );
 }

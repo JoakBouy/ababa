@@ -4,7 +4,7 @@ An interactive map of the Presbyterian Relief and Development Agency's work acro
 
 The journey is **South Sudan → Place → Person → Story → Impact**. Choose a place on the map to see what PRDA does there and the people connected to it. Open a person to read their story: their portrait and video, what life was like before, what PRDA supported, and what changed, with the evidence behind each claim.
 
-This project grew out of the Ababa Group Starlink fleet command centre. It keeps that app's night-map command view, the camera that flies to a selected location, the floating context card and map controls, and the drill-down from map to detail. The fleet telemetry, login and Starlink backend have been removed.
+This project grew out of the Ababa Group Starlink fleet command centre. It keeps that app's design system (Manrope and Inter, the same colour tokens, cards, badges and header layout) and its interactions: the camera flying to a selected location, marker popups, the focus card, zoom, reset and fullscreen controls, and table rows that locate a place on the map. The fleet telemetry, login and Starlink backend have been removed.
 
 ## What is real and what is a placeholder
 

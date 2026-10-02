@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import L, { type LatLngBoundsExpression, type Map as LeafletMap } from 'leaflet';
-import { GeoJSON, MapContainer, Marker, useMapEvents } from 'react-leaflet';
+import { GeoJSON, MapContainer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { ArrowRight, User } from 'lucide-react';
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
 import 'leaflet/dist/leaflet.css';
 
@@ -12,6 +13,7 @@ import riversGeo from '../data/geo/rivers.json';
 import { placeByCounty, places, sectorsForPlace, storiesForPlace } from '../data';
 import { SECTORS } from '../data/sectors';
 import type { Place, SectorId, Story } from '../data/types';
+import { cn } from '../utils/cn';
 
 const counties = countiesGeo as unknown as FeatureCollection<Geometry, { name: string }>;
 const states = statesGeo as unknown as FeatureCollection<Geometry, { name: string; label: [number, number] }>;
@@ -38,20 +40,14 @@ const STATE_LABEL_POS: Record<string, [number, number]> = {
 
 export const NATIONAL_BOUNDS = L.geoJSON(outline as any).getBounds();
 
-/** Ring of sector colours around each marker, so the map doubles as a legend for what PRDA does where. */
-function ringFor(sectors: SectorId[]): string {
-  if (sectors.length === 0) return 'var(--lit)';
-  const step = 360 / sectors.length;
-  const stops = sectors.map((s, i) => `${SECTORS[s].color} ${i * step}deg ${(i + 1) * step}deg`);
-  return `conic-gradient(${stops.join(', ')})`;
-}
-
 const PERSON_GLYPH =
-  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
+  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
 
 function escapeHtml(s: string) {
   return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 }
+
+export const PRDA_BLUE = '#005477';
 
 function placeIcon(opts: {
   place: Place;
@@ -61,25 +57,23 @@ function placeIcon(opts: {
   hovered: boolean;
   dim: boolean;
   showLabel: boolean;
-  story?: Story;
 }) {
-  const { place, storyCount, sectors, selected, hovered, dim, showLabel, story } = opts;
+  const { place, storyCount, sectors, selected, hovered, dim, showLabel } = opts;
   const people = storyCount > 0;
-  let core = people ? String(storyCount) : '';
-  if (selected && story) {
-    core = story.portrait
-      ? `<img src="${escapeHtml(story.portrait.src)}" alt="" style="width:100%;height:100%;object-fit:cover" />`
-      : PERSON_GLYPH;
-  }
+  const color = people ? PRDA_BLUE : SECTORS[sectors[0] ?? 'relief'].color;
   const cls = ['pm', people ? 'pm--people' : 'pm--quiet', selected && 'is-selected', hovered && 'is-hover', dim && 'is-dim']
     .filter(Boolean)
     .join(' ');
   const label = showLabel ? `<span class="pm-label pm-label--${place.labelSide}">${escapeHtml(place.name)}</span>` : '';
-  const size = people ? 32 : 16;
+  const body = people
+    ? `<span class="pm-persona">${PERSON_GLYPH}<span class="pm-count">${storyCount}</span></span>`
+    : '<span class="pm-dot"></span>';
+  const size = people ? 30 : 16;
   return L.divIcon({
     className: 'place-icon',
     iconSize: [size, size],
-    html: `<div class="${cls}" style="--pm-ring:${ringFor(sectors)}"><span class="pm-ring"></span><span class="pm-core">${core}</span>${label}</div>`,
+    popupAnchor: [0, -size / 2],
+    html: `<div class="${cls}" style="--pm-color:${color}"><span class="pm-ping"></span>${body}${label}</div>`,
   });
 }
 
@@ -108,7 +102,8 @@ interface Props {
   selectedStory?: Story;
   hoveredPlaceId?: string;
   sector: SectorId | null;
-  onSelectPlace: (id: string) => void;
+  onSelectPlace: (id: string, reveal?: boolean) => void;
+  onOpenStory: (id: string) => void;
   onHoverPlace: (id?: string) => void;
   onMapReady: (map: LeafletMap) => void;
 }
@@ -119,6 +114,7 @@ export default function ImpactMap({
   hoveredPlaceId,
   sector,
   onSelectPlace,
+  onOpenStory,
   onHoverPlace,
   onMapReady,
 }: Props) {
@@ -155,7 +151,7 @@ export default function ImpactMap({
     const markerRect = (i: (typeof placeInfo)[number]): Rect => {
       const p = map.latLngToContainerPoint(i.place.coords);
       const far = map.getZoom() < 5.75;
-      const r = i.storyCount ? (far ? 12 : 17) : far ? 6 : 8;
+      const r = i.storyCount ? (far ? 12 : 16) : far ? 6 : 8;
       return { x1: p.x - r, y1: p.y - r, x2: p.x + r, y2: p.y + r };
     };
     const markers = placeInfo.map((i) => ({ id: i.place.id, rect: markerRect(i) }));
@@ -206,17 +202,17 @@ export default function ImpactMap({
   const countyStyle = useCallback(
     (feature?: Feature<Geometry, { name: string }>): L.PathOptions => {
       const info = feature ? infoByCounty.get(feature.properties.name) : undefined;
-      if (!info) return { fillColor: '#000', fillOpacity: 0, color: '#3b3229', weight: 0.6, opacity: 0.9, interactive: false };
+      if (!info) return { fillColor: '#fff', fillOpacity: 0, color: '#d3d6da', weight: 0.7, opacity: 1, interactive: false };
       const match = !sector || info.sectors.includes(sector);
       const selected = info.place.id === selectedPlaceId;
       const hovered = info.place.id === hoveredPlaceId;
       return {
         className: 'county-lit',
-        fillColor: '#d9a441',
-        fillOpacity: selected ? 0.3 : hovered ? 0.24 : match ? (info.storyCount ? 0.16 : 0.1) : 0.03,
-        color: '#d9a441',
+        fillColor: PRDA_BLUE,
+        fillOpacity: selected ? 0.22 : hovered ? 0.16 : match ? (info.storyCount ? 0.1 : 0.06) : 0.02,
+        color: PRDA_BLUE,
         weight: selected ? 2 : 1,
-        opacity: selected ? 0.95 : match ? 0.45 : 0.12,
+        opacity: selected ? 0.9 : match ? 0.4 : 0.1,
       };
     },
     [infoByCounty, sector, selectedPlaceId, hoveredPlaceId],
@@ -262,16 +258,16 @@ export default function ImpactMap({
       <GeoJSON
         data={neighbours}
         interactive={false}
-        style={{ fillColor: '#161b1d', fillOpacity: 1, color: '#2a2e2f', weight: 1 }}
+        style={{ fillColor: '#eef1f3', fillOpacity: 1, color: '#c4c6cc', weight: 1 }}
         attribution='Boundaries <a href="https://www.geoboundaries.org" target="_blank" rel="noreferrer">geoBoundaries</a> (CC BY 4.0) · <a href="https://www.naturalearthdata.com" target="_blank" rel="noreferrer">Natural Earth</a>'
       />
-      <GeoJSON data={outline} interactive={false} style={{ fillColor: '#262019', fillOpacity: 1, color: '#6b5a48', weight: 1.4 }} />
+      <GeoJSON data={outline} interactive={false} style={{ fillColor: '#ffffff', fillOpacity: 1, color: '#74777d', weight: 1.4 }} />
       <GeoJSON ref={countiesRef} data={counties} style={countyStyle as L.StyleFunction} onEachFeature={onEachCounty as any} />
-      <GeoJSON data={states} interactive={false} style={{ fill: false, color: '#5a4b3d', weight: 1, opacity: 0.8 }} />
+      <GeoJSON data={states} interactive={false} style={{ fill: false, color: '#a9adb3', weight: 1.1, opacity: 1 }} />
       <GeoJSON
         data={rivers}
         interactive={false}
-        style={(f) => ({ color: '#3f88aa', weight: (f?.properties?.scalerank ?? 9) <= 1 ? 2.2 : 1.2, opacity: 0.75 })}
+        style={(f) => ({ color: '#67bafd', weight: (f?.properties?.scalerank ?? 9) <= 1 ? 2.4 : 1.3, opacity: 0.95 })}
       />
 
       {zoom < 7.25 &&
@@ -288,6 +284,7 @@ export default function ImpactMap({
         const hovered = place.id === hoveredPlaceId;
         const dim = !!sector && !sectors.includes(sector);
         const showLabel = labels.has(place.id);
+        const people = storiesForPlace(place.id);
         return (
           <Marker
             key={place.id}
@@ -295,7 +292,7 @@ export default function ImpactMap({
             title={`${place.name}${storyCount ? `: ${storyCount} ${storyCount === 1 ? 'story' : 'stories'}` : ''}`}
             alt={place.name}
             zIndexOffset={selected ? 1000 : storyCount ? 500 : 0}
-            icon={placeIcon({ place, storyCount, sectors, selected, hovered, dim, showLabel, story: selected ? selectedStory : undefined })}
+            icon={placeIcon({ place, storyCount, sectors, selected, hovered, dim, showLabel })}
             eventHandlers={{
               click: () => selectRef.current(place.id),
               mouseover: () => hoverRef.current(place.id),
@@ -304,7 +301,60 @@ export default function ImpactMap({
                 if ((e.originalEvent as KeyboardEvent).key === 'Enter') selectRef.current(place.id);
               },
             }}
-          />
+          >
+            <Popup autoPan={false} closeButton={false}>
+              <div className="min-w-[230px] max-w-[260px] p-3 font-body">
+                <div className="mb-1 flex items-center justify-between gap-2 border-b border-outline-variant/30 pb-1.5">
+                  <span className="font-headline text-sm font-bold text-on-surface">{place.name}</span>
+                  <span
+                    className={cn(
+                      'rounded px-1.5 py-0.5 text-[9px] font-bold uppercase',
+                      storyCount ? 'bg-[#005477]/10 text-[#005477]' : 'bg-surface-container text-on-surface-variant',
+                    )}
+                  >
+                    {storyCount ? `${storyCount} ${storyCount === 1 ? 'person' : 'people'}` : 'No stories yet'}
+                  </span>
+                </div>
+                <div className="mb-1 text-[11px] font-medium text-on-surface-variant">
+                  {place.county} County • {place.state}
+                </div>
+                <div className="mb-2 flex flex-wrap gap-1">
+                  {sectors.map((s) => (
+                    <span key={s} className="rounded px-1.5 py-0.5 text-[9px] font-bold" style={{ color: SECTORS[s].color, background: `${SECTORS[s].color}1A` }}>
+                      {SECTORS[s].short}
+                    </span>
+                  ))}
+                </div>
+                {people.length > 0 && (
+                  <ul className="mb-2 flex flex-col gap-1">
+                    {people.map((p: Story) => (
+                      <li key={p.id}>
+                        <button
+                          type="button"
+                          onClick={() => onOpenStory(p.id)}
+                          className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1 text-left transition-colors hover:bg-surface-container"
+                        >
+                          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#005477]/10 text-[#005477]">
+                            <User className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="min-w-0 flex-1 truncate text-xs font-semibold text-on-surface">{p.name}</span>
+                          {p.status === 'demo' && <span className="rounded bg-amber-500/10 px-1 py-0.5 text-[8.5px] font-bold uppercase text-amber-700">Demo</span>}
+                          <ArrowRight className="h-3 w-3 text-on-surface-variant" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <button
+                  type="button"
+                  onClick={() => selectRef.current(place.id, true)}
+                  className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-on-primary shadow-sm transition-colors hover:bg-primary/90"
+                >
+                  {storyCount ? 'View place & people' : "View PRDA's work here"}
+                </button>
+              </div>
+            </Popup>
+          </Marker>
         );
       })}
     </MapContainer>

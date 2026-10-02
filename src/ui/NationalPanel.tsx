@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import { places, programmes, sectorsForPlace, stories, storiesForPlace, unplacedProgrammes } from '../data';
 import type { SectorId } from '../data/types';
 import { DemoTag, Portrait, SectionHeading, SectorDot, SourceLinks } from './bits';
@@ -20,30 +20,21 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
   const allSourceIds = programmes.flatMap((p) => p.sourceIds);
 
   return (
-    <div className="flex flex-col gap-9">
+    <div className="flex flex-col gap-7">
       <header className="flex flex-col gap-4">
-        <p className="eyebrow text-gold-ink">Presbyterian Relief and Development Agency · since 1993</p>
-        <h1 className="font-display text-[34px] leading-[1.08] font-medium text-ink sm:text-[40px]">
-          Where PRDA works, and the people behind the work
-        </h1>
-        <p className="max-w-[60ch] text-[15.5px] leading-relaxed text-ink-2">
-          PRDA is the relief and development arm of the Presbyterian Church of South Sudan. It trains midwives and
-          nurses, supports farming, water and schools, and responds when conflict and floods force families from
-          their homes. Choose a place on the map to meet the people there.
-        </p>
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12.5px] text-ink-2 lg:hidden">
-          <span className="inline-flex items-center gap-2">
-            <span className="h-3.5 w-3.5 rounded-full border-[3px] border-lit bg-night" aria-hidden="true" />
-            Stories recorded here
+        <h2 className="flex items-center gap-2 font-headline text-lg font-bold text-on-surface">
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#005477]/10 text-[#005477]">
+            <Users className="h-4 w-4" aria-hidden="true" />
           </span>
-          <span className="inline-flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full border-2 border-lit" aria-hidden="true" />
-            PRDA works here
-          </span>
-          <span>Ring colours show the type of work.</span>
+          Meet the people PRDA reaches
+        </h2>
+        <p className="text-sm leading-relaxed text-on-surface-variant">
+          PRDA is the relief and development arm of the Presbyterian Church of South Sudan, working since 1993. It trains
+          midwives and nurses, supports farming, water and schools, and responds when conflict and floods force families
+          from their homes. Choose a place on the map to meet the people there.
         </p>
         {hasDemo && (
-          <p className="rounded-md bg-demo-bg px-3.5 py-3 text-[13px] leading-snug text-demo-ink">
+          <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-3 text-xs leading-snug text-amber-800">
             Places and programmes come from PRDA's published materials and partner reports. The people are{' '}
             <strong className="font-semibold">demo profiles</strong> showing where PRDA's real stories will go.
           </p>
@@ -54,7 +45,7 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
         <SectionHeading aside={`${withPeople.length} places`}>
           <span id="people-heading">People on the map</span>
         </SectionHeading>
-        {withPeople.length === 0 && <p className="py-4 text-[14px] text-ink-2">No stories recorded for this sector yet.</p>}
+        {withPeople.length === 0 && <p className="py-4 text-[14px] text-on-surface-variant">No stories recorded for this sector yet.</p>}
         <ul className="flex flex-col">
           {withPeople.map((place) => {
             const people = storiesForPlace(place.id);
@@ -68,23 +59,23 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
                   onFocus={() => onHoverPlace(place.id)}
                   onBlur={() => onHoverPlace(undefined)}
                   className={cn(
-                    'group grid w-full grid-cols-[auto_1fr_auto] items-center gap-3.5 border-b border-line py-3.5 text-left transition-colors',
-                    hoveredPlaceId === place.id && 'bg-paper-2/60',
+                    'group grid w-full grid-cols-[auto_1fr_auto] items-center gap-3.5 border-b border-outline-variant/30 py-3.5 text-left transition-colors',
+                    hoveredPlaceId === place.id && 'bg-surface-container/50',
                   )}
                 >
                   <span className="flex -space-x-2">
                     {people.slice(0, 3).map((s) => (
-                      <span key={s.id} className="h-10 w-10 overflow-hidden rounded-full border-2 border-paper">
+                      <span key={s.id} className="h-10 w-10 overflow-hidden rounded-full border-2 border-white">
                         <Portrait story={s} size="thumb" />
                       </span>
                     ))}
                   </span>
                   <span className="min-w-0">
                     <span className="flex items-baseline gap-2">
-                      <span className="font-display text-[20px] leading-tight text-ink">{place.name}</span>
-                      <span className="truncate text-[12px] text-ink-2">{place.state}</span>
+                      <span className="font-headline text-base font-bold leading-tight text-on-surface">{place.name}</span>
+                      <span className="truncate text-[12px] text-on-surface-variant">{place.state}</span>
                     </span>
-                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-ink-2">
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-on-surface-variant">
                       {people.map((s, i) => (
                         <span key={s.id} className="inline-flex items-center gap-1.5">
                           {s.name}
@@ -94,7 +85,7 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
                       ))}
                     </span>
                   </span>
-                  <ArrowRight className="h-4 w-4 text-ink-2 transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+                  <ArrowRight className="h-4 w-4 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-[#005477]" />
                 </button>
               </li>
             );
@@ -115,8 +106,8 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
                 onMouseEnter={() => onHoverPlace(place.id)}
                 onMouseLeave={() => onHoverPlace(undefined)}
                 className={cn(
-                  'inline-flex items-center gap-2 rounded-full border border-line px-3 py-1.5 text-[13px] text-ink transition-colors hover:border-accent hover:text-accent',
-                  hoveredPlaceId === place.id && 'border-accent text-accent',
+                  'inline-flex items-center gap-2 rounded-full border border-outline-variant/30 px-3 py-1.5 text-[13px] text-on-surface transition-colors hover:border-[#005477] hover:text-[#005477]',
+                  hoveredPlaceId === place.id && 'border-[#005477] text-[#005477]',
                 )}
               >
                 <span className="flex gap-0.5">
@@ -145,8 +136,8 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
                   ))}
                 </span>
                 <span className="min-w-0 text-[13.5px] leading-snug">
-                  <span className="font-medium text-ink">{p.name}</span>
-                  <span className="text-ink-2"> · {p.summary}</span>
+                  <span className="font-medium text-on-surface">{p.name}</span>
+                  <span className="text-on-surface-variant"> · {p.summary}</span>
                 </span>
               </li>
             ))}
@@ -156,31 +147,31 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
 
       <section className="flex flex-col gap-3 pb-6">
         <details className="group">
-          <summary className="eyebrow cursor-pointer list-none font-semibold text-ink marker:hidden">
+          <summary className="eyebrow cursor-pointer list-none font-semibold text-on-surface marker:hidden">
             <span className="inline-flex items-center gap-2">
-              Sources <span className="text-ink-2 group-open:hidden">+</span>
-              <span className="hidden text-ink-2 group-open:inline">−</span>
+              Sources <span className="text-on-surface-variant group-open:hidden">+</span>
+              <span className="hidden text-on-surface-variant group-open:inline">−</span>
             </span>
           </summary>
           <SourceLinks ids={allSourceIds} className="mt-3" />
         </details>
         <details className="group">
-          <summary className="eyebrow cursor-pointer list-none font-semibold text-ink">
+          <summary className="eyebrow cursor-pointer list-none font-semibold text-on-surface">
             <span className="inline-flex items-center gap-2">
-              For PRDA staff: adding a real story <span className="text-ink-2 group-open:hidden">+</span>
-              <span className="hidden text-ink-2 group-open:inline">−</span>
+              For PRDA staff: adding a real story <span className="text-on-surface-variant group-open:hidden">+</span>
+              <span className="hidden text-on-surface-variant group-open:inline">−</span>
             </span>
           </summary>
-          <ol className="mt-3 flex list-decimal flex-col gap-1.5 pl-5 text-[13.5px] leading-snug text-ink-2">
+          <ol className="mt-3 flex list-decimal flex-col gap-1.5 pl-5 text-[13.5px] leading-snug text-on-surface-variant">
             <li>Record the person's consent, including permission to show their photo, name and video.</li>
-            <li>Add their portrait to <code className="font-mono text-[12px] text-ink">public/media/people/</code>.</li>
+            <li>Add their portrait to <code className="font-mono text-[12px] text-on-surface">public/media/people/</code>.</li>
             <li>
-              Add a record to <code className="font-mono text-[12px] text-ink">src/data/content/stories.json</code> with{' '}
-              <code className="font-mono text-[12px] text-ink">"status": "published"</code>, linked to a place and programme.
+              Add a record to <code className="font-mono text-[12px] text-on-surface">src/data/content/stories.json</code> with{' '}
+              <code className="font-mono text-[12px] text-on-surface">"status": "published"</code>, linked to a place and programme.
             </li>
             <li>Back each impact with evidence: a record, survey, testimony or report.</li>
             <li>
-              Run <code className="font-mono text-[12px] text-ink">npm run validate</code>, then remove the demo profiles.
+              Run <code className="font-mono text-[12px] text-on-surface">npm run validate</code>, then remove the demo profiles.
             </li>
           </ol>
         </details>
