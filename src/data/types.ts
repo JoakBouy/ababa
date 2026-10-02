@@ -76,8 +76,12 @@ export type Media =
 
 export interface Story {
   id: string;
-  /** demo = placeholder, never a real person; draft = real but not yet approved; published = real and consented */
-  status: 'demo' | 'draft' | 'published';
+  /**
+   * demo = empty template, never a real person
+   * test = fictional test persona with illustrated portrait, for trying out the map
+   * draft = real but not yet approved; published = real and consented
+   */
+  status: 'demo' | 'test' | 'draft' | 'published';
   name: string;
   role: string;
   locationId: string;

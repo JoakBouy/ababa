@@ -14,7 +14,11 @@ import { SECTORS } from '../data/sectors';
 import type { Place, SectorId, Story } from '../data/types';
 import { cn } from '../utils/cn';
 
-const counties = countiesGeo as unknown as FeatureCollection<Geometry, { name: string }>;
+const counties = countiesGeo as unknown as FeatureCollection<Geometry, { name: string; label: [number, number]; area: number }>;
+
+/** County names as people write them (source data has a few lower-case quirks). */
+const countyName = (n: string) => n.replace(/-([a-z])/g, (_, c: string) => `-${c.toUpperCase()}`);
+const countiesBySize = [...counties.features].sort((a, b) => b.properties.area - a.properties.area);
 const states = statesGeo as unknown as FeatureCollection<Geometry, { name: string; label: [number, number] }>;
 const outline = outlineGeo as unknown as FeatureCollection;
 const rivers = riversGeo as unknown as FeatureCollection<Geometry, { name: string; scalerank: number }>;
@@ -42,11 +46,11 @@ export const PRDA_ACCENT = '#A84A23';
  * Each marker's DOM is built once. Selection, hover, filter and label visibility are then
  * toggled as classes on that element, so the marker is never swapped out mid-click.
  */
-function placeIcon(place: Place, storyCount: number, sectors: SectorId[]) {
+function placeIcon(place: Place, storyCount: number, sectors: SectorId[], portrait?: string) {
   const people = storyCount > 0;
   const color = people ? PRDA_ACCENT : SECTORS[sectors[0] ?? 'relief'].color;
   const body = people
-    ? `<span class="pm-persona">${PERSON_GLYPH}<span class="pm-count">${storyCount}</span></span>`
+    ? `<span class="pm-persona${portrait ? ' has-photo' : ''}">${portrait ? `<img src="${escapeHtml(portrait)}" alt="" />` : PERSON_GLYPH}<span class="pm-count">${storyCount}</span></span>`
     : '<span class="pm-dot"></span>';
   const size = people ? 30 : 16;
   return L.divIcon({
@@ -112,9 +116,27 @@ export default function ImpactMap({
     [],
   );
   const infoByCounty = useMemo(() => new Map(placeInfo.map((i) => [i.place.county, i])), [placeInfo]);
-  const icons = useMemo(() => new Map(placeInfo.map((i) => [i.place.id, placeIcon(i.place, i.storyCount, i.sectors)])), [placeInfo]);
+  const icons = useMemo(
+    () => new Map(placeInfo.map((i) => [i.place.id, placeIcon(i.place, i.storyCount, i.sectors, storiesForPlace(i.place.id).find((x) => x.portrait)?.portrait?.src)])),
+    [placeInfo],
+  );
   const stateIcons = useMemo(() => new Map(states.features.map((f) => [f.properties.name, labelIcon(f.properties.name, 'state')])), []);
   const markerRefs = useRef(new Map<string, L.Marker>());
+  const countyIcons = useMemo(
+    () =>
+      new Map(
+        counties.features.map((f) => [
+          f.properties.name,
+          L.divIcon({
+            className: 'place-icon',
+            iconSize: [0, 0],
+            html: `<span class="map-label map-label--county is-hidden">${escapeHtml(countyName(f.properties.name))}</span>`,
+          }),
+        ]),
+      ),
+    [],
+  );
+  const countyRefs = useRef(new Map<string, L.Marker>());
   const [viewTick, setViewTick] = useState(0);
   const onView = useCallback((z: number) => {
     setZoom(z);
@@ -127,9 +149,10 @@ export default function ImpactMap({
   }, [map]);
 
   // Label placement: most important places first; a label is dropped if it would collide.
-  const labels = useMemo(() => {
+  const { labels, countyLabels } = useMemo(() => {
     const show = new Set<string>();
-    if (!map) return show;
+    const countyShow = new Set<string>();
+    if (!map) return { labels: show, countyLabels: countyShow };
     const z = map.getZoom();
     const markerRect = (i: (typeof placeInfo)[number]): Rect => {
       const p = map.latLngToContainerPoint(i.place.coords);
@@ -145,11 +168,11 @@ export default function ImpactMap({
     for (const i of ordered) {
       const forced = i.place.id === selectedPlaceId || i.place.id === hoveredPlaceId;
       const dim = !!sector && !i.sectors.includes(sector);
-      if (!forced && (dim || (!i.storyCount && z < 6.75))) continue;
+      if (!forced && dim) continue;
       const m = markerRect(i);
       const cx = (m.x1 + m.x2) / 2;
       const cy = (m.y1 + m.y2) / 2;
-      const w = i.place.name.length * 7.4 + 6;
+      const w = i.place.name.length * (i.storyCount ? 7.4 : 6.8) + 6;
       const h = 17;
       const gap = 9;
       const rect: Rect =
@@ -167,7 +190,21 @@ export default function ImpactMap({
         taken.push(rect);
       }
     }
-    return show;
+
+    // County names fill the remaining space, largest counties first
+    if (z >= 5.9) {
+      for (const f of countiesBySize) {
+        if (placeByCounty.has(f.properties.name)) continue; // the PRDA place label covers it
+        const p = map.latLngToContainerPoint(f.properties.label);
+        const w = countyName(f.properties.name).length * 5.9 + 6;
+        const h = 13;
+        const rect: Rect = { x1: p.x - w / 2, y1: p.y - h / 2, x2: p.x + w / 2, y2: p.y + h / 2 };
+        if (taken.some((t) => overlaps(t, rect)) || markers.some((mk) => overlaps(mk.rect, rect))) continue;
+        countyShow.add(f.properties.name);
+        taken.push(rect);
+      }
+    }
+    return { labels: show, countyLabels: countyShow };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, viewTick, placeInfo, selectedPlaceId, hoveredPlaceId, sector]);
 
@@ -198,6 +235,9 @@ export default function ImpactMap({
       el.classList.toggle('is-dim', !!sector && !sectors.includes(sector));
       el.querySelector('.pm-label')?.classList.toggle('is-hidden', !labels.has(place.id));
       marker.setZIndexOffset(selected ? 1000 : storyCount ? 500 : 0);
+    });
+    countyRefs.current.forEach((m, name) => {
+      m.getElement()?.querySelector('.map-label')?.classList.toggle('is-hidden', !countyLabels.has(name));
     });
   });
 
@@ -278,7 +318,20 @@ export default function ImpactMap({
         style={(f) => ({ color: '#7fb3cf', weight: (f?.properties?.scalerank ?? 9) <= 1 ? 2.4 : 1.3, opacity: 0.95 })}
       />
 
-      {zoom < 7.25 &&
+      {counties.features.map((f) => (
+        <Marker
+          key={`county-${f.properties.name}`}
+          position={f.properties.label}
+          icon={countyIcons.get(f.properties.name)!}
+          interactive={false}
+          keyboard={false}
+          ref={(m) => {
+            if (m) countyRefs.current.set(f.properties.name, m);
+            else countyRefs.current.delete(f.properties.name);
+          }}
+        />
+      ))}
+      {zoom < 5.9 &&
         states.features.map((f) => (
           <Marker key={f.properties.name} position={STATE_LABEL_POS[f.properties.name] ?? f.properties.label} icon={stateIcons.get(f.properties.name)!} interactive={false} keyboard={false} />
         ))}
@@ -337,11 +390,13 @@ export default function ImpactMap({
                           onClick={() => onOpenStory(p.id)}
                           className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1 text-left transition-colors hover:bg-surface-container"
                         >
-                          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#A84A23]/10 text-[#A84A23]">
-                            <User className="h-3.5 w-3.5" />
+                          <span className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-[#A84A23]/10 text-[#A84A23]">
+                            {p.portrait ? <img src={p.portrait.src} alt="" className="h-full w-full object-cover" /> : <User className="h-3.5 w-3.5" />}
                           </span>
                           <span className="min-w-0 flex-1 truncate text-xs font-semibold text-on-surface">{p.name}</span>
-                          {p.status === 'demo' && <span className="rounded bg-amber-500/10 px-1 py-0.5 text-[8.5px] font-bold uppercase text-amber-700">Demo</span>}
+                          {(p.status === 'demo' || p.status === 'test') && (
+                            <span className="rounded bg-amber-500/10 px-1 py-0.5 text-[8.5px] font-bold uppercase text-amber-700">{p.status === 'test' ? 'Test' : 'Demo'}</span>
+                          )}
                           <ArrowRight className="h-3 w-3 text-on-surface-variant" />
                         </button>
                       </li>

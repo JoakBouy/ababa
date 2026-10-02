@@ -18,6 +18,8 @@ import {
   sectorsForPlace,
   stories,
   storiesForPlace,
+  anyPlaceholders,
+  placeholderLabel,
 } from './data';
 import { SECTORS, SECTOR_ORDER } from './data/sectors';
 import type { SectorId } from './data/types';
@@ -230,7 +232,7 @@ function Shell() {
     if (!isFullscreen) cardRef.current?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
   };
 
-  const allDemo = stories.every((s) => s.status === 'demo');
+  const allDemo = anyPlaceholders;
   const placesWithPeople = places.filter((p) => storiesForPlace(p.id).length).length;
   const galleryStories = stories.filter((x) => !sector || x.sectors.includes(sector));
   const quietPlaces = places.filter((p) => storiesForPlace(p.id).length === 0 && (!sector || sectorsForPlace(p).includes(sector)));
@@ -257,14 +259,14 @@ function Shell() {
             <div className="min-w-0 max-w-3xl">
               <div className="mb-1 flex flex-wrap items-center gap-2">
                 <span className="font-label text-[10px] font-bold tracking-widest text-[#A84A23] uppercase">Presbyterian Relief and Development Agency</span>
-                {allDemo && <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-700">Demo stories</span>}
+                {allDemo && <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-700">{placeholderLabel}</span>}
               </div>
               <h1 className="font-headline text-3xl font-bold tracking-tight text-on-surface sm:text-4xl">
                 {story ? story.name : place ? `People of ${place.name}` : 'Meet the people behind PRDA’s work'}
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant sm:text-base">
                 {story
-                  ? `${story.role}, ${place?.name}.`
+                  ? `${place && story.role.includes(place.name) ? story.role : `${story.role}, ${place?.name}`}.`
                   : place
                     ? place.summary
                     : 'Across South Sudan, PRDA trains midwives and nurses, supports farming, water and schools, and stands with families when conflict and floods strike. Choose a place to meet the people there.'}
@@ -417,7 +419,7 @@ function Shell() {
                   <>
                     <ChevronRight className="h-3.5 w-3.5 text-on-surface-variant" aria-hidden="true" />
                     <span className="truncate font-label font-bold text-on-surface">{story.name}</span>
-                    {story.status === 'demo' && <DemoTag className="ml-1" />}
+                    <DemoTag className="ml-1" status={story.status} />
                   </>
                 )}
               </nav>
@@ -474,7 +476,7 @@ function Shell() {
                       <span className="flex flex-col gap-1 p-3">
                         <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
                           <span className="font-headline text-sm leading-tight font-bold text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
-                          {s.status === 'demo' && <DemoTag />}
+                          <DemoTag status={s.status} />
                         </span>
                         <span className="inline-flex items-center gap-1 text-xs text-on-surface-variant">
                           <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
@@ -524,6 +526,7 @@ function Shell() {
 
           <p className="pb-4 text-center text-[11px] text-on-surface-variant">
             Places and programmes come from PRDA's published materials and partner reports. Map: geoBoundaries (CC BY 4.0), Natural Earth.
+            {stories.some((x) => x.status === 'test') && ' Test persona illustrations: Personas by Draftbit (CC BY 4.0).'}
           </p>
         </div>
       </main>

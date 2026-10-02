@@ -52,7 +52,7 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
                     <span className="flex flex-col gap-1">
                       <span className="flex items-center gap-2">
                         <span className="font-headline text-base font-bold leading-tight text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
-                        {s.status === 'demo' && <DemoTag />}
+                        <DemoTag status={s.status} />
                       </span>
                       <span className="text-[12.5px] leading-snug text-on-surface-variant">{s.role}</span>
                     </span>

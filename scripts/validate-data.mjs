@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 const read = (p) => JSON.parse(readFileSync(new URL(`../src/data/${p}`, import.meta.url), 'utf8'));
 const places = read('content/locations.json');
 const programmes = read('content/programmes.json');
-const stories = read('content/stories.json');
+const stories = [...read('content/stories.json'), ...read('content/test-personas.json')];
 const sources = read('content/sources.json');
 const counties = read('geo/counties.json');
 
@@ -27,7 +27,8 @@ const dupes = (list, label) => {
 };
 dupes(places, 'place');
 dupes(programmes, 'programme');
-dupes(stories, 'story');
+dupes(read('content/stories.json'), 'story');
+dupes(read('content/test-personas.json'), 'test persona');
 
 const placeIds = new Set(places.map((p) => p.id));
 const progById = new Map(programmes.map((p) => [p.id, p]));
@@ -101,7 +102,9 @@ for (const story of stories) {
 }
 
 const demo = stories.filter((s) => s.status === 'demo').length;
-if (demo) warnings.push(`${demo} demo stories are still in stories.json (set SHOW_DEMO_STORIES=false in src/data/index.ts to hide them)`);
+const test = stories.filter((s) => s.status === 'test').length;
+if (demo || test)
+  warnings.push(`${demo} demo templates and ${test} fictional test personas are in the content. Set CONTENT_MODE to 'live' in src/data/index.ts before launch.`);
 
 warnings.forEach((w) => console.warn(`  warn  ${w}`));
 errors.forEach((e) => console.error(`  error ${e}`));

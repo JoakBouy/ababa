@@ -1,5 +1,5 @@
 import { ArrowRight, Users } from 'lucide-react';
-import { places, programmes, sectorsForPlace, stories, storiesForPlace, unplacedProgrammes } from '../data';
+import { CONTENT_MODE, anyPlaceholders, places, programmes, sectorsForPlace, storiesForPlace, unplacedProgrammes } from '../data';
 import type { SectorId } from '../data/types';
 import { DemoTag, Portrait, SectionHeading, SectorDot, SourceLinks } from './bits';
 import { cn } from '../utils/cn';
@@ -15,7 +15,7 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
   const matches = (sectors: SectorId[]) => !sector || sectors.includes(sector);
   const withPeople = places.filter((p) => storiesForPlace(p.id).length > 0 && matches(sectorsForPlace(p)));
     const unplaced = unplacedProgrammes.filter((p) => matches(p.sectors));
-  const hasDemo = stories.some((s) => s.status === 'demo');
+  const hasDemo = anyPlaceholders;
   const allSourceIds = programmes.flatMap((p) => p.sourceIds);
 
   return (
@@ -29,8 +29,16 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
         </h2>
         {hasDemo && (
           <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-3 text-xs leading-snug text-amber-800">
-            The places and work shown are real, drawn from PRDA’s own materials and its partners. The people are{' '}
-            <strong className="font-semibold">demo profiles</strong>, holding a space for the real stories PRDA will add.
+            The places and work shown are real, drawn from PRDA’s own materials and its partners.{' '}
+            {CONTENT_MODE === 'test' ? (
+              <>
+                The people are <strong className="font-semibold">fictional test personas</strong>, used to try out the map until PRDA’s real stories are added.
+              </>
+            ) : (
+              <>
+                The people are <strong className="font-semibold">demo profiles</strong>, holding a space for the real stories PRDA will add.
+              </>
+            )}
           </p>
         )}
       </header>
@@ -73,7 +81,7 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
                       {people.map((s, i) => (
                         <span key={s.id} className="inline-flex items-center gap-1.5">
                           {s.name}
-                          {s.status === 'demo' && i === people.length - 1 && <DemoTag />}
+                          {i === people.length - 1 && <DemoTag status={s.status} />}
                           {i < people.length - 1 && <span aria-hidden="true">·</span>}
                         </span>
                       ))}
@@ -129,7 +137,7 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
             </li>
             <li>Back each impact with evidence: a record, survey, testimony or report.</li>
             <li>
-              Run <code className="font-mono text-[12px] text-on-surface">npm run validate</code>, then remove the demo profiles.
+              Run <code className="font-mono text-[12px] text-on-surface">npm run validate</code>, then set CONTENT_MODE to 'live' in src/data/index.ts.
             </li>
           </ol>
         </details>

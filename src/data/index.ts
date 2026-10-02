@@ -3,17 +3,29 @@ import { SECTOR_ORDER } from './sectors';
 import placesJson from './content/locations.json';
 import programmesJson from './content/programmes.json';
 import storiesJson from './content/stories.json';
+import testPersonasJson from './content/test-personas.json';
 import sourcesJson from './content/sources.json';
 
 /**
- * Set to false once PRDA's real stories are in, to hide demo profiles.
+ * Which people appear on the map:
+ *   'test' — fictional test personas with illustrated portraits (for trying the map out)
+ *   'demo' — empty story templates showing where real content goes
+ *   'live' — only PRDA's real stories from stories.json (demo templates hidden)
  */
-export const SHOW_DEMO_STORIES = true;
+export const CONTENT_MODE: 'test' | 'demo' | 'live' = 'test';
 
 export const places = placesJson as Place[];
 export const programmes = programmesJson as Programme[];
 export const sources = sourcesJson as Record<string, Source>;
-export const stories = (storiesJson as Story[]).filter((s) => SHOW_DEMO_STORIES || s.status !== 'demo');
+export const stories: Story[] =
+  CONTENT_MODE === 'test'
+    ? (testPersonasJson as Story[])
+    : (storiesJson as Story[]).filter((s) => CONTENT_MODE === 'demo' || s.status !== 'demo');
+
+/** True when a story is not a real, consented person. */
+export const isPlaceholder = (s: Story) => s.status === 'demo' || s.status === 'test';
+export const anyPlaceholders = stories.some(isPlaceholder);
+export const placeholderLabel = CONTENT_MODE === 'test' ? 'Test personas' : 'Demo stories';
 
 const programmeById = new Map(programmes.map((p) => [p.id, p]));
 const placeById = new Map(places.map((p) => [p.id, p]));

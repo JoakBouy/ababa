@@ -1,0 +1,212 @@
+[
+  {
+    "id": "leer-midwife",
+    "status": "test",
+    "name": "Nyakim",
+    "role": "Community midwife, trained at the Leer school",
+    "locationId": "leer",
+    "programmeIds": ["leer-midwifery"],
+    "sectors": ["health", "education"],
+    "headline": "Nyakim walked two days to start training. Today she is the midwife women in her village call first.",
+    "portrait": { "src": "media/test-personas/leer-midwife.svg", "alt": "Illustrated portrait of Nyakim, a test persona", "credit": "Illustration: Personas by Draftbit (CC BY 4.0)" },
+    "video": null,
+    "quote": "When a mother calls me at night, I go. Nobody came for my mother.",
+    "chapters": {
+      "before": "Nyakim grew up in a village outside Leer where women gave birth at home, helped only by relatives. When her older sister died in childbirth, she decided she wanted to learn how to keep mothers alive.",
+      "supported": "She was selected for the community midwifery course and spent two years learning antenatal care, safe delivery and how to spot danger signs early. After graduating she received a delivery kit and was placed at a health facility close to home.",
+      "changed": "Nyakim now runs antenatal visits twice a week and is on call at night. Women who once delivered alone now come to her early in their pregnancy, and she refers difficult cases before they become emergencies."
+    },
+    "support": [
+      { "label": "Two-year midwifery training", "detail": "Community midwifery diploma, Leer school" },
+      { "label": "Delivery kit and placement", "detail": "Placed at a health facility near her home village" }
+    ],
+    "impact": [
+      { "label": "Births attended since qualifying", "value": 214, "unit": "births", "evidence": { "type": "record", "note": "Test figure: facility delivery register", "sourceId": null } },
+      { "label": "Antenatal visits each week", "value": 30, "unit": "visits", "evidence": { "type": "record", "note": "Test figure: clinic attendance book", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": "Test data",
+    "recordedOn": null,
+    "relatedStoryIds": ["leer-mother"]
+  },
+  {
+    "id": "leer-mother",
+    "status": "test",
+    "name": "Nyaduoth",
+    "role": "Mother of three, cared for by Nyakim",
+    "locationId": "leer",
+    "programmeIds": ["leer-midwifery"],
+    "sectors": ["health"],
+    "headline": "Her first two babies were born at home. Her third was born with a trained midwife beside her.",
+    "portrait": { "src": "media/test-personas/leer-mother.svg", "alt": "Illustrated portrait of Nyaduoth, a test persona", "credit": "Illustration: Personas by Draftbit (CC BY 4.0)" },
+    "video": null,
+    "quote": "This time I was not afraid. Someone knew what to do.",
+    "chapters": {
+      "before": "Nyaduoth gave birth to her first two children at home. During the second birth she lost a lot of blood, and there was no one nearby who knew how to help.",
+      "supported": "In her third pregnancy she attended antenatal visits with Nyakim, who noticed early that the baby was in a difficult position and planned the birth at the health facility.",
+      "changed": "Her daughter was born safely. Nyaduoth now brings her sister and neighbours to the clinic when they are pregnant."
+    },
+    "support": [
+      { "label": "Antenatal care", "detail": "Four visits with a trained midwife" },
+      { "label": "Facility birth", "detail": "Delivery planned at the health facility" }
+    ],
+    "impact": [
+      { "label": "Antenatal visits attended", "value": 4, "unit": "visits", "evidence": { "type": "record", "note": "Test figure: antenatal card", "sourceId": null } },
+      { "label": "Outcome for mother and baby", "value": "Both healthy", "unit": null, "evidence": { "type": "testimony", "note": "Test data: interview", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": "Test data",
+    "recordedOn": null,
+    "relatedStoryIds": ["leer-midwife"]
+  },
+  {
+    "id": "juba-phsi-graduate",
+    "status": "test",
+    "name": "Achol",
+    "role": "Nurse, Presbyterian Health Science Institute graduate",
+    "locationId": "juba",
+    "programmeIds": ["phsi"],
+    "sectors": ["health", "education"],
+    "headline": "Achol was the first in her family to finish school. Now she runs the children's ward at a county hospital.",
+    "portrait": { "src": "media/test-personas/juba-phsi-graduate.svg", "alt": "Illustrated portrait of Achol, a test persona", "credit": "Illustration: Personas by Draftbit (CC BY 4.0)" },
+    "video": null,
+    "quote": "The children I nurse now could be my brothers and sisters. That is why I stay.",
+    "chapters": {
+      "before": "Achol grew up between Bor and Juba, moving whenever fighting came close. She finished secondary school late, and could not afford further study.",
+      "supported": "She won a place on the nursing diploma at PHSI, with support for fees and accommodation in Juba. Her training included placements on hospital wards.",
+      "changed": "After graduating she joined a county hospital, where she now leads the children's ward and trains newer nurses."
+    },
+    "support": [
+      { "label": "Nursing diploma", "detail": "Three years at PHSI, Juba" },
+      { "label": "Fees and accommodation", "detail": "Support throughout her studies" }
+    ],
+    "impact": [
+      { "label": "Children treated on her ward each month", "value": 120, "unit": "children", "evidence": { "type": "record", "note": "Test figure: ward admissions log", "sourceId": null } },
+      { "label": "Nurses she has mentored", "value": 6, "unit": "nurses", "evidence": { "type": "testimony", "note": "Test data: interview", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": "Test data",
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "pochalla-farmer",
+    "status": "test",
+    "name": "Ochan",
+    "role": "Farmer, Pochalla",
+    "locationId": "pochalla",
+    "programmeIds": ["pochalla-integrated"],
+    "sectors": ["food"],
+    "headline": "Ochan's family used to run out of food every rainy season. Last year they had grain to sell.",
+    "portrait": { "src": "media/test-personas/pochalla-farmer.svg", "alt": "Illustrated portrait of Ochan, a test persona", "credit": "Illustration: Personas by Draftbit (CC BY 4.0)" },
+    "video": null,
+    "quote": "Now my children eat in the hungry months too.",
+    "chapters": {
+      "before": "Ochan farms two plots near the river with his wife and five children. Seeds were often eaten before planting, and pests spoiled much of what they stored.",
+      "supported": "Through the programme he received improved sorghum and groundnut seed, tools, and training in planting, and joined a farmers' group that shares a storage store.",
+      "changed": "His harvest grew, and with better storage the family's grain now lasts through the rainy season. Last year they sold their surplus at the local market."
+    },
+    "support": [
+      { "label": "Seeds and tools", "detail": "Sorghum and groundnut seed, hoes" },
+      { "label": "Farmer training and group storage", "detail": "Training sessions and a shared grain store" }
+    ],
+    "impact": [
+      { "label": "Months the harvest lasts", "value": "10 (was 5)", "unit": null, "evidence": { "type": "survey", "note": "Test figure: household survey", "sourceId": null } },
+      { "label": "Sacks of grain sold last season", "value": 6, "unit": "sacks", "evidence": { "type": "testimony", "note": "Test data: interview", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": "Test data",
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "uror-water",
+    "status": "test",
+    "name": "Nyabol",
+    "role": "Water committee member, Uror County",
+    "locationId": "uror",
+    "programmeIds": ["uror-agri-wash"],
+    "sectors": ["water"],
+    "headline": "Nyabol used to spend her mornings fetching water. Now she keeps the village borehole running.",
+    "portrait": { "src": "media/test-personas/uror-water.svg", "alt": "Illustrated portrait of Nyabol, a test persona", "credit": "Illustration: Personas by Draftbit (CC BY 4.0)" },
+    "video": null,
+    "quote": "My daughters go to school in the morning now, not to the river.",
+    "chapters": {
+      "before": "Every morning Nyabol and her daughters walked to a seasonal pond to collect water, shared with cattle. Children in the village often fell sick with diarrhoea.",
+      "supported": "A borehole was drilled at the centre of the village, and Nyabol was elected to the water committee and trained in hygiene promotion and basic repairs.",
+      "changed": "Families now collect clean water close to home. Nyabol collects a small monthly fee for repairs and leads hygiene sessions at the school."
+    },
+    "support": [
+      { "label": "Borehole", "detail": "Drilled at the village centre" },
+      { "label": "Water committee training", "detail": "Hygiene promotion and repairs" }
+    ],
+    "impact": [
+      { "label": "Daily time spent collecting water", "value": "20 min (was 3 hrs)", "unit": null, "evidence": { "type": "survey", "note": "Test figure: baseline and follow-up", "sourceId": null } },
+      { "label": "Households using the borehole", "value": 85, "unit": "households", "evidence": { "type": "observation", "note": "Test data: committee register", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": "Test data",
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "bor-flood",
+    "status": "test",
+    "name": "Deng",
+    "role": "Father of four, displaced by floods near Bor",
+    "locationId": "bor",
+    "programmeIds": ["act-ssd241"],
+    "sectors": ["relief", "protection"],
+    "headline": "The floods took Deng's home and cattle. The family is now rebuilding on higher ground.",
+    "portrait": { "src": "media/test-personas/bor-flood.svg", "alt": "Illustrated portrait of Deng, a test persona", "credit": "Illustration: Personas by Draftbit (CC BY 4.0)" },
+    "video": null,
+    "quote": "We lost everything in one night. We are standing again, slowly.",
+    "chapters": {
+      "before": "When the river rose, Deng's family fled their village with almost nothing. They spent weeks in a crowded site for displaced families.",
+      "supported": "The family received shelter materials, household items and food, and the children joined a temporary learning space. Deng took part in community preparedness meetings.",
+      "changed": "They have built a new home on higher ground and the children are back in school. Deng now helps his neighbours plan for the next flood season."
+    },
+    "support": [
+      { "label": "Shelter and household items", "detail": "Plastic sheeting, blankets, cooking set" },
+      { "label": "Learning space for the children", "detail": "Temporary classroom at the site" }
+    ],
+    "impact": [
+      { "label": "Children back in school", "value": 3, "unit": "of 4", "evidence": { "type": "record", "note": "Test figure: school enrolment", "sourceId": null } },
+      { "label": "Family's situation today", "value": "Rebuilt home", "unit": null, "evidence": { "type": "testimony", "note": "Test data: follow-up interview", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": "Test data",
+    "recordedOn": null,
+    "relatedStoryIds": []
+  },
+  {
+    "id": "akobo-health-worker",
+    "status": "test",
+    "name": "Gatluak",
+    "role": "Clinical officer, Akobo",
+    "locationId": "akobo",
+    "programmeIds": ["akobo-integrated"],
+    "sectors": ["health"],
+    "headline": "Gatluak keeps a small clinic open in a place where the nearest hospital is days away.",
+    "portrait": { "src": "media/test-personas/akobo-health-worker.svg", "alt": "Illustrated portrait of Gatluak, a test persona", "credit": "Illustration: Personas by Draftbit (CC BY 4.0)" },
+    "video": null,
+    "quote": "If the clinic closes, people walk for days. So it does not close.",
+    "chapters": {
+      "before": "Gatluak returned to Akobo after years away and found the local clinic without medicines for weeks at a time.",
+      "supported": "Through the programme the clinic received regular essential medicines, and Gatluak was trained to treat malaria, pneumonia and diarrhoea in children.",
+      "changed": "The clinic now opens every day. Gatluak treats most cases locally and refers only the most serious ones."
+    },
+    "support": [
+      { "label": "Essential medicines", "detail": "Regular supply to the clinic" },
+      { "label": "Clinical training", "detail": "Treatment of common childhood illnesses" }
+    ],
+    "impact": [
+      { "label": "Patients seen each month", "value": 450, "unit": "patients", "evidence": { "type": "record", "note": "Test figure: clinic register", "sourceId": null } },
+      { "label": "Days the clinic is open each week", "value": 7, "unit": "days", "evidence": { "type": "observation", "note": "Test data", "sourceId": null } }
+    ],
+    "consent": { "obtained": false, "date": null, "scope": null },
+    "recordedBy": "Test data",
+    "recordedOn": null,
+    "relatedStoryIds": []
+  }
+]

@@ -5,13 +5,14 @@ import { sources } from '../data';
 import type { SectorId, Story } from '../data/types';
 import { cn } from '../utils/cn';
 
-export function DemoTag({ className }: { className?: string }) {
+export function DemoTag({ className, status = 'demo' }: { className?: string; status?: Story['status'] }) {
+  if (status !== 'demo' && status !== 'test') return null;
   return (
     <span
       className={cn('inline-flex items-center rounded bg-amber-500/10 px-1.5 py-0.5 font-label text-[9px] font-bold tracking-wider text-amber-700 uppercase', className)}
-      title="Demo profile: not a real person"
+      title={status === 'test' ? 'Test persona: fictional, for trying out the map' : 'Demo profile: not a real person'}
     >
-      Demo
+      {status === 'test' ? 'Test' : 'Demo'}
     </span>
   );
 }
@@ -50,11 +51,12 @@ export function Portrait({
   size?: 'tile' | 'hero' | 'thumb';
 }) {
   if (story.portrait) {
+    const illustration = story.portrait.src.endsWith('.svg');
     return (
       <img
         src={story.portrait.src}
         alt={story.portrait.alt}
-        className={cn('h-full w-full object-cover', className)}
+        className={cn('h-full w-full object-cover', illustration ? 'object-[50%_20%]' : 'object-top', className)}
         loading="lazy"
       />
     );

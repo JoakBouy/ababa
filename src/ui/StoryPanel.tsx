@@ -34,7 +34,8 @@ function Chapter({ index, title, text, demo, children }: { index: number; title:
 
 export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
   const place = getPlace(story.locationId)!;
-  const demo = story.status === 'demo';
+  const demo = story.status === 'demo'; // empty template text
+  const test = story.status === 'test';
   const progs = story.programmeIds.map(getProgramme).filter(Boolean);
   const related = story.relatedStoryIds.map((id) => getStory(id)).filter(Boolean) as Story[];
   const samePlace = storiesForPlace(place.id).filter((s) => s.id !== story.id && !story.relatedStoryIds.includes(s.id));
@@ -57,7 +58,7 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="font-headline text-2xl leading-tight font-bold tracking-tight text-on-surface">{story.name}</h1>
-            {demo && <DemoTag className="text-[11px]" />}
+            <DemoTag className="text-[11px]" status={story.status} />
           </div>
           <p className="text-[14px] text-on-surface-variant">{story.role}</p>
           <button
@@ -70,6 +71,12 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
           </button>
         </div>
 
+        {test && (
+          <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-3 text-xs leading-snug text-amber-800">
+            <strong className="font-semibold">Test persona.</strong> {story.name} is fictional, and so are this story and its figures. They are here to try
+            out the map until real stories from {place.name} are added.
+          </p>
+        )}
         {demo && (
           <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-3 text-xs leading-snug text-amber-800">
             <strong className="font-semibold">Demo profile.</strong> This is not a real person. It shows how a story
@@ -153,7 +160,7 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
         </summary>
         <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[13px]">
           <dt className="text-on-surface-variant">Story</dt>
-          <dd className="text-on-surface">{demo ? 'Demo profile' : story.status === 'draft' ? 'Draft, not yet approved' : 'Published'}</dd>
+          <dd className="text-on-surface">{demo ? 'Demo profile' : test ? 'Fictional test persona' : story.status === 'draft' ? 'Draft, not yet approved' : 'Published'}</dd>
           <dt className="text-on-surface-variant">Consent</dt>
           <dd className="text-on-surface">
             {story.consent.obtained ? `Recorded${story.consent.date ? ` ${story.consent.date}` : ''}${story.consent.scope ? ` · ${story.consent.scope}` : ''}` : 'Not recorded'}
@@ -184,7 +191,7 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
                   <span className="min-w-0">
                     <span className="flex items-center gap-2">
                       <span className="font-headline text-base font-bold text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
-                      {s.status === 'demo' && <DemoTag />}
+                      <DemoTag status={s.status} />
                     </span>
                     <span className="block truncate text-[12.5px] text-on-surface-variant">{s.role}</span>
                   </span>

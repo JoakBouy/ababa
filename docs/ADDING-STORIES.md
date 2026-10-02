@@ -60,6 +60,16 @@ Copy this into `stories.json` and fill it in:
 - `impact.value`: leave `null` until you have the evidence. Never estimate.
 - `evidence.type`: `record`, `survey`, `testimony`, `observation` or `external`. If the evidence is a published report, add it to `sources.json` and put its id in `sourceId`.
 
+## Test personas
+
+While real stories are being collected, the map runs on **fictional test personas** (`src/data/content/test-personas.json`), each with an illustrated portrait in `public/media/test-personas/`. They are labelled "Test" everywhere. The portraits are drawn with the open-source Personas set by Draftbit (CC BY 4.0) and can be regenerated with `scripts/generate-test-portraits.cjs`.
+
+`CONTENT_MODE` in `src/data/index.ts` chooses what appears:
+
+- `'test'`: the fictional test personas (current setting)
+- `'demo'`: empty story templates showing where content goes
+- `'live'`: only PRDA's real stories. Use this before launch.
+
 ## 3. Check and publish
 
 ```bash
