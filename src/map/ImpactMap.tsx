@@ -8,7 +8,6 @@ import 'leaflet/dist/leaflet.css';
 import countiesGeo from '../data/geo/counties.json';
 import statesGeo from '../data/geo/states.json';
 import outlineGeo from '../data/geo/outline.json';
-import neighboursGeo from '../data/geo/neighbours.json';
 import riversGeo from '../data/geo/rivers.json';
 import { placeByCounty, places, sectorsForPlace, storiesForPlace } from '../data';
 import { SECTORS } from '../data/sectors';
@@ -18,17 +17,7 @@ import { cn } from '../utils/cn';
 const counties = countiesGeo as unknown as FeatureCollection<Geometry, { name: string }>;
 const states = statesGeo as unknown as FeatureCollection<Geometry, { name: string; label: [number, number] }>;
 const outline = outlineGeo as unknown as FeatureCollection;
-const neighbours = neighboursGeo as unknown as FeatureCollection;
 const rivers = riversGeo as unknown as FeatureCollection<Geometry, { name: string; scalerank: number }>;
-
-const COUNTRY_LABELS: [string, [number, number]][] = [
-  ['Sudan', [12.9, 28.6]],
-  ['Ethiopia', [8.6, 36.4]],
-  ['Kenya', [3.0, 36.4]],
-  ['Uganda', [2.7, 32.4]],
-  ['DR Congo', [3.1, 26.4]],
-  ['Central African Rep.', [7.4, 22.6]],
-];
 
 /** Nudge state names off PRDA markers so labels never collide. */
 const STATE_LABEL_POS: Record<string, [number, number]> = {
@@ -125,7 +114,6 @@ export default function ImpactMap({
   const infoByCounty = useMemo(() => new Map(placeInfo.map((i) => [i.place.county, i])), [placeInfo]);
   const icons = useMemo(() => new Map(placeInfo.map((i) => [i.place.id, placeIcon(i.place, i.storyCount, i.sectors)])), [placeInfo]);
   const stateIcons = useMemo(() => new Map(states.features.map((f) => [f.properties.name, labelIcon(f.properties.name, 'state')])), []);
-  const countryIcons = useMemo(() => new Map(COUNTRY_LABELS.map(([n]) => [n, labelIcon(n, 'country')])), []);
   const markerRefs = useRef(new Map<string, L.Marker>());
   const [viewTick, setViewTick] = useState(0);
   const onView = useCallback((z: number) => {
@@ -187,6 +175,17 @@ export default function ImpactMap({
     if (map) onMapReady(map);
   }, [map, onMapReady]);
 
+  // Never let the view zoom out past the whole of South Sudan
+  useEffect(() => {
+    if (!map) return;
+    const fit = () => map.setMinZoom(Math.max(4, map.getBoundsZoom(NATIONAL_BOUNDS, false, L.point(32, 32)) - 0.3));
+    fit();
+    map.on('resize', fit);
+    return () => {
+      map.off('resize', fit);
+    };
+  }, [map]);
+
   // Sync marker state onto the existing marker elements
   useEffect(() => {
     placeInfo.forEach(({ place, sectors, storyCount }) => {
@@ -212,7 +211,7 @@ export default function ImpactMap({
   const countyStyle = useCallback(
     (feature?: Feature<Geometry, { name: string }>): L.PathOptions => {
       const info = feature ? infoByCounty.get(feature.properties.name) : undefined;
-      if (!info) return { fillColor: '#fff', fillOpacity: 0, color: '#e6dccd', weight: 0.7, opacity: 1, interactive: false };
+      if (!info) return { fillColor: '#fff', fillOpacity: 0, color: '#e2d4c0', weight: 0.7, opacity: 1, interactive: false };
       const match = !sector || info.sectors.includes(sector);
       const selected = info.place.id === selectedPlaceId;
       const hovered = info.place.id === hoveredPlaceId;
@@ -244,21 +243,18 @@ export default function ImpactMap({
     });
   };
 
-  const maxBounds: LatLngBoundsExpression = [
-    [-3, 17],
-    [17, 43],
-  ];
+  const maxBounds: LatLngBoundsExpression = NATIONAL_BOUNDS.pad(0.35);
 
   return (
     <MapContainer
       ref={setMap}
       bounds={NATIONAL_BOUNDS}
-      boundsOptions={{ padding: [24, 24] }}
+      boundsOptions={{ padding: [16, 16] }}
       zoomControl={false}
       // Leaflet's keyboard handler focuses the map on mousedown, which scrolls the page
       // mid-click (our scroll container is not the window) and makes marker clicks miss.
       keyboard={false}
-      zoomSnap={0.25}
+      zoomSnap={0.1}
       zoomDelta={0.5}
       minZoom={4.5}
       maxZoom={10}
@@ -269,12 +265,11 @@ export default function ImpactMap({
     >
       <ViewWatcher onView={onView} />
       <GeoJSON
-        data={neighbours}
+        data={outline}
         interactive={false}
-        style={{ fillColor: '#f5eee3', fillOpacity: 1, color: '#d9ccba', weight: 1 }}
+        style={{ fillColor: '#f4ecdf', fillOpacity: 1, color: '#a8977f', weight: 1.8 }}
         attribution='Boundaries <a href="https://www.geoboundaries.org" target="_blank" rel="noreferrer">geoBoundaries</a> (CC BY 4.0) · <a href="https://www.naturalearthdata.com" target="_blank" rel="noreferrer">Natural Earth</a>'
       />
-      <GeoJSON data={outline} interactive={false} style={{ fillColor: '#fffdf9', fillOpacity: 1, color: '#8b7d6c', weight: 1.4 }} />
       <GeoJSON ref={countiesRef} data={counties} style={countyStyle as L.StyleFunction} onEachFeature={onEachCounty as any} />
       <GeoJSON data={states} interactive={false} style={{ fill: false, color: '#c4b6a3', weight: 1.1, opacity: 1 }} />
       <GeoJSON
@@ -286,10 +281,6 @@ export default function ImpactMap({
       {zoom < 7.25 &&
         states.features.map((f) => (
           <Marker key={f.properties.name} position={STATE_LABEL_POS[f.properties.name] ?? f.properties.label} icon={stateIcons.get(f.properties.name)!} interactive={false} keyboard={false} />
-        ))}
-      {zoom < 6.75 &&
-        COUNTRY_LABELS.map(([name, pos]) => (
-          <Marker key={name} position={pos} icon={countryIcons.get(name)!} interactive={false} keyboard={false} />
         ))}
 
       {placeInfo.map(({ place, sectors, storyCount }) => {

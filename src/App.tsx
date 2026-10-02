@@ -159,11 +159,23 @@ function Shell() {
     if (!map) return;
     const animate = !reducedMotion();
     if (place) {
-      map.flyTo(place.coords, place.coordsPrecision === 'county' ? 7.25 : 7.5, { duration: animate ? 1.5 : 0, animate });
+      // Centre slightly above the place so its popup has room above the marker
+      const zoom = place.coordsPrecision === 'county' ? 7.25 : 7.5;
+      const target = map.unproject(map.project(place.coords, zoom).subtract([0, map.getSize().y * 0.18]), zoom);
+      map.flyTo(target, zoom, { duration: animate ? 1.5 : 0, animate });
     } else {
       map.closePopup();
-      map.flyToBounds(NATIONAL_BOUNDS, { padding: [24, 24], duration: animate ? 1.5 : 0, animate });
+      map.flyToBounds(NATIONAL_BOUNDS, { padding: [16, 16], duration: animate ? 1.5 : 0, animate });
     }
+  }, [map, place]);
+
+  useEffect(() => {
+    if (!map || place) return;
+    const refit = () => map.fitBounds(NATIONAL_BOUNDS, { padding: [16, 16], animate: false });
+    map.on('resize', refit);
+    return () => {
+      map.off('resize', refit);
+    };
   }, [map, place]);
 
   // Keep the panel in step with the journey
@@ -299,7 +311,7 @@ function Shell() {
               className={cn('relative flex flex-col overflow-hidden transition-all duration-300', isFullscreen ? 'fixed inset-0 z-50 h-screen w-screen' : '')}
             >
               {/* Top Left Focus Card */}
-              <div className={cn("absolute top-4 left-4 z-[500] max-w-[calc(100%-80px)] rounded-xl border border-outline-variant/40 bg-surface-container-lowest/95 p-3.5 shadow-lg backdrop-blur-md sm:max-w-sm", place && "hidden sm:block")}>
+              <div className={cn("absolute top-4 left-4 z-[500] max-w-[calc(100%-80px)] rounded-xl border border-outline-variant/40 bg-surface-container-lowest/95 p-3.5 shadow-lg backdrop-blur-md sm:max-w-sm", "hidden sm:block")}>
                 <p className="mb-1 font-label text-[10px] font-bold tracking-widest text-[#A84A23] uppercase">
                   {place ? `${place.state}, South Sudan` : 'Start here'}
                 </p>
@@ -327,7 +339,7 @@ function Shell() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => (place ? navigate('/') : map?.flyToBounds(NATIONAL_BOUNDS, { padding: [24, 24], duration: 1.5 }))}
+                  onClick={() => (place ? navigate('/') : map?.flyToBounds(NATIONAL_BOUNDS, { padding: [16, 16], duration: 1.5 }))}
                   className={ctrl}
                   title="Reset National View"
                   aria-label="Reset national view"
@@ -368,7 +380,7 @@ function Shell() {
                 ))}
               </div>
 
-              <div className={cn('relative z-0 bg-[#efe6d8]', isFullscreen ? 'h-full w-full' : 'h-[480px] sm:h-[580px] lg:h-[660px]')}>
+              <div className={cn('relative z-0 bg-surface-container-lowest', isFullscreen ? 'h-full w-full' : 'h-[400px] sm:h-[580px] lg:h-[700px]')}>
                 <ImpactMap
                   selectedPlaceId={place?.id}
                   selectedStory={story}
@@ -382,7 +394,7 @@ function Shell() {
               </div>
             </div>
 
-            <aside ref={panelRef} className="min-w-0 scroll-mt-4 border-t border-outline-variant/30 lg:h-[660px] lg:overflow-y-auto lg:border-t-0 lg:border-l">
+            <aside ref={panelRef} className="min-w-0 scroll-mt-4 border-t border-outline-variant/30 lg:h-[700px] lg:overflow-y-auto lg:border-t-0 lg:border-l">
               <nav
                 aria-label="Breadcrumb"
                 className="sticky top-0 z-10 flex items-center gap-1 border-b border-outline-variant/30 bg-surface-container-lowest/95 px-5 py-3 text-xs backdrop-blur-md sm:px-6"

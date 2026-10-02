@@ -116,7 +116,7 @@ body { color-scheme: light; }
 }
 
 /* Basemap (vector, so it works without tile servers) */
-.leaflet-container { background: #efe6d8; font-family: var(--font-body); }
+.leaflet-container { background: var(--color-surface-container-lowest); font-family: var(--font-body); }
 .leaflet-container .leaflet-control-attribution { font-size: 10px; background: rgba(255,253,249,0.85); }
 .leaflet-tooltip.county-tip {
   background: rgba(255,255,255,0.95);
@@ -140,7 +140,6 @@ body { color-scheme: light; }
   display: inline-block;
 }
 .map-label--state { font-size: 9px; color: rgba(106,93,79,0.5); }
-.map-label--country { font-size: 10px; color: rgba(106,93,79,0.4); letter-spacing: 0.3em; }
 
 /* Place markers: Ababa's ping + white-bordered dot, with a persona marker where stories exist */
 .pm { position: absolute; inset: 0; display: grid; place-items: center; transition: transform 0.25s ease, opacity 0.25s ease; }
