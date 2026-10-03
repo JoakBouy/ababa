@@ -14,7 +14,30 @@
     "status": "active",
     "partners": [],
     "locationIds": [
-      "juba"
+      "juba",
+      "malakal",
+      "renk",
+      "fangak",
+      "yei",
+      "nimule",
+      "kakuma",
+      "rubkona",
+      "pibor",
+      "rumbek",
+      "chuil",
+      "bor",
+      "akobo",
+      "leer",
+      "abiemnhom",
+      "pariang",
+      "wau",
+      "abyei",
+      "koch",
+      "ayod",
+      "mayendit",
+      "canal",
+      "ulang",
+      "mandeang"
     ],
     "facts": [],
     "sourceIds": [
@@ -124,7 +147,8 @@
     "status": "active",
     "partners": [],
     "locationIds": [
-      "uror"
+      "uror",
+      "pieri"
     ],
     "facts": [],
     "sourceIds": [
@@ -227,7 +251,12 @@
       "nasir",
       "ulang",
       "juba",
-      "kodok"
+      "kodok",
+      "canal",
+      "pieri",
+      "leer",
+      "mandeang",
+      "abyei"
     ],
     "facts": [],
     "sourceIds": [
@@ -261,7 +290,9 @@
       "malakal",
       "renk",
       "pochalla",
-      "pibor"
+      "pibor",
+      "canal",
+      "leer"
     ],
     "facts": [
       {
@@ -314,6 +345,87 @@
     "facts": [],
     "sourceIds": [
       "pcusa-wash"
+    ]
+  },
+  {
+    "id": "peacebuilding",
+    "name": "Peace Building and Conflict Transformation",
+    "summary": "Grassroots peace dialogues, community reconciliation forums, and cross-clan conflict transformation along the Sobat corridor and Upper Nile.",
+    "sectors": [
+      "protection"
+    ],
+    "years": {
+      "start": 2018,
+      "end": null
+    },
+    "status": "active",
+    "partners": [
+      "Mission 21",
+      "PCOSS"
+    ],
+    "locationIds": [
+      "ulang",
+      "nasir",
+      "canal",
+      "ayod",
+      "juba",
+      "leer",
+      "abyei"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-about",
+      "prda-field-records"
+    ]
+  },
+  {
+    "id": "gbv-protection",
+    "name": "Gender-Based Violence (GBV) and Protection",
+    "summary": "Protection services, safe spaces, dignity kit distribution, and trauma healing for women, girls, and displaced families.",
+    "sectors": [
+      "protection"
+    ],
+    "years": {
+      "start": 2020,
+      "end": null
+    },
+    "status": "active",
+    "partners": [
+      "UNFPA",
+      "ACT Alliance"
+    ],
+    "locationIds": [
+      "nasir"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-about",
+      "prda-field-records"
+    ]
+  },
+  {
+    "id": "medical-camps",
+    "name": "Community Medical Camps & Health Outreach",
+    "summary": "Mobile multi-disciplinary medical camps delivering free doctor consultations, maternal checkups, pediatric treatments, and essential medicines to peri-urban settlements and displaced communities.",
+    "sectors": [
+      "health"
+    ],
+    "years": {
+      "start": 2021,
+      "end": null
+    },
+    "status": "active",
+    "partners": [
+      "Presbyterian Church of South Sudan",
+      "Ministry of Health"
+    ],
+    "locationIds": [
+      "juba"
+    ],
+    "facts": [],
+    "sourceIds": [
+      "prda-about",
+      "prda-field-records"
     ]
   }
 ]

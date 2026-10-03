@@ -31,7 +31,9 @@ const STATE_LABEL_POS: Record<string, [number, number]> = {
   Unity: [9.35, 29.35],
 };
 
-export const NATIONAL_BOUNDS = L.geoJSON(outline as any).getBounds();
+const rawBounds = L.geoJSON(outline as any).getBounds();
+// Frame national bounds tightly around South Sudan and Kakuma cross-border post
+export const NATIONAL_BOUNDS = rawBounds.extend([3.71, 34.86]).pad(0.02);
 
 const PERSON_GLYPH =
   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
@@ -40,7 +42,7 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 }
 
-export const PRDA_ACCENT = '#A84A23';
+export const PRDA_ACCENT = '#008751';
 
 /**
  * Each marker's DOM is built once. Selection, hover, filter and label visibility are then
@@ -283,7 +285,7 @@ export default function ImpactMap({
     });
   };
 
-  const maxBounds: LatLngBoundsExpression = NATIONAL_BOUNDS.pad(0.35);
+  const maxBounds: LatLngBoundsExpression = NATIONAL_BOUNDS.pad(0.06);
 
   return (
     <MapContainer
@@ -307,8 +309,8 @@ export default function ImpactMap({
       <GeoJSON
         data={outline}
         interactive={false}
-        style={{ fillColor: '#f4ecdf', fillOpacity: 1, color: '#a8977f', weight: 1.8 }}
-        attribution='Boundaries <a href="https://www.geoboundaries.org" target="_blank" rel="noreferrer">geoBoundaries</a> (CC BY 4.0) · <a href="https://www.naturalearthdata.com" target="_blank" rel="noreferrer">Natural Earth</a>'
+        style={{ fillColor: '#fcfaf5', fillOpacity: 1, color: '#008751', weight: 2, opacity: 0.95 }}
+        attribution='Boundaries <a href="https://www.geoboundaries.org" target="_blank" rel="noreferrer">geoBoundaries</a> (CC BY 4.0)'
       />
       <GeoJSON ref={countiesRef} data={counties} style={countyStyle as L.StyleFunction} onEachFeature={onEachCounty as any} />
       <GeoJSON data={states} interactive={false} style={{ fill: false, color: '#c4b6a3', weight: 1.1, opacity: 1 }} />
@@ -365,7 +367,7 @@ export default function ImpactMap({
                   <span
                     className={cn(
                       'rounded px-1.5 py-0.5 text-[9px] font-bold uppercase',
-                      storyCount ? 'bg-[#A84A23]/10 text-[#A84A23]' : 'bg-surface-container text-on-surface-variant',
+                      storyCount ? 'bg-[#008751]/10 text-[#008751]' : 'bg-surface-container text-on-surface-variant',
                     )}
                   >
                     {storyCount ? `${storyCount} to meet` : 'Stories to come'}
@@ -390,7 +392,7 @@ export default function ImpactMap({
                           onClick={() => onOpenStory(p.id)}
                           className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1 text-left transition-colors hover:bg-surface-container"
                         >
-                          <span className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-[#A84A23]/10 text-[#A84A23]">
+                          <span className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-[#008751]/10 text-[#008751]">
                             {p.portrait ? <img src={p.portrait.src} alt="" className="h-full w-full object-cover" /> : <User className="h-3.5 w-3.5" />}
                           </span>
                           <span className="min-w-0 flex-1 truncate text-xs font-semibold text-on-surface">{p.name}</span>
@@ -406,7 +408,7 @@ export default function ImpactMap({
                 <button
                   type="button"
                   onClick={() => selectRef.current(place.id, true)}
-                  className="w-full rounded-lg bg-[#A84A23] px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#8f3d1c]"
+                  className="w-full rounded-lg bg-[#008751] px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#007043]"
                 >
                   {storyCount ? `Meet the people of ${place.name}` : 'See PRDA’s work here'}
                 </button>

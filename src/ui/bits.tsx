@@ -68,10 +68,10 @@ export function Portrait({
       aria-label={`Portrait of ${story.name} still to come`}
     >
       {size === 'thumb' ? (
-        <User className="h-4 w-4 text-[#A84A23]" aria-hidden="true" />
+        <User className="h-4 w-4 text-[#008751]" aria-hidden="true" />
       ) : (
         <>
-          <span className={cn('grid place-items-center rounded-full border-2 border-[#A84A23] bg-white text-[#A84A23] shadow-md', size === 'hero' ? 'h-16 w-16' : 'h-12 w-12')}>
+          <span className={cn('grid place-items-center rounded-full border-2 border-[#008751] bg-white text-[#008751] shadow-md', size === 'hero' ? 'h-16 w-16' : 'h-12 w-12')}>
             <User className={size === 'hero' ? 'h-8 w-8' : 'h-6 w-6'} aria-hidden="true" />
           </span>
           <span className="mt-1 font-label text-[10px] font-bold tracking-wider uppercase">Portrait to come</span>
@@ -96,7 +96,7 @@ export function VideoBlock({ story }: { story: Story }) {
   if (v.kind === 'file') {
     return (
       <figure className="flex flex-col gap-2">
-        <video controls preload="metadata" poster={v.poster} className="aspect-video w-full max-w-full rounded-md bg-black">
+        <video controls preload="metadata" poster={v.poster} className="aspect-video w-full max-w-full rounded-xl bg-black shadow-md">
           <source src={v.src} />
         </video>
         {v.caption && <figcaption className="text-[12.5px] text-on-surface-variant">{v.caption}</figcaption>}
@@ -113,13 +113,13 @@ export function VideoBlock({ story }: { story: Story }) {
       <iframe
         src={src}
         title={`Video: ${story.name}`}
-        className="aspect-video w-full max-w-full rounded-md bg-black"
+        className="aspect-video w-full max-w-full rounded-xl bg-black shadow-md"
         allow="accelerometer; encrypted-media; picture-in-picture"
         allowFullScreen
       />
       <figcaption className="flex items-center justify-between gap-3 text-[12.5px] text-on-surface-variant">
         <span>{v.caption}</span>
-        <a href={watch} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[#A84A23] hover:underline">
+        <a href={watch} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[#008751] hover:underline">
           Watch on {v.kind === 'youtube' ? 'YouTube' : 'Vimeo'} <ExternalLink className="h-3 w-3" />
         </a>
       </figcaption>
@@ -138,11 +138,11 @@ export function SourceLinks({ ids, className }: { ids: string[]; className?: str
             href={sources[id].url}
             target="_blank"
             rel="noreferrer"
-            className="group inline-flex items-baseline gap-1.5 text-on-surface-variant hover:text-[#A84A23]"
+            className="group inline-flex items-baseline gap-1.5 text-on-surface-variant hover:text-[#008751]"
           >
             <ExternalLink className="h-3 w-3 shrink-0 translate-y-[1px]" aria-hidden="true" />
             <span>
-              <span className="font-medium text-on-surface group-hover:text-[#A84A23]">{sources[id].publisher}</span>
+              <span className="font-medium text-on-surface group-hover:text-[#008751]">{sources[id].publisher}</span>
               {' · '}
               {sources[id].title}
             </span>

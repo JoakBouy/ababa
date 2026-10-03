@@ -22,7 +22,7 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
     <div className="flex flex-col gap-7">
       <header className="flex flex-col gap-4">
         <h2 className="flex items-center gap-2.5 font-headline text-lg font-bold text-on-surface">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-[#A84A23]/10 text-[#A84A23]">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-[#008751]/10 text-[#008751]">
             <Users className="h-4 w-4" aria-hidden="true" />
           </span>
           Who you’ll meet
@@ -87,7 +87,7 @@ export default function NationalPanel({ sector, onOpenPlace, onHoverPlace, hover
                       ))}
                     </span>
                   </span>
-                  <ArrowRight className="h-4 w-4 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-[#A84A23]" />
+                  <ArrowRight className="h-4 w-4 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-[#008751]" />
                 </button>
               </li>
             );

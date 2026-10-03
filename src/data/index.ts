@@ -6,6 +6,8 @@ import storiesJson from './content/stories.json';
 import testPersonasJson from './content/test-personas.json';
 import sourcesJson from './content/sources.json';
 
+import { loadAdminPlaces, loadAdminProgrammes, loadAdminStories } from './DataManager';
+
 /**
  * Which people appear on the map:
  *   'test' — fictional test personas with illustrated portraits (for trying the map out)
@@ -14,22 +16,58 @@ import sourcesJson from './content/sources.json';
  */
 export const CONTENT_MODE: 'test' | 'demo' | 'live' = 'test';
 
-export const places = placesJson as Place[];
-export const programmes = programmesJson as Programme[];
+export const places: Place[] = [];
+export const programmes: Programme[] = [];
 export const sources = sourcesJson as Record<string, Source>;
-export const stories: Story[] =
-  CONTENT_MODE === 'test'
-    ? (testPersonasJson as Story[])
-    : (storiesJson as Story[]).filter((s) => CONTENT_MODE === 'demo' || s.status !== 'demo');
+export const stories: Story[] = [];
 
 /** True when a story is not a real, consented person. */
 export const isPlaceholder = (s: Story) => s.status === 'demo' || s.status === 'test';
-export const anyPlaceholders = stories.some(isPlaceholder);
+export let anyPlaceholders = false;
 export const placeholderLabel = CONTENT_MODE === 'test' ? 'Test personas' : 'Demo stories';
 
-const programmeById = new Map(programmes.map((p) => [p.id, p]));
-const placeById = new Map(places.map((p) => [p.id, p]));
-const storyById = new Map(stories.map((s) => [s.id, s]));
+export const programmeById = new Map<string, Programme>();
+export const placeById = new Map<string, Place>();
+export const storyById = new Map<string, Story>();
+export const placeByCounty = new Map<string, Place>();
+export const unplacedProgrammes: Programme[] = [];
+
+export function reloadData() {
+  places.length = 0;
+  programmes.length = 0;
+  stories.length = 0;
+  unplacedProgrammes.length = 0;
+
+  const loadedPlaces = loadAdminPlaces();
+  const loadedProgrammes = loadAdminProgrammes();
+  const loadedStories = loadAdminStories();
+
+  places.push(...loadedPlaces);
+  programmes.push(...loadedProgrammes);
+  stories.push(...loadedStories);
+
+  programmeById.clear();
+  placeById.clear();
+  storyById.clear();
+  placeByCounty.clear();
+
+  programmes.forEach((p) => programmeById.set(p.id, p));
+  places.forEach((p) => {
+    placeById.set(p.id, p);
+    placeByCounty.set(p.county, p);
+  });
+  stories.forEach((s) => storyById.set(s.id, s));
+
+  unplacedProgrammes.push(...programmes.filter((p) => p.locationIds.length === 0));
+  anyPlaceholders = stories.some(isPlaceholder);
+}
+
+// Initial load
+reloadData();
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('prda_data_changed', reloadData);
+}
 
 export const getPlace = (id?: string) => (id ? placeById.get(id) : undefined);
 export const getStory = (id?: string) => (id ? storyById.get(id) : undefined);
@@ -49,10 +87,6 @@ export function sectorsForPlace(place: Place): SectorId[] {
   storiesForPlace(place.id).forEach((s) => s.sectors.forEach((x) => set.add(x)));
   return SECTOR_ORDER.filter((s) => set.has(s));
 }
-
-export const unplacedProgrammes = programmes.filter((p) => p.locationIds.length === 0);
-
-export const placeByCounty = new Map(places.map((p) => [p.county, p]));
 
 export function yearsLabel(p: Programme): string | null {
   const { start, end } = p.years;

@@ -22,7 +22,7 @@ interface Props {
 function Chapter({ index, title, text, demo, children }: { index: number; title: string; text: string; demo: boolean; children?: React.ReactNode }) {
   return (
     <section className="grid grid-cols-[28px_1fr] gap-x-3">
-      <span className="font-mono text-[12px] text-[#A84A23] tabular pt-1">0{index}</span>
+      <span className="font-mono text-[12px] text-[#008751] tabular pt-1">0{index}</span>
       <div className="flex min-w-0 flex-col gap-3">
         <h3 className="font-headline text-lg font-bold text-on-surface">{title}</h3>
         <p className={cn('max-w-[60ch] text-sm leading-relaxed', demo ? 'placeholder-copy' : 'text-on-surface')}>{text}</p>
@@ -64,7 +64,7 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
           <button
             type="button"
             onClick={() => onOpenPlace(place.id)}
-            className="inline-flex w-fit items-center gap-1 text-[13px] text-[#A84A23] hover:underline"
+            className="inline-flex w-fit items-center gap-1 text-[13px] text-[#008751] hover:underline"
           >
             <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
             {place.name}, {place.state}
@@ -90,10 +90,10 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
       <figure
         className={cn(
           'flex gap-3 border-l-2 pl-4',
-          story.quote ? 'border-[#A84A23]' : 'border-dashed border-outline-variant',
+          story.quote ? 'border-[#008751]' : 'border-dashed border-outline-variant',
         )}
       >
-        <Quote className={cn('h-5 w-5 shrink-0', story.quote ? 'text-[#A84A23]' : 'text-on-surface-variant')} aria-hidden="true" />
+        <Quote className={cn('h-5 w-5 shrink-0', story.quote ? 'text-[#008751]' : 'text-on-surface-variant')} aria-hidden="true" />
         <blockquote className={cn('font-headline text-lg leading-snug font-semibold', story.quote ? 'text-on-surface' : 'text-on-surface-variant italic')}>
           {story.quote ?? 'Their own words go here, in one or two sentences.'}
         </blockquote>
@@ -142,7 +142,7 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
                     <FileText className="h-3 w-3" aria-hidden="true" />
                     {EVIDENCE_LABEL[i.evidence.type]} · {i.evidence.note}
                     {src && (
-                      <a href={src.url} target="_blank" rel="noreferrer" className="text-[#A84A23] hover:underline">
+                      <a href={src.url} target="_blank" rel="noreferrer" className="text-[#008751] hover:underline">
                         {src.publisher}
                       </a>
                     )}
@@ -190,12 +190,12 @@ export default function StoryPanel({ story, onOpenStory, onOpenPlace }: Props) {
                   </span>
                   <span className="min-w-0">
                     <span className="flex items-center gap-2">
-                      <span className="font-headline text-base font-bold text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
+                      <span className="font-headline text-base font-bold text-on-surface group-hover:text-[#008751]">{s.name}</span>
                       <DemoTag status={s.status} />
                     </span>
                     <span className="block truncate text-[12.5px] text-on-surface-variant">{s.role}</span>
                   </span>
-                  <ArrowRight className="h-4 w-4 text-on-surface-variant group-hover:text-[#A84A23]" />
+                  <ArrowRight className="h-4 w-4 text-on-surface-variant group-hover:text-[#008751]" />
                 </button>
               </li>
             ))}

@@ -38,16 +38,31 @@
   --color-secondary: #006399;
   --color-on-secondary-fixed: #001d32;
   --color-inverse-surface: #3a3128;
-  --color-surface-container-lowest: #fffdf9;
-  --color-surface-container-highest: #e8dfd2;
-  --color-primary: #2a1f17;
-  --color-on-secondary-container: #004972;
-  --color-error-container: #ffdad6;
-  --color-background: #fbf8f3;
-  --color-surface-container-high: #ebe2d5;
-  --color-on-secondary: #ffffff;
-  --color-on-primary-container: #c9b7a5;
-  --color-on-background: #2a231c;
+  --color-primary: #008751;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #e6f7ef;
+  --color-on-primary-container: #004d2e;
+  --color-prda-green: #008751;
+  --color-prda-green-dark: #005a36;
+  --color-prda-green-light: #e8f5ee;
+  --color-prda-red: #dc2626;
+  --color-prda-red-dark: #b91c1c;
+  --color-prda-red-light: #fef2f2;
+  --color-prda-gold: #d97706;
+  --color-prda-sand: #fbf9f5;
+
+  --color-surface-variant: #ede7dc;
+  --color-surface-container-low: #f7f2eb;
+  --color-surface-dim: #e4dbcd;
+  --color-surface-container: #f1ebd0;
+  --color-surface: #fbf9f5;
+  --color-on-surface: #1e293b;
+  --color-on-surface-variant: #526071;
+  --color-background: #fbf9f5;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-highest: #e8e0d4;
+  --color-outline-variant: #e2d9cd;
+  --color-outline: #8c8273;
 
   --font-headline: "Manrope", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -101,9 +116,9 @@
 /* ─── PRDA Impact Map additions (built on the Ababa tokens above) ─────── */
 html, body, #root { height: 100%; }
 body { color-scheme: light; }
-:focus-visible { outline: 2px solid #A84A23; outline-offset: 2px; }
+:focus-visible { outline: 2px solid #008751; outline-offset: 2px; }
 
-/* Placeholder portraits: clearly not a photo */
+/* Placeholder portraits: clearly marked when awaiting photography */
 .media-placeholder {
   background-color: var(--color-surface-container-low);
   background-image: repeating-linear-gradient(135deg, transparent 0 9px, var(--color-surface-container-high) 9px 10px);
@@ -115,17 +130,17 @@ body { color-scheme: light; }
   padding-left: 12px;
 }
 
-/* Basemap (vector, so it works without tile servers) */
-.leaflet-container { background: var(--color-surface-container-lowest); font-family: var(--font-body); }
+/* Basemap styling */
+.leaflet-container { background: #fbf9f5; font-family: var(--font-body); }
 .leaflet-container .leaflet-control-attribution { font-size: 10px; background: rgba(255,253,249,0.85); }
 .leaflet-tooltip.county-tip {
-  background: rgba(255,255,255,0.95);
-  border: 1px solid rgba(221,210,194,0.8);
+  background: rgba(255,255,255,0.98);
+  border: 1px solid rgba(0, 135, 81, 0.2);
   color: var(--color-on-surface);
   font: 600 11px var(--font-label);
   border-radius: 8px;
-  box-shadow: 0 4px 12px -4px rgba(0,0,0,0.15);
-  padding: 4px 8px;
+  box-shadow: 0 6px 16px -4px rgba(0, 135, 81, 0.15);
+  padding: 5px 9px;
 }
 .leaflet-tooltip.county-tip::before { display: none; }
 
@@ -139,41 +154,42 @@ body { color-scheme: light; }
   transform: translate(-50%, -50%);
   display: inline-block;
 }
-.map-label--state { font-size: 9px; color: rgba(106,93,79,0.5); }
+.map-label--state { font-size: 9px; color: rgba(82,96,113,0.65); font-weight: 800; }
 
-/* Place markers: Ababa's ping + white-bordered dot, with a persona marker where stories exist */
+/* Place markers: PRDA green ping + white-bordered dot, with persona marker where stories exist */
 .pm { position: absolute; inset: 0; display: grid; place-items: center; transition: transform 0.25s ease, opacity 0.25s ease; }
 .pm-ping {
-  position: absolute; inset: 0; border-radius: 9999px; background: var(--pm-color); opacity: 0.35;
-  animation: ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  position: absolute; inset: -4px; border-radius: 9999px; background: var(--pm-color); opacity: 0.45;
+  animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 .pm-dot {
-  position: relative; width: 12px; height: 12px; border-radius: 9999px;
-  background: var(--pm-color); border: 2px solid #fff;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--pm-color) 80%, transparent);
+  position: relative; width: 13px; height: 13px; border-radius: 9999px;
+  background: var(--pm-color); border: 2.5px solid #fff;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--pm-color) 85%, transparent);
 }
 .pm-persona {
-  position: relative; width: 30px; height: 30px; border-radius: 9999px;
-  background: #fff; color: #A84A23; border: 2.5px solid #A84A23;
+  position: relative; width: 32px; height: 32px; border-radius: 9999px;
+  background: #fff; color: #008751; border: 2.5px solid #008751;
   display: grid; place-items: center;
-  box-shadow: 0 4px 14px -2px rgba(168,74,35,0.4);
+  box-shadow: 0 4px 14px -2px rgba(0, 135, 81, 0.35);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .pm-count {
   position: absolute; top: -5px; right: -7px; min-width: 17px; height: 17px; padding: 0 4px;
-  border-radius: 9999px; background: #000; color: #fff; border: 2px solid #fff;
+  border-radius: 9999px; background: #008751; color: #fff; border: 2px solid #fff;
   font: 700 9.5px/13px var(--font-label); text-align: center;
 }
-.pm.is-hover { transform: scale(1.15); }
-.pm.is-selected { transform: scale(1.25); }
-.pm.is-selected .pm-persona { background: #A84A23; color: #fff; }
-.pm-persona.has-photo { width: 34px; height: 34px; overflow: visible; }
+.pm.is-hover { transform: scale(1.18); }
+.pm.is-selected { transform: scale(1.28); }
+.pm.is-selected .pm-persona { background: #008751; color: #fff; border-color: #008751; }
+.pm-persona.has-photo { width: 36px; height: 36px; overflow: visible; }
 .pm-persona.has-photo img { width: 100%; height: 100%; border-radius: 9999px; object-fit: cover; }
-.pm.is-selected .pm-persona.has-photo { background: #fff; box-shadow: 0 0 0 3px #A84A23, 0 4px 14px -2px rgba(168,74,35,0.5); }
-.pm.is-selected .pm-dot { width: 14px; height: 14px; }
+.pm.is-selected .pm-persona.has-photo { background: #fff; box-shadow: 0 0 0 3px #008751, 0 6px 18px -2px rgba(0, 135, 81, 0.45); }
+.pm.is-selected .pm-dot { width: 15px; height: 15px; }
 .pm.is-dim { opacity: 0.2; }
 .pm.is-dim .pm-ping { animation: none; opacity: 0; }
 .pm--quiet .pm-ping { animation: none; opacity: 0; }
-.pm--quiet.is-selected .pm-ping, .pm--quiet.is-hover .pm-ping { animation: ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite; opacity: 0.35; }
+.pm--quiet.is-selected .pm-ping, .pm--quiet.is-hover .pm-ping { animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; opacity: 0.4; }
 .is-far .pm { transform: scale(0.8); }
 .is-far .pm.is-hover { transform: scale(0.95); }
 .is-far .pm.is-selected { transform: scale(1.05); }
@@ -189,15 +205,34 @@ body { color-scheme: light; }
 .pm-label--left { right: calc(100% + 8px); top: 50%; transform: translateY(-50%); }
 .pm-label--top { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
 .pm-label--bottom { top: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
-.pm.is-selected .pm-label { color: #A84A23; }
+.pm.is-selected .pm-label { color: #008751; font-weight: 800; }
 .place-icon { background: transparent; border: 0; }
 .pm-label.is-hidden, .map-label.is-hidden { display: none; }
 .map-label--county {
   font-size: 10px; font-weight: 600; letter-spacing: 0.01em; text-transform: none;
-  color: rgba(106, 93, 79, 0.85);
+  color: rgba(82, 96, 113, 0.85);
   text-shadow: 0 0 2px #f4ecdf, 0 0 4px #f4ecdf, 0 0 6px #f4ecdf;
 }
 
+@keyframes radar-ping {
+  0% { transform: scale(0.85); opacity: 0.7; }
+  60% { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .pm-ping { animation: none !important; }

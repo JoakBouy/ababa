@@ -46,12 +46,12 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
               return (
                 <li key={s.id} className={cn('min-w-0 transition-opacity', dim && 'opacity-45')}>
                   <button type="button" onClick={() => onOpenStory(s.id)} className="group flex w-full flex-col gap-2.5 text-left">
-                    <span className="block aspect-[4/5] w-full max-w-full overflow-hidden rounded-2xl border border-outline-variant/30 ring-[#A84A23] transition group-hover:ring-2">
+                    <span className="block aspect-[4/5] w-full max-w-full overflow-hidden rounded-2xl border border-outline-variant/30 ring-[#008751] transition group-hover:ring-2">
                       <Portrait story={s} />
                     </span>
                     <span className="flex flex-col gap-1">
                       <span className="flex items-center gap-2">
-                        <span className="font-headline text-base font-bold leading-tight text-on-surface group-hover:text-[#A84A23]">{s.name}</span>
+                        <span className="font-headline text-base font-bold leading-tight text-on-surface group-hover:text-[#008751]">{s.name}</span>
                         <DemoTag status={s.status} />
                       </span>
                       <span className="text-[12.5px] leading-snug text-on-surface-variant">{s.role}</span>
@@ -111,7 +111,7 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
                     {p.facts.map((f) => (
                       <li key={f.text} className="text-[13px] leading-snug text-on-surface">
                         {f.text}{' '}
-                        <a href={sources[f.sourceId]?.url} target="_blank" rel="noreferrer" className="text-[11.5px] text-[#A84A23] hover:underline">
+                        <a href={sources[f.sourceId]?.url} target="_blank" rel="noreferrer" className="text-[11.5px] text-[#008751] hover:underline">
                           {sources[f.sourceId]?.publisher}
                         </a>
                       </li>
@@ -135,6 +135,25 @@ export default function PlacePanel({ place, sector, onOpenStory }: Props) {
               </span>
             </p>
           ))}
+        </section>
+      )}
+
+      {place.subCounties && place.subCounties.length > 0 && (
+        <section className="flex flex-col gap-3" aria-labelledby="place-subcounties">
+          <SectionHeading aside={`${place.subCounties.length} payams`}>
+            <span id="place-subcounties">Active Payams & Sub-Counties</span>
+          </SectionHeading>
+          <div className="flex flex-wrap gap-2">
+            {place.subCounties.map((sub) => (
+              <span
+                key={sub}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant/40 bg-surface-container-low px-3 py-1.5 text-xs font-semibold text-on-surface hover:border-[#008751]/50 transition-colors"
+              >
+                <MapPin className="h-3 w-3 text-[#008751]" />
+                {sub}
+              </span>
+            ))}
+          </div>
         </section>
       )}
 

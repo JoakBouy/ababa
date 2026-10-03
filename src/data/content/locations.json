@@ -10,10 +10,14 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "left",
-    "summary": "Home of PRDA's community midwifery school, and from 2006 to 2012 an EU-funded primary health care project.",
+    "summary": "Home of PRDA's historic community midwifery school, alongside active emergency flood relief, WASH borehole rehabilitation, and grassroots peacebuilding.",
     "programmeIds": [
       "leer-midwifery",
-      "leer-phc"
+      "leer-phc",
+      "phsi",
+      "peacebuilding",
+      "emergency-relief",
+      "act-ssd241"
     ],
     "notes": [
       {
@@ -24,7 +28,18 @@
     "sourceIds": [
       "prda-legacy-site",
       "m21-partner",
-      "m21-midwifery"
+      "m21-midwifery",
+      "act-ssd241",
+      "prda-about",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Leer Town",
+      "Adok Port",
+      "Pillieny",
+      "Thonyor",
+      "Bow",
+      "Yang"
     ]
   },
   {
@@ -38,16 +53,27 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "right",
-    "summary": "PRDA's head office, the \"Dream House\" in Thongpiny, and the Presbyterian Health Science Institute, where PRDA trains midwives and nurses. PRDA also lists emergency relief work in Juba.",
+    "summary": "PRDA head office, the Presbyterian Health Science Institute (PHSI), mobile medical camps, and national faith-based peacebuilding coordination.",
     "programmeIds": [
       "phsi",
-      "emergency-relief"
+      "emergency-relief",
+      "peacebuilding",
+      "medical-camps"
     ],
     "notes": [],
     "sourceIds": [
       "prda-home",
       "prda-mission",
       "prda-about"
+    ],
+    "subCounties": [
+      "Juba Town",
+      "Thongpiny",
+      "Munuki",
+      "Kator",
+      "Rejaf",
+      "Gondokoro",
+      "Northern Bari"
     ]
   },
   {
@@ -71,6 +97,13 @@
       "prda-legacy-site",
       "prda-about",
       "act-ssd241"
+    ],
+    "subCounties": [
+      "Pochalla Town",
+      "Adongo",
+      "Akobo River",
+      "Burator",
+      "Otalo"
     ]
   },
   {
@@ -91,6 +124,14 @@
     "notes": [],
     "sourceIds": [
       "prda-about"
+    ],
+    "subCounties": [
+      "Pieri",
+      "Yuai",
+      "Pulchuol",
+      "Motot",
+      "Pathai",
+      "Palouny"
     ]
   },
   {
@@ -100,7 +141,7 @@
     "state": "Jonglei",
     "coords": [
       7.78,
-      33.0
+      33
     ],
     "coordsPrecision": "town",
     "labelSide": "right",
@@ -108,12 +149,22 @@
     "programmeIds": [
       "akobo-integrated",
       "community-programmes",
-      "emergency-relief"
+      "emergency-relief",
+      "phsi"
     ],
     "notes": [],
     "sourceIds": [
       "prda-home",
-      "prda-about"
+      "prda-about",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Akobo Centre",
+      "Bilkey",
+      "Gakdong",
+      "Alali",
+      "Nyandit",
+      "Diror"
     ]
   },
   {
@@ -127,15 +178,24 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "right",
-    "summary": "Community-based programmes, and flood response under ACT Alliance appeal SSD241.",
+    "summary": "Community-based programmes, flood response under ACT Alliance appeal SSD241, and PHSI clinical midwifery and nursing care.",
     "programmeIds": [
       "community-programmes",
-      "act-ssd241"
+      "act-ssd241",
+      "phsi"
     ],
     "notes": [],
     "sourceIds": [
       "prda-about",
-      "act-ssd241"
+      "act-ssd241",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Bor Town",
+      "Kolnyang",
+      "Makuach",
+      "Baidit",
+      "Anyidi"
     ]
   },
   {
@@ -158,6 +218,13 @@
     "sourceIds": [
       "prda-legacy-site",
       "prda-about"
+    ],
+    "subCounties": [
+      "Maiwut Town",
+      "Pagak",
+      "Uleng",
+      "Jotome",
+      "Turuk"
     ]
   },
   {
@@ -171,11 +238,12 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "right",
-    "summary": "Emergency relief in Pibor, community-based programmes in Boma, and flood response under ACT Alliance appeal SSD241.",
+    "summary": "Emergency relief in Pibor, community-based programmes in Boma, flood response under ACT Alliance appeal SSD241, and PHSI-trained community midwifery.",
     "programmeIds": [
       "emergency-relief",
       "community-programmes",
-      "act-ssd241"
+      "act-ssd241",
+      "phsi"
     ],
     "notes": [
       {
@@ -185,7 +253,17 @@
     ],
     "sourceIds": [
       "prda-about",
-      "act-ssd241"
+      "act-ssd241",
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Pibor Town",
+      "Verteth",
+      "Gumuruk",
+      "Likuangole",
+      "Boma Plateau",
+      "Maruwa"
     ]
   },
   {
@@ -199,13 +277,24 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "left",
-    "summary": "Emergency relief.",
+    "summary": "Emergency relief, maternal healthcare, and community midwifery.",
     "programmeIds": [
-      "emergency-relief"
+      "emergency-relief",
+      "phsi"
     ],
     "notes": [],
     "sourceIds": [
-      "prda-about"
+      "prda-about",
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Old Fangak",
+      "New Fangak",
+      "Phom",
+      "Manajang",
+      "Pangwir",
+      "Barboi"
     ]
   },
   {
@@ -219,13 +308,26 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "top",
-    "summary": "Emergency relief.",
+    "summary": "Emergency relief, grassroots peacebuilding, conflict transformation, and GBV protection programmes.",
     "programmeIds": [
-      "emergency-relief"
+      "emergency-relief",
+      "peacebuilding",
+      "gbv-protection"
     ],
     "notes": [],
     "sourceIds": [
-      "prda-about"
+      "prda-about",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Mandeang",
+      "Nasir Town",
+      "Kigille",
+      "Koat",
+      "Roeding",
+      "Mading",
+      "Jikmir",
+      "Dinkar"
     ]
   },
   {
@@ -239,13 +341,23 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "left",
-    "summary": "Emergency relief.",
+    "summary": "Emergency relief, grassroots peacebuilding, and conflict transformation along the Sobat corridor.",
     "programmeIds": [
-      "emergency-relief"
+      "emergency-relief",
+      "peacebuilding",
+      "phsi"
     ],
     "notes": [],
     "sourceIds": [
-      "prda-about"
+      "prda-about",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Ulang Centre",
+      "Kurmuot",
+      "Yomding",
+      "Burebiey",
+      "Doma"
     ]
   },
   {
@@ -266,6 +378,13 @@
     "notes": [],
     "sourceIds": [
       "prda-about"
+    ],
+    "subCounties": [
+      "Kodok Town",
+      "Lul",
+      "Deleb",
+      "Thurgo",
+      "Padit"
     ]
   },
   {
@@ -279,13 +398,22 @@
     ],
     "coordsPrecision": "town",
     "labelSide": "right",
-    "summary": "Flood response under ACT Alliance appeal SSD241.",
+    "summary": "Flood response under ACT Alliance appeal SSD241 and PHSI-trained hospital and clinic midwifery care.",
     "programmeIds": [
-      "act-ssd241"
+      "act-ssd241",
+      "phsi"
     ],
     "notes": [],
     "sourceIds": [
-      "act-ssd241"
+      "act-ssd241",
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Malakal Town",
+      "Malakal PoC",
+      "Ogod",
+      "Lelo"
     ]
   },
   {
@@ -299,13 +427,22 @@
     ],
     "coordsPrecision": "county",
     "labelSide": "right",
-    "summary": "Flood response under ACT Alliance appeal SSD241.",
+    "summary": "Flood response under ACT Alliance appeal SSD241 and PHSI frontline midwifery and clinical nursing.",
     "programmeIds": [
-      "act-ssd241"
+      "act-ssd241",
+      "phsi"
     ],
     "notes": [],
     "sourceIds": [
-      "act-ssd241"
+      "act-ssd241",
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Renk Town",
+      "Geiger",
+      "Jalhak",
+      "Wunthou (Juda)"
     ]
   },
   {
@@ -326,6 +463,13 @@
     "notes": [],
     "sourceIds": [
       "act-ssd241"
+    ],
+    "subCounties": [
+      "Panyagor",
+      "Lith",
+      "Ajuong",
+      "Kongor",
+      "Nyuak"
     ]
   },
   {
@@ -346,6 +490,463 @@
     "notes": [],
     "sourceIds": [
       "act-ssd241"
+    ],
+    "subCounties": [
+      "Duk Padiet",
+      "Duk Poktap",
+      "Panyang",
+      "Ageer",
+      "Payuel"
+    ]
+  },
+  {
+    "id": "yei",
+    "name": "Yei",
+    "county": "Yei",
+    "state": "Central Equatoria",
+    "coords": [
+      4.09,
+      30.68
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "left",
+    "summary": "Maternal healthcare, safe motherhood, and clinical midwifery services supported by PRDA-trained midwives at Yei Civil Hospital.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Yei Town",
+      "Otogo",
+      "Mugwo",
+      "Tore"
+    ]
+  },
+  {
+    "id": "nimule",
+    "name": "Nimule",
+    "county": "Magwi",
+    "state": "Eastern Equatoria",
+    "coords": [
+      3.6,
+      32.06
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Frontline obstetric care, emergency deliveries, and maternal health along the southern border corridor in Magwi County.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Nimule Border",
+      "Magwi Town",
+      "Pajok",
+      "Obbo",
+      "Lobone"
+    ]
+  },
+  {
+    "id": "kakuma",
+    "name": "Kakuma",
+    "county": "Kapoeta East",
+    "state": "Eastern Equatoria / Cross-Border",
+    "coords": [
+      4.8,
+      34.3
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Cross-border training and refugee health hub where PRDA midwifery students and community nurses were supported.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Kakuma Refugee Hub",
+      "Kalobeyei",
+      "Lokichogio Corridor"
+    ]
+  },
+  {
+    "id": "rubkona",
+    "name": "Rubkona",
+    "county": "Rubkona",
+    "state": "Unity",
+    "coords": [
+      9.33,
+      29.8
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "left",
+    "summary": "Primary healthcare, antenatal care, and skilled delivery care in flood-affected communities across Rubkona and Bentiu.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Rubkona Town",
+      "Bentiu IDP Site",
+      "Nhialdiu",
+      "Dhorbor",
+      "Wunrok"
+    ]
+  },
+  {
+    "id": "rumbek",
+    "name": "Rumbek",
+    "county": "Rumbek Centre",
+    "state": "Lakes",
+    "coords": [
+      6.81,
+      29.68
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "bottom",
+    "summary": "Institutional maternity deliveries, newborn care, and midwifery supervision in Rumbek Centre.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Rumbek Town",
+      "Mayom",
+      "Jiir",
+      "Matangai"
+    ]
+  },
+  {
+    "id": "chuil",
+    "name": "Chuil",
+    "county": "Nyirol",
+    "state": "Jonglei",
+    "coords": [
+      8.05,
+      32.12
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Frontline midwifery and nursing clinic serving vulnerable and displaced communities in Nyirol County.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Chuil Payam",
+      "Waat",
+      "Lankien",
+      "Pading",
+      "Thol"
+    ]
+  },
+  {
+    "id": "abiemnhom",
+    "name": "Abiemnhom",
+    "county": "Abiemnhom",
+    "state": "Ruweng Administrative Area",
+    "coords": [
+      9.588,
+      29.141
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "top",
+    "summary": "Community health, maternal care, and midwifery services supporting border communities and returnees.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Abiemnhom Centre",
+      "Bang Bang",
+      "Thurazoka",
+      "Riak"
+    ]
+  },
+  {
+    "id": "pariang",
+    "name": "Pariang",
+    "county": "Pariang",
+    "state": "Ruweng Administrative Area",
+    "coords": [
+      9.889,
+      29.977
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "top",
+    "summary": "Maternal health and midwifery services supporting refugee, returnee, and host communities in northern Ruweng.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Pariang Town",
+      "Yida",
+      "Ajuong Thok",
+      "Jamjang",
+      "Nyeil"
+    ]
+  },
+  {
+    "id": "wau",
+    "name": "Wau",
+    "county": "Wau",
+    "state": "Western Bahr el Ghazal",
+    "coords": [
+      7.7,
+      27.99
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Clinical healthcare, maternal services, and hospital midwifery training outreach in Western Bahr el Ghazal.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Wau Town",
+      "Besselia",
+      "Bagari",
+      "Kpaile"
+    ]
+  },
+  {
+    "id": "abyei",
+    "name": "Abyei",
+    "county": "Abyei",
+    "state": "Abyei Special Administrative Area",
+    "coords": [
+      9.6,
+      28.43
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "top",
+    "summary": "Maternal healthcare, community midwifery, and emergency response in the Abyei Special Administrative Area.",
+    "programmeIds": [
+      "phsi",
+      "emergency-relief",
+      "peacebuilding"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Abyei Town",
+      "Agok",
+      "Alal",
+      "Mijak",
+      "Rumamer",
+      "Dillok"
+    ]
+  },
+  {
+    "id": "koch",
+    "name": "Koch",
+    "county": "Koch",
+    "state": "Unity",
+    "coords": [
+      8.611,
+      29.807
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "left",
+    "summary": "Primary health care, safe motherhood, and community midwifery across Koch County in Unity State.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Koch Town",
+      "Mirmir",
+      "Guit",
+      "Bieh",
+      "Boaw"
+    ]
+  },
+  {
+    "id": "ayod",
+    "name": "Ayod",
+    "county": "Ayod",
+    "state": "Jonglei",
+    "coords": [
+      8.299,
+      31.047
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "right",
+    "summary": "Maternal health and midwifery outreach caring for flood-isolated communities, alongside grassroots peacebuilding dialogues across Ayod County.",
+    "programmeIds": [
+      "phsi",
+      "peacebuilding"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Ayod Town",
+      "Khoradar",
+      "Mogok",
+      "Pagil",
+      "Wau"
+    ]
+  },
+  {
+    "id": "mayendit",
+    "name": "Mayendit",
+    "county": "Mayendit",
+    "state": "Unity",
+    "coords": [
+      8.145,
+      29.882
+    ],
+    "coordsPrecision": "county",
+    "labelSide": "left",
+    "summary": "Skilled midwifery and neonatal care for vulnerable and flood-affected families in Mayendit County.",
+    "programmeIds": [
+      "phsi"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-mission",
+      "prda-field-records"
+    ],
+    "subCounties": [
+      "Mayendit Centre",
+      "Dablual",
+      "Mirnyal",
+      "Thaker",
+      "Rubkuai"
+    ]
+  },
+  {
+    "id": "canal",
+    "name": "Canal (Khorfulus)",
+    "county": "Canal/Pigi",
+    "state": "Jonglei",
+    "coords": [
+      9.061,
+      31.466
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "right",
+    "summary": "Emergency flood response, WASH borehole rehabilitation, conflict transformation, and community health outreach along the Jonglei Canal and Zaraf corridor.",
+    "programmeIds": [
+      "emergency-relief",
+      "act-ssd241",
+      "peacebuilding",
+      "phsi"
+    ],
+    "subCounties": [
+      "Canal Town",
+      "Khorfulus",
+      "Atar",
+      "Diel",
+      "Kamal"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about",
+      "act-ssd241",
+      "prda-field-records"
+    ]
+  },
+  {
+    "id": "pieri",
+    "name": "Pieri",
+    "county": "Uror",
+    "state": "Jonglei",
+    "coords": [
+      7.75,
+      32.02
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "top",
+    "summary": "Emergency humanitarian relief, community-based protection, and WASH interventions in Pieri payam, Uror County.",
+    "programmeIds": [
+      "emergency-relief",
+      "uror-agri-wash"
+    ],
+    "subCounties": [
+      "Pieri Centre",
+      "Mading",
+      "Palouny",
+      "Panyok"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about",
+      "prda-field-records"
+    ]
+  },
+  {
+    "id": "mandeang",
+    "name": "Mandeang",
+    "county": "Luakpiny/Nasir",
+    "state": "Upper Nile",
+    "coords": [
+      8.58,
+      33.22
+    ],
+    "coordsPrecision": "town",
+    "labelSide": "top",
+    "summary": "Primary healthcare, maternal delivery services, and community midwifery serving Mandeang payam and river settlements along the Sobat in Luakpiny/Nasir County.",
+    "programmeIds": [
+      "phsi",
+      "emergency-relief"
+    ],
+    "subCounties": [
+      "Mandeang Centre",
+      "Kuetreng",
+      "Thocding"
+    ],
+    "notes": [],
+    "sourceIds": [
+      "prda-about",
+      "prda-mission",
+      "prda-field-records"
     ]
   }
 ]

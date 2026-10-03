@@ -54,6 +54,7 @@ export interface Place {
   labelSide: 'left' | 'right' | 'top' | 'bottom';
   summary: string;
   programmeIds: string[];
+  subCounties?: string[];
   notes: PlaceNote[];
   sourceIds: string[];
 }
